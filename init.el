@@ -2,8 +2,6 @@
 ;;; Commentary:
 ; Not enthused about the opinionated spacemacs
 ; attempting to recreate it here
-; Packages and stuff
-
 
 ;;; Code:
 (require 'package)
@@ -13,13 +11,34 @@
 
 (package-initialize)
 
-(setq use-package-always-ensure t)
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
 
 (eval-when-compile
   (require 'use-package))
+
+(setq
+  abbrev-file-name "~/.emacs.d/abbrev_defs.el"
+  backup-directory-alist `(("." . "~/.emacs.d/backups/"))
+  initial-scratch-message nil
+  use-package-always-ensure t
+  isearch-regexp nil
+  save-abbrevs 'silently
+  )
+
+(use-package undo-tree
+  :config
+  (global-undo-tree-mode)
+  (setq 
+    undo-tree-auto-save-history t
+    )
+  )
+
+(setq-default flycheck-disabled-checker '(emacs-lisp-checkdoc))
+(auto-revert-mode)
+
+(add-to-list 'load-path "lisp")
 
 (use-package ido
   :config
@@ -28,7 +47,12 @@
     ido-everywhere t)
   )
 
-; (use-package magit)
+(use-package magit)
+
+(use-package git-gutter
+  :config
+  (global-git-gutter-mode 1)
+  )
 
 (use-package anzu
   :config
@@ -39,7 +63,10 @@
   :defines helm-M-x-fuzzy-match
   :config
   (global-set-key (kbd "M-x") 'helm-M-x)
-  (setq helm-M-x-fuzzy-match t)
+  (setq
+    helm-M-x-fuzzy-match t
+    helm-autoresize-max-height 10
+    )
   )
 
 (use-package haskell-mode
@@ -63,6 +90,7 @@
   :config
   (global-flycheck-mode)
   )
+
 ; todo....
 ;; (use-package ido-ubiquitous
 ;;   :config
@@ -86,13 +114,13 @@
     )
   )
 
-(use-package fuzzy
-  :config
-  (setq
-    fuzzy-match-accept-error-rate .5
-    fuzzy-match-accept-length-difference 20
-    )
-  )
+;; (use-package fuzzy
+;;   :config
+;;   (setq
+;;     fuzzy-match-accept-error-rate .5
+;;     fuzzy-match-accept-length-difference 20
+;;     )
+;;   )
 
 
 ;; (defun my-company-hook ()
@@ -126,12 +154,13 @@
   :config
   (global-evil-surround-mode 1))
 
-;; (use-package shackle
-;;   :config
-;;   (shackle-mode)
-;;   (setq shackle-rules '(("\\`\\*helm.*?\\*\\'" :regexp t :align t :ratio 0.4)))
-;;   ;; (setq shackle-default-rule '(:same t))
-;;   )
+(use-package shackle
+  :config
+  (shackle-mode)
+  (setq shackle-rules '(("\\`\\*helm.*?\\*\\'" :regexp t :other t :ratio 0.3))
+    ;; shackle-default-rule '(:align t)
+    )
+  )
 
 (use-package mmm-mode
    :config
@@ -151,7 +180,8 @@
   (save-excursion
     (forward-line)
     (move-beginning-of-line 1)
-    (newline))
+    (newline)
+  )
 )
 
 (defun insert-newline-before ()
@@ -183,7 +213,8 @@
     "i" 'edit-init
     "v" 'eval-last-sexp
     "b" 'eval-buffer
-    "," 'previous-buffer
+    ; todo "," 'append-comma
+    ;; "," 'previous-buffer
     )
   )
 
@@ -211,6 +242,8 @@
   (define-key evil-visual-state-map (kbd "V") 'evil-a-paragraph)
   (define-key evil-operator-state-map (kbd "V") 'evil-a-paragraph)
   (define-key evil-normal-state-map (kbd "RET") 'delete-other-windows)
+  (define-key evil-normal-state-map (kbd "M-RET") 'my-toggle-frame-maximized)
+  (define-key evil-normal-state-map (kbd "] c") 'git-gutter:next-hunk)
 
   ;; todo
   ;; (define-key haskell-error-mode-map (kbd "q") 'quit-window)
@@ -257,11 +290,6 @@
   (eshell-send-input)
   )
 
-(setq
-  undo-tree-auto-save-history t
-  isearch-regexp nil
-  )
-
 (add-to-list 'auto-mode-alist '("\\.http\\'" . restclient-mode))
 
 (use-package virtualenvwrapper
@@ -282,7 +310,7 @@
   (local-set-key (kbd "C-a") 'previous-line)
   ;; (local-set-key (kbd "<tab>") 'ac-fuzzy-complete)
   (local-set-key (kbd "C-p") 'eshell-previous-matching-input-from-input)
-  (local-set-key (kbd "<tab>") 'pcomplete-list)
+  ;; (local-set-key (kbd "<tab>") 'pcomplete-list)
   (define-key evil-insert-state-map (kbd "C-c") 'eshell-interrupt-process)
   (define-key evil-insert-state-map (kbd "C-a") 'eshell-bol)
   ;; (local-set-key (kbd "<tab>") 'company-complete)
@@ -312,10 +340,15 @@
 
 (set-face-attribute 'default nil :height 182)
 
-(setq ns-auto-hide-menu-bar t)
+(defun my-toggle-frame-maximized ()
+  (interactive)
+  (setq ns-auto-hide-menu-bar t)
+  (set-frame-position nil 0 -24)
+  (set-frame-size nil 128 43)
+  )
+
 (tool-bar-mode 0)
 (menu-bar-mode -1)
-(setq scratch-initial-message nil)
 (setq inhibit-splash-screen t)
 (setq inhibit-startup-message t)
 
@@ -327,22 +360,10 @@
 (defun save-if-file ()
   (if (buffer-file-name)
     (save-buffer)
-    ;; (message "no file is associated to this buffer")
   )
 )
 
-(defun s-trim-left (s)
-  "Remove whitespace at the beginning of S."
-  (if (string-match "\\`[ \t\n\r]+" s)
-      (replace-match "" t t s)
-    s))
-
-(defun s-trim-right (s)
-  "Remove whitespace at the end of S."
-  (if (string-match "[ \t\n\r]+\\'" s)
-      (replace-match "" t t s)
-    s))
-
+(require 'utils "~/.emacs.d/lisp/utils.el")
 (defun s-trim (s)
   "Remove whitespace at the beginning and end of a string."
   (s-trim-left (s-trim-right s)))
@@ -358,11 +379,14 @@
 )
 
 
+; todo!!
 (setq-default indent-tabs-mode nil)
 (setq tab-width 2)
 
 (add-hook 'emacs-lisp-mode-hook (lambda ()
-   (setq evil-shift-width 2)))
+  (abbrev-mode)
+  (setq evil-shift-width 2)))
+
 ;(use-package icicles
 ; (setq eshell-cmpl-cycle-completions t)
 ; (setq pcomplete-cycle-completions t)
@@ -373,11 +397,6 @@
 (setq eshell-smart-space-goes-to-end t)
 
 (global-set-key (kbd "C-j") 'newline-and-indent)
-(setq backup-directory-alist `(("." . "~/.emacs.d/backups/")))
-(set-frame-position nil 0 -25)
-(set-frame-size nil 129 43)
-(setq abbrev-mode t)
-(setq abbrev-file-name "~/.emacs.d/abbrev_defs.el")
 (define-abbrev global-abbrev-table "g" "git")
 
 (define-key isearch-mode-map (kbd "C-j") 'isearch-done)
@@ -396,8 +415,10 @@
 (setq eshell-banner-message "")
 ;; (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
 
-(use-package monokai-theme)
-(load-theme 'monokai t)
+(use-package monokai-theme
+  :config
+  (load-theme 'monokai t)
+  )
 
 (use-package pony-mode)
 
@@ -405,51 +426,19 @@
 ; todo
 ; VV ?
 ; i c-l
-
-(defun ac-pcomplete ()
-  ;; eshell uses `insert-and-inherit' to insert a \t if no completion
-  ;; can be found, but this must not happen as auto-complete source
-  (flet ((insert-and-inherit (&rest args)))
-    ;; this code is stolen from `pcomplete' in pcomplete.el
-    (let* (tramp-mode ;; do not automatically complete remote stuff
-           (pcomplete-stub)
-           (pcomplete-show-list t) ;; inhibit patterns like * being deleted
-           pcomplete-seen pcomplete-norm-func
-           pcomplete-args pcomplete-last pcomplete-index
-           (pcomplete-autolist pcomplete-autolist)
-           (pcomplete-suffix-list pcomplete-suffix-list)
-           (candidates (pcomplete-completions))
-           (beg (pcomplete-begin))
-           ;; note, buffer text and completion argument may be
-           ;; different because the buffer text may bet transformed
-           ;; before being completed (e.g. variables like $HOME may be
-           ;; expanded)
-           (buftext (buffer-substring beg (point)))
-           (arg (nth pcomplete-index pcomplete-args)))
-      ;; we auto-complete only if the stub is non-empty and matches
-      ;; the end of the buffer text
-      (when (and (not (zerop (length pcomplete-stub)))
-                    (string= pcomplete-stub ; Emacs 24
-                            (substring arg
-                                        (max 0
-                                            (- (length arg)
-                                                (length pcomplete-stub))))))
-        ;; Collect all possible completions for the stub. Note that
-        ;; `candidates` may be a function, that's why we use
-        ;; `all-completions`.
-        (let* ((cnds (all-completions pcomplete-stub candidates))
-               (bnds (completion-boundaries pcomplete-stub
-                                            candidates
-                                            nil
-                                            ""))
-               (skip (- (length pcomplete-stub) (car bnds))))
-          ;; We replace the stub at the beginning of each candidate by
-          ;; the real buffer content.
-          (mapcar #'(lambda (cand) (concat buftext (substring cand skip)))
-                  cnds))))))
-
-;; (defvar ac-source-pcomplete
-;;   '((candidates . ac-pcomplete)))
-
-;; (defvar ac-source-library
-;;   '((candidates . (list "Library"))))
+; wip move stuff into own files
+; hide undo-tree files
+; automatic space after semicolon
+; auto save abbrev defs
+                                        ; eshell
+; jump to next input line
+; git status -sb
+; space as first char to switch back to other frame
+; git colored output
+; trim trailing whitespace
+; `. goto last changed spot
+; turn off elisp doccheck
+; easy way to define abbrev
+; paste setq combine
+;; http://acroca.com/blog/2013/09/13/speed-up-github-connection.html
+;

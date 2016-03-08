@@ -1,0 +1,128 @@
+brew update
+cd /usr/local/Library/Taps/caskroom
+ls
+cd homebrew-versions
+ls
+git pull
+brew update
+cd ~
+brew upgrade
+git --version
+which git
+/usr/local/bin/git
+/usr/local/bin/git --version
+ecoh $PATH
+echo $PATH
+e ~/.emacs.d/eshell/profile
+e ~/.gist
+git --version
+setenv "PATH" (concat "/usr/local/bin:" (getenv "PATH"))
+git --versoin
+git --version
+echo $PATH
+which git
+eshell-path-env
+echo $eshell-path-env
+setq eshell-path-env (concat "/usr/local/bin:" eshell-path-env)
+git --version
+e ~/.emacs.d/eshell/profile
+echo $PATH
+git --version
+sleep 5
+sleep 5 &
+ls
+fg
+date
+jobs
+sleep 5 &
+jobs
+echo $_
+sleep 1
+echo $_
+e ~/.emacs.d/eshell/profile
+cd code/clint
+cat init.el
+cat init.el
+shell-smart-initialize
+eshell-smart-initialize
+cat init.el
+cat init.el
+ls
+who
+ls
+ls
+ls
+cd ~/code/clint
+-
+cd -
+ls
+cat init.el
+who
+e init.el
+cd code/trade
+cd code
+ls
+..
+ls
+cd hack/trade
+ls
+jupyter notebook
+ls
+python indicators.py
+python indicators.py
+python indicators.py
+python
+mv ~/Downloads/city.list.json.gz .
+ls
+gunzip city.list.json.gz
+ls
+ff city.list.json
+find-file city.list.json
+e indicators.py
+pip install pyfmt
+pip install --upgrade pip
+ls
+pyfmt
+time pyfmt
+time pyfmt
+ls
+pyfmt -i indicators.py
+pyfmt -i indicators.py
+pyfmt -i indicators.py
+0.256 secs
+cat indicators.py
+git status
+git pull
+python
+python indicators.py 
+python indicators.py 
+python indicators.py 
+python indicators.py 
+pip install requests
+pip install --upgrade requests
+python indicators.py 
+python indicators.py 
+pbpaste > wunderground.txt
+cat wunderground.txt 
+pbpaste > openweathermap.txt
+cat openweathermap.txt 
+git status
+git add indicators.py 
+mv indicators.py raw_data.py
+ls
+git add raw_data.py 
+git commit -m 'Add script to generate raw data lists from date range'
+ls
+git reset @^
+git status
+git add raw_data.py 
+git commit -m 'Add script to generate raw data lists from date range'
+git push
+gs
+gs
+cd ~/.emacs.d/
+ls
+cat utils.el 
+mkdir lisip
+mv lisip/ lisp
+mv utils.el lisp/
