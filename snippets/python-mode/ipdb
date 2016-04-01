@@ -1,3 +1,5 @@
+# -*- mode: snippet -*-
 # name: ipdb
 # key: i
+# --
 import ipdb; ipdb.set_trace()

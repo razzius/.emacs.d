@@ -1,2 +1,0 @@
-setq eshell-path-env (concat "/usr/local/bin:" eshell-path-env) > /dev/null
-setenv "PATH" (concat "/usr/local/bin:" (getenv "PATH")) > /dev/null
