@@ -21,9 +21,12 @@
   save-abbrevs 'silently
   indent-tabs-mode nil
   tab-width 2
+  js-indent-level 2
 ; todo!!
   ns-pop-up-frames nil
   vc-follow-symlinks t
+  frame-title-format "%f"
+  ;; tags-file-name "~/code/clint/etags"
   )
 
 (server-start)
@@ -42,7 +45,14 @@
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ; todo (these work now)
-;; (add-hook 'focus-out-hook 'save-buffer)
+(defun razzi/focus-out-hook ()
+  (interactive)
+  (message "focus OUT")
+  (evil-normal-state)
+  (save-if-file)
+  )
+
+(add-hook 'focus-out-hook 'razzi/focus-out-hook)
 ;; (add-hook 'focus-in-hook (lambda () (interactive) (save-buffer)))
 
 ;; (use-package focus-autosave-mode
@@ -52,15 +62,20 @@
 
 (use-package thingatpt)
 
+(use-package highlight-numbers
+  :config
+  (highlight-numbers-mode)
+  )
+
 (use-package fish-mode)
 
-(use-package undo-tree
-  :config
-  (global-undo-tree-mode)
-  (setq
-    undo-tree-auto-save-history t
-    )
-  )
+;; (use-package undo-tree
+;;   :config
+;;   (global-undo-tree-mode)
+;;   (setq
+;;     undo-tree-auto-save-history t
+;;     )
+;;   )
 
 
 (add-to-list 'load-path "lisp")
@@ -94,6 +109,9 @@
   (setq
     helm-M-x-fuzzy-match t
     helm-autoresize-max-height 10
+    helm-buffers-fuzzy-matching t
+    helm-recentf-fuzzy-matching t
+    helm-find-file-fuzzy-matching t
     )
   )
 
@@ -244,10 +262,10 @@
   (interactive)
   (move-beginning-of-line nil)
   (let ((sentence (thing-at-point 'sentence)))
-    (insert "\n\n")
     (message "sentence is")
     (message sentence)
-    ;; (insert sentence)
+    (insert sentence)
+    (insert "\n\n")
     ; TODO
     )
   )
@@ -263,36 +281,74 @@
   (message "TODO")
   )
 
+(defun razzi/yank-file-name ()
+  (interactive)
+  (kill-new (buffer-file-name))
+  )
+
+(defun razzi/append-comma ()
+  (interactive)
+  (evil-append 0 0 nil)
+  (move-end-of-line nil)
+  (insert ",")
+  (evil-normal-state)
+  )
+
+(defun razzi/magit-checkout-file ()
+  (interactive)
+					; todo get current branch (revision)
+  ; todo get current file
+  (magit-checkout-file "HEAD" (buffer-file-name))
+  )
+
+(add-to-list 'load-path "~/.emacs.d/helm-projectile")
+(require 'helm-projectile)
+; (use-package helm-projectile)
+
 (use-package evil-leader
   :config
   (global-evil-leader-mode)
   (evil-leader/set-leader "<SPC>")
   (evil-leader/set-key
-    "SPC" 'save-buffer
-    "e" 'eshell
-    "s" 'switch-to-scratch
+    "," 'razzi/append-comma
+    ";" 'previous-buffer
+    "A" 'add-global-abbrev
+    "C" 'razzi/magit-checkout-file
     "DEL" 'restart-emacs
+    "SPC" 'save-buffer
+    "a" 'add-global-abbrev
+    "b" 'magit-blame
+    "c" 'razzi/copy-paragraph
+    "e" 'eshell
+    "f" 'razzi/yank-file-name
+    "g" 'magit-status
+    "i" 'edit-init
+    "j" 'avy-goto-char
+    "k" 'edit-private-xml
+    "m" 'razzi/show-messages
     "o" 'put-after
     "q" 'razzi/kill-buffer-and-window
-    "j" 'avy-goto-char
-    "i" 'edit-init
-    "k" 'edit-private-xml
+    "r" 'helm-recentf
+    "s" 'switch-to-scratch
+    "t" 'helm-projectile
     "v" 'eval-last-sexp
-    "b" 'eval-buffer
-    "g" 'magit-status
-    ; todo "," 'append-comma
-    ";" 'previous-buffer
-    "r" 'recentf-open-files
-    "a" 'add-global-abbrev
-    "c" 'razzi/copy-paragraph
-    "m" 'razzi/show-messages
+    ;; "b" 'eval-buffer
     )
   )
+
+(use-package pt)
 
 (defun transpose-prev-chars ()
   (interactive)
   (backward-char 1)
   (transpose-chars nil)
+  )
+
+
+(defun razzi/clear ()
+  (interactive)
+  (delete-other-windows)
+  (magit-blame-quit)
   )
 
 (use-package paredit)
@@ -312,12 +368,14 @@
   (define-key evil-normal-state-map (kbd "gc") 'evilnc-comment-operator)
   (define-key evil-visual-state-map (kbd "V") 'evil-a-paragraph)
   (define-key evil-operator-state-map (kbd "V") 'evil-a-paragraph)
-  (define-key evil-normal-state-map (kbd "RET") 'delete-other-windows)
+  (define-key evil-normal-state-map (kbd "RET") 'razzi/clear)
   (define-key evil-normal-state-map (kbd "M-RET") 'my-toggle-frame-maximized)
   (define-key evil-normal-state-map (kbd "] c") 'git-gutter:next-hunk)
   (define-key evil-normal-state-map (kbd "M-]") 'my-toggle-frame-right)
   (define-key evil-normal-state-map (kbd "M-[") 'my-toggle-frame-left)
   (define-key evil-normal-state-map (kbd "M-a") 'mark-whole-buffer)
+  (define-key evil-normal-state-map (kbd "C-j") 'windmove-down)
+  (define-key evil-normal-state-map (kbd "C-k") 'windmove-up)
 
   ;; todo
   ;; (define-key haskell-error-mode-map (kbd "q") 'quit-window)
@@ -352,10 +410,10 @@
   (projectile-global-mode)
   (setq
     projectile-enable-caching t
+    projectile-completion-system 'helm
     )
   )
 
-; (use-package helm-projectile)
 
 (use-package change-inner)
 
@@ -515,8 +573,11 @@
 
 
 (add-hook 'emacs-lisp-mode-hook (lambda ()
-  (abbrev-mode)
-  (setq evil-shift-width 2)))
+    (abbrev-mode)
+    (enable-paredit-mode)
+    (setq evil-shift-width 2)
+    )
+  )
 
 ;(use-package icicles
 ; (setq eshell-cmpl-cycle-completions t)
@@ -528,6 +589,8 @@
 ;; (setq eshell-smart-space-goes-to-end t)
 
 (global-set-key (kbd "C-j") 'newline-and-indent)
+; scroll-other-window
+; scroll-other-window-down
 (define-abbrev global-abbrev-table "g" "git")
 
 (define-key isearch-mode-map (kbd "C-j") 'isearch-done)
@@ -564,7 +627,6 @@
 ; hide undo-tree files
 ; automatic space after semicolon
 ; auto save abbrev defs
-; trim trailing whitespace
                                         ; eshell
 ; highlight valid commands
 ; don't right align stuff
@@ -573,12 +635,10 @@
 
 ; `. goto last changed spot
 ; turn off elisp doccheck
-; easy way to define abbrev
 ; paste setq combine
 ; electric pair
-;; http://acroca.com/blog/2013/09/13/speed-up-github-connection.html
+; http://acroca.com/blog/2013/09/13/speed-up-github-connection.html
 ; http://wikemacs.org/wiki/Shell#Shell_completion_with_a_nice_menu_.C3.A0_la_zsh
-; http://stackoverflow.com/questions/1230245/how-to-automatically-save-files-on-lose-focus-in-emacs
 ; disable scratch save status indicator
 ; autopep8!!
 ;; todo ido... http://stackoverflow.com/questions/7860894/ido-mode-and-tab-key-not-working-as-expected-in-24-0-x0-builds
@@ -589,9 +649,15 @@
 ; don't move to the right like that emacs...
 ; search c-t transpose chars
 ; search c-g cancel
+; :tag command
+"
+some things
+"
 
+; search c-w delete word, not paste...
+
+; paredit
 ; have to install from source
-;; https://github.com/bbatsov/helm-projectile
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
