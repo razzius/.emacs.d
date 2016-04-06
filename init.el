@@ -32,6 +32,8 @@
 (server-start)
 (global-hl-line-mode 1)
 (global-auto-revert-mode 1)
+(set-face-attribute 'default nil :height 182)
+;; (global-set-key (kbd "M-v") 'evil-paste-after)
 
 ;; (setq
 ;;   whitespace-display-mappings
@@ -47,8 +49,8 @@
 ; todo (these work now)
 (defun razzi/focus-out-hook ()
   (interactive)
-  (message "focus OUT")
-  (evil-normal-state)
+  ; TODO have timer or sth
+  ;; (evil-normal-state)
   (save-if-file)
   )
 
@@ -92,14 +94,24 @@
 
 (use-package git-gutter
   :config
-  (global-git-gutter-mode 1)
+  (setq
+   git-gutter:update-interval .4
+   git-gutter:hide-gutter t
+   )
   (git-gutter:linum-setup)
+  (global-git-gutter-mode 1)
   (global-linum-mode)
+  (add-to-list 'git-gutter:update-hooks 'focus-in-hook)
   )
 
 (use-package anzu
   :config
   (global-anzu-mode 1)
+  )
+
+(use-package helm-flx
+  :config
+  (helm-flx-mode 1)
   )
 
 (use-package helm
@@ -299,6 +311,7 @@
 					; todo get current branch (revision)
   ; todo get current file
   (magit-checkout-file "HEAD" (buffer-file-name))
+  ;; (git-gutter:update-all-windows)
   )
 
 (add-to-list 'load-path "~/.emacs.d/helm-projectile")
@@ -322,6 +335,7 @@
     "e" 'eshell
     "f" 'razzi/yank-file-name
     "g" 'magit-status
+    "h" 'help-command
     "i" 'edit-init
     "j" 'avy-goto-char
     "k" 'edit-private-xml
@@ -352,46 +366,53 @@
   )
 
 (use-package paredit)
+; todo no delete closing parens
 
 (use-package evil
   :config
   (evil-mode 1)
 
-  ;; (setq evil-escape-key-sequence "kj")
   (setq
     evil-regexp-search nil
     evil-cross-lines t
     )
 
-  (define-key evil-normal-state-map (kbd "[ SPC") 'insert-newline-before)
-  (define-key evil-normal-state-map (kbd "] SPC") 'insert-newline-after)
-  (define-key evil-normal-state-map (kbd "gc") 'evilnc-comment-operator)
-  (define-key evil-visual-state-map (kbd "V") 'evil-a-paragraph)
-  (define-key evil-operator-state-map (kbd "V") 'evil-a-paragraph)
-  (define-key evil-normal-state-map (kbd "RET") 'razzi/clear)
-  (define-key evil-normal-state-map (kbd "M-RET") 'my-toggle-frame-maximized)
-  (define-key evil-normal-state-map (kbd "] c") 'git-gutter:next-hunk)
-  (define-key evil-normal-state-map (kbd "M-]") 'my-toggle-frame-right)
-  (define-key evil-normal-state-map (kbd "M-[") 'my-toggle-frame-left)
-  (define-key evil-normal-state-map (kbd "M-a") 'mark-whole-buffer)
+  (define-key evil-insert-state-map (kbd "C-`") 'describe-key)
+  (define-key evil-insert-state-map (kbd "C-a") nil)
+  (define-key evil-insert-state-map (kbd "C-h") 'delete-backward-char)
+  (define-key evil-insert-state-map (kbd "C-k") 'kill-line)
+  (define-key evil-insert-state-map (kbd "C-p") 'evil-complete-previous)
+  (define-key evil-insert-state-map (kbd "C-t") 'transpose-prev-chars)
+
   (define-key evil-normal-state-map (kbd "C-j") 'windmove-down)
   (define-key evil-normal-state-map (kbd "C-k") 'windmove-up)
+  (define-key evil-normal-state-map (kbd "C-h") 'windmove-left)
+  (define-key evil-normal-state-map (kbd "C-l") 'windmove-right)
+  (define-key evil-normal-state-map (kbd "M-RET") 'my-toggle-frame-maximized)
+  (define-key evil-normal-state-map (kbd "M-[") 'my-toggle-frame-left)
+  (define-key evil-normal-state-map (kbd "M-]") 'my-toggle-frame-right)
+  (define-key evil-normal-state-map (kbd "M-a") 'mark-whole-buffer)
+  (define-key evil-normal-state-map (kbd "RET") 'razzi/clear)
+  (define-key evil-normal-state-map (kbd "[ SPC") 'insert-newline-before)
+  (define-key evil-normal-state-map (kbd "] SPC") 'insert-newline-after)
+  (define-key evil-normal-state-map (kbd "[ c") 'git-gutter:previous-hunk)
+  (define-key evil-normal-state-map (kbd "] c") 'git-gutter:next-hunk)
+  (define-key evil-normal-state-map (kbd "gc") 'evilnc-comment-operator)
 
-  ;; todo
-  ;; (define-key haskell-error-mode-map (kbd "q") 'quit-window)
+  ; todo n and N don't work with * and #
 
-  (define-key evil-insert-state-map (kbd "C-h") 'delete-backward-char)
-  ;; (define-key evil-insert-state-map (kbd "M-S-h") 'describe-key)
-  (define-key evil-insert-state-map (kbd "C-k") 'kill-line)
-  (define-key evil-insert-state-map (kbd "C-`") 'describe-key)
-  (define-key evil-insert-state-map (kbd "C-p") 'evil-complete-previous)
-  (define-key evil-insert-state-map (kbd "C-a") nil)
+  ; doesn't seem to wrap
+  ;; (define-key evil-normal-state-map (kbd "/") 'isearch-forward)
+
+  (define-key evil-operator-state-map (kbd "V") 'evil-a-paragraph)
+
+  (define-key evil-visual-state-map (kbd "V") 'evil-a-paragraph)
+  (define-key evil-visual-state-map (kbd "s") 'evil-surround-region)
+
+  (add-hook 'evil-insert-state-exit-hook 'save-if-file)
 
   ;; todo
   ;; (define-key evil-insert-state-map (kbd "C-j") 'newline-and-indent)
-  (define-key evil-insert-state-map (kbd "C-t") 'transpose-prev-chars)
-  (define-key evil-visual-state-map (kbd "s") 'evil-surround-region)
-  (add-hook 'evil-insert-state-exit-hook 'save-if-file)
   )
 
 ;; (use-package evil-remap)
@@ -403,7 +424,10 @@
   (global-evil-surround-mode 1)
   )
 
-(use-package restclient)
+(use-package restclient
+  :config
+  (add-to-list 'auto-mode-alist '("\\.http\\'" . restclient-mode))
+  )
 
 (use-package projectile
   :config
@@ -413,7 +437,6 @@
     projectile-completion-system 'helm
     )
   )
-
 
 (use-package change-inner)
 
@@ -446,7 +469,6 @@
   (eshell-send-input)
   )
 
-(add-to-list 'auto-mode-alist '("\\.http\\'" . restclient-mode))
 
 (use-package virtualenvwrapper
   :config
@@ -460,83 +482,103 @@
   (evil-append 0 0 nil)
   )
 
-(add-hook 'nxml-mode-hook (lambda ()
-  (setq
-    nxml-child-indent 2
-    nxml-attribute-indent 2
-    tab-width 2
-    )
-  )
-)
-
-(add-hook 'python-mode-hook (lambda ()
-  (message "hi this is python mode")
-  (superword-mode)
-  (modify-syntax-entry ?_ "w" python-mode-syntax-table)
-  )
-)
-
-(add-hook 'eshell-mode-hook (lambda ()
-  (abbrev-mode)
-  ;; (eshell-cmpl-initialize)
-  (local-set-key (kbd "C-u") 'eshell-kill-input)
-
-  (local-set-key (kbd "C-p") 'eshell-previous-input)
-
-  (local-set-key (kbd "C-j") 'nil)
-  (local-set-key (kbd "C-j") 'abbrev-and-return)
-  (local-set-key (kbd "C-a") 'previous-line)
-  ;; (local-set-key (kbd "<tab>") 'ac-fuzzy-complete)
-  (local-set-key (kbd "C-p") 'eshell-previous-matching-input-from-input)
-  ;; (local-set-key (kbd "<tab>") 'pcomplete-list)
-  (define-key evil-insert-state-map (kbd "C-c") 'eshell-interrupt-process)
-  (define-key evil-insert-state-map (kbd "C-a") 'eshell-bol)
-  ;; (local-set-key (kbd "A") nil)
-  ; todo
-  ;; (define-key evil-normal-state-map (kbd "A") 'razzi/eshell-point-to-prompt)
-  ;; (local-set-key (kbd "<tab>") 'company-complete)
-  (setq ac-sources (
-      append '(
-        ac-source-abbrev
-        ; ac-source-words-in-same-mode-buffers
-        ac-source-files-in-current-dir
-        ac-source-pcomplete
-        ac-source-library
-        )
-        ;; ac-sources
+(add-hook 'html-mode-hook (lambda ()
+    (modify-syntax-entry ?_ "w")
+    (setq
+   ; todo?
+    ;; nxml-child-indent 2
+    ;; nxml-attribute-indent 2
+      tab-width 2
       )
     )
   )
-)
 
-; todo
-(add-hook 'eshell-post-command-hook
-  (lambda ()
-    ;; (eshell/ls)
+(add-hook 'js-mode-hook (lambda ()
+    (modify-syntax-entry ?_ "w")
+    (setq js-indent-level 2)
     )
   )
+
+(add-hook 'nxml-mode-hook (lambda ()
+    (setq
+      nxml-child-indent 2
+      nxml-attribute-indent 2
+      tab-width 2
+      )
+    )
+  )
+
+(add-hook 'python-mode-hook (lambda ()
+    (superword-mode)
+    (modify-syntax-entry ?_ "w" python-mode-syntax-table)
+    )
+  )
+
+(add-hook 'eshell-mode-hook (lambda ()
+    (abbrev-mode)
+    ;; (eshell-cmpl-initialize)
+    (local-set-key (kbd "C-u") 'eshell-kill-input)
+
+    (local-set-key (kbd "C-p") 'eshell-previous-input)
+
+    (local-set-key (kbd "C-j") 'nil)
+    (local-set-key (kbd "C-j") 'abbrev-and-return)
+    (local-set-key (kbd "C-a") 'previous-line)
+    ;; (local-set-key (kbd "<tab>") 'ac-fuzzy-complete)
+    (local-set-key (kbd "C-p") 'eshell-previous-matching-input-from-input)
+    ;; (local-set-key (kbd "<tab>") 'pcomplete-list)
+    (define-key evil-insert-state-map (kbd "C-c") 'eshell-interrupt-process)
+    (define-key evil-insert-state-map (kbd "C-a") 'eshell-bol)
+    ;; (local-set-key (kbd "A") nil)
+    ; todo
+    ;; (define-key evil-normal-state-map (kbd "A") 'razzi/eshell-point-to-prompt)
+    ;; (local-set-key (kbd "<tab>") 'company-complete)
+    ;; (setq ac-sources (
+    ;; 	append '(
+    ;; 	  ac-source-abbrev
+    ;; 	  ; ac-source-words-in-same-mode-buffers
+    ;; 	  ac-source-files-in-current-dir
+    ;; 	  ac-source-pcomplete
+    ;; 	  ac-source-library
+    ;; 	  )
+    ;; 	  ;; ac-sources
+    ;; 	)
+    ;;   )
+    ;; )
+    )
+  )
+
+; todo
+;; (add-hook 'eshell-post-command-hook
+;;   (lambda ()
+;;     ;; (eshell/ls)
+;;     )
+;;   )
   ;; (local-set-key (kbd "<tab>") 'helm-esh-pcomplete)
   ;; (setq pcomplete-cycle-completions nil
   ;;       pcomplete-ignore-case t)))
 
-(set-face-attribute 'default nil :height 182)
 
 (defun my-toggle-frame-maximized ()
   (interactive)
   ;; (setq ns-auto-hide-menu-bar nil)
-  (set-frame-position nil 0 124)
-  (set-frame-size nil 128 43)
+  (set-frame-position nil 0 0)
+  ;; (set-frame-size nil 113 66)
+  (set-frame-size nil 113 35)
   )
 
-(defun my-toggle-frame-left ()
+(defun my-toggle-frame-left () ;(small)
   (interactive)
-  (set-frame-position nil 0 24)
-  (set-frame-size nil 113 66)
+  ;; (let screen-size-alist (small . (113 35)))
+  ;; (if (small))
+  (set-frame-position nil 0 0)
+  ;; (set-frame-size nil 113 66)
+  (set-frame-size nil 113 35)
   )
 
 (defun my-toggle-frame-right ()
   (interactive)
-  (set-frame-position nil (/ (display-pixel-width) 2) 24)
+  (set-frame-position nil (/ (display-pixel-width) 2) 0)
   (set-frame-size nil 113 66)
   )
 
@@ -575,7 +617,10 @@
 (add-hook 'emacs-lisp-mode-hook (lambda ()
     (abbrev-mode)
     (enable-paredit-mode)
-    (setq evil-shift-width 2)
+    (setq
+      evil-shift-width 2
+      tab-width 2
+      )
     )
   )
 
@@ -591,16 +636,22 @@
 (global-set-key (kbd "C-j") 'newline-and-indent)
 ; scroll-other-window
 ; scroll-other-window-down
-(define-abbrev global-abbrev-table "g" "git")
 
 (define-key isearch-mode-map (kbd "C-j") 'isearch-done)
 (define-key isearch-mode-map (kbd "C-h") 'isearch-delete-char)
+;; (define-key isearch-mode-map (kbd "C-`") 'describe-key)
+(global-set-key (kbd "M-v") 'nil)
+(global-set-key (kbd "M-v") 'isearch-yank-pop)
+(define-key minibuffer-local-isearch-map (kbd "M-v") 'nil)
+(define-key minibuffer-local-isearch-map (kbd "M-v") 'isearch-yank-pop)
 
 (defun minibuffer-config ()
   (interactive)
   (local-set-key (kbd "C-h") 'nil)
   (local-set-key (kbd "C-h") 'delete-backward-char)
   (local-set-key (kbd "C-j") 'exit-minibuffer)
+  ; todo
+  ;; (local-set-key (kbd "M-v") 'isearch-yank-pop)
   )
 
 (add-hook 'minibuffer-setup-hook 'minibuffer-config)
@@ -610,7 +661,6 @@
  eshell-banner-message ""
  eshell-scroll-to-bottom-on-input t
  )
-;; (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
 
 (use-package monokai-theme
   :config
@@ -650,14 +700,14 @@
 ; search c-t transpose chars
 ; search c-g cancel
 ; :tag command
-"
-some things
-"
+; open most recent by default?
+; open recentf list in scratch buffer? x
 
 ; search c-w delete word, not paste...
+; visual block i to block insert
 
-; paredit
-; have to install from source
+"
+todo
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -670,3 +720,6 @@ some things
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+"
+
+(my-toggle-frame-right)
