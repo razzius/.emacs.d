@@ -21,11 +21,10 @@
   save-abbrevs 'silently
   indent-tabs-mode nil
   tab-width 2
-  js-indent-level 2
-; todo!!
   ns-pop-up-frames nil
   vc-follow-symlinks t
   frame-title-format "%f"
+	column-number-mode t
   ;; tags-file-name "~/code/clint/etags"
   )
 
@@ -45,31 +44,38 @@
 ;; (global-whitespace-mode)
 
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
+(add-hook 'focus-out-hook 'save-if-file)
 
-; todo (these work now)
-(defun razzi/focus-out-hook ()
-  (interactive)
-  ; TODO have timer or sth
-  ;; (evil-normal-state)
-  (save-if-file)
-  )
+(add-to-list 'load-path "lisp")
 
-(add-hook 'focus-out-hook 'razzi/focus-out-hook)
-;; (add-hook 'focus-in-hook (lambda () (interactive) (save-buffer)))
-
-;; (use-package focus-autosave-mode
-;;   :config
-;;   (focus-autosave-mode 1)
-;;   )
+(use-package evil-numbers)
 
 (use-package thingatpt)
+
+(use-package emmet-mode
+	:config
+	(add-hook 'nxml-mode-hook (lambda () (emmet-mode)))
+	(add-hook 'html-mode-hook (lambda () (emmet-mode)))
+
+	(define-key emmet-mode-keymap (kbd "C-j") nil)
+	)
+
+(use-package hippie-exp
+  ;; :bind ("<tab>" . hippie-expand)
+  :config
+  (setq hippie-expand-try-functions-list '(
+      yas-hippie-try-expand
+      emmet-expand-line
+      )
+    )
+  )
 
 (use-package highlight-numbers
   :config
   (highlight-numbers-mode)
   )
 
-(use-package fish-mode)
+;; (use-package fish-mode)
 
 ;; (use-package undo-tree
 ;;   :config
@@ -80,7 +86,6 @@
 ;;   )
 
 
-(add-to-list 'load-path "lisp")
 
 (use-package ido
   :config
@@ -115,15 +120,19 @@
   )
 
 (use-package helm
-  :defines helm-M-x-fuzzy-match
+  :defines
+  helm-M-x-fuzzy-match
+  helm-buffers-fuzzy-match
+  helm-find-file-fuzzy-match
+  helm-recentf-fuzzy-match
   :config
   (global-set-key (kbd "M-x") 'helm-M-x)
   (setq
     helm-M-x-fuzzy-match t
     helm-autoresize-max-height 10
-    helm-buffers-fuzzy-matching t
-    helm-recentf-fuzzy-matching t
-    helm-find-file-fuzzy-matching t
+    helm-buffers-fuzzy-match t
+    helm-recentf-fuzzy-match t
+    helm-find-file-fuzzy-match t
     )
   )
 
@@ -140,12 +149,11 @@
 ;; (use-package flycheck-haskell)
 
 (use-package flycheck
-  :disabled t
   :init
   (setq
     flycheck-display-errors-delay .08
     flycheck-highlighting-mode 'lines
-    flycheck-disabled-checker '(emacs-lisp-checkdoc)
+    flycheck-disabled-checkers '(emacs-lisp-checkdoc)
     )
   :config
   (global-flycheck-mode nil)
@@ -308,8 +316,6 @@
 
 (defun razzi/magit-checkout-file ()
   (interactive)
-					; todo get current branch (revision)
-  ; todo get current file
   (magit-checkout-file "HEAD" (buffer-file-name))
   ;; (git-gutter:update-all-windows)
   )
@@ -345,6 +351,7 @@
     "r" 'helm-recentf
     "s" 'switch-to-scratch
     "t" 'helm-projectile
+    "v" 'eval-last-sexp
     "v" 'eval-last-sexp
     ;; "b" 'eval-buffer
     )
@@ -384,6 +391,8 @@
   (define-key evil-insert-state-map (kbd "C-p") 'evil-complete-previous)
   (define-key evil-insert-state-map (kbd "C-t") 'transpose-prev-chars)
 
+  (define-key evil-normal-state-map (kbd "C-a") 'evil-numbers/inc-at-pt)
+  ;; (define-key evil-normal-state-map (kbd "C-x") 'evil-numbers/dec-at-pt)
   (define-key evil-normal-state-map (kbd "C-j") 'windmove-down)
   (define-key evil-normal-state-map (kbd "C-k") 'windmove-up)
   (define-key evil-normal-state-map (kbd "C-h") 'windmove-left)
@@ -392,12 +401,16 @@
   (define-key evil-normal-state-map (kbd "M-[") 'my-toggle-frame-left)
   (define-key evil-normal-state-map (kbd "M-]") 'my-toggle-frame-right)
   (define-key evil-normal-state-map (kbd "M-a") 'mark-whole-buffer)
+  (define-key evil-normal-state-map (kbd "M-p") 'scroll-other-window)
+  (define-key evil-normal-state-map (kbd "M-n") 'scroll-other-window-down)
+  (define-key evil-normal-state-map (kbd "M-q") 'save-buffers-kill-terminal)
   (define-key evil-normal-state-map (kbd "RET") 'razzi/clear)
   (define-key evil-normal-state-map (kbd "[ SPC") 'insert-newline-before)
   (define-key evil-normal-state-map (kbd "] SPC") 'insert-newline-after)
   (define-key evil-normal-state-map (kbd "[ c") 'git-gutter:previous-hunk)
   (define-key evil-normal-state-map (kbd "] c") 'git-gutter:next-hunk)
   (define-key evil-normal-state-map (kbd "gc") 'evilnc-comment-operator)
+  (define-key evil-normal-state-map (kbd "TAB") 'previous-buffer)
 
   ; todo n and N don't work with * and #
 
@@ -414,8 +427,6 @@
   ;; todo
   ;; (define-key evil-insert-state-map (kbd "C-j") 'newline-and-indent)
   )
-
-;; (use-package evil-remap)
 
 (use-package evil-nerd-commenter)
 
@@ -443,7 +454,7 @@
 (defun change-inner-parens ()
   (interactive)
   (change-inner* nil "(")
-  ; TODO fails in the middle of words?
+  ; TODO fails in the middle of words
   ;; (command-execute 'change-inner nil ["("])
   )
 
@@ -495,7 +506,10 @@
 
 (add-hook 'js-mode-hook (lambda ()
     (modify-syntax-entry ?_ "w")
-    (setq js-indent-level 2)
+    (setq
+      js-indent-level 2
+      evil-shift-width 2
+      )
     )
   )
 
@@ -509,7 +523,7 @@
   )
 
 (add-hook 'python-mode-hook (lambda ()
-    (superword-mode)
+    ;; (superword-mode)
     (modify-syntax-entry ?_ "w" python-mode-syntax-table)
     )
   )
@@ -620,6 +634,7 @@
     (setq
       evil-shift-width 2
       tab-width 2
+      indent-tabs-mode nil
       )
     )
   )
@@ -634,8 +649,6 @@
 ;; (setq eshell-smart-space-goes-to-end t)
 
 (global-set-key (kbd "C-j") 'newline-and-indent)
-; scroll-other-window
-; scroll-other-window-down
 
 (define-key isearch-mode-map (kbd "C-j") 'isearch-done)
 (define-key isearch-mode-map (kbd "C-h") 'isearch-delete-char)
@@ -656,11 +669,11 @@
 
 (add-hook 'minibuffer-setup-hook 'minibuffer-config)
 (setq visible-bell nil)
-(setq ring-bell-function 'ignore)
-(setq
- eshell-banner-message ""
- eshell-scroll-to-bottom-on-input t
- )
+;; (setq ring-bell-function 'ignore)
+;; (setq
+;;  eshell-banner-message ""
+;;  eshell-scroll-to-bottom-on-input t
+;;  )
 
 (use-package monokai-theme
   :config
@@ -675,8 +688,7 @@
 ; insert mode c-l
 ; wip elisp move stuff into own files
 ; hide undo-tree files
-; automatic space after semicolon
-; auto save abbrev defs
+; automatic space after semicolon?
                                         ; eshell
 ; highlight valid commands
 ; don't right align stuff
@@ -705,6 +717,13 @@
 
 ; search c-w delete word, not paste...
 ; visual block i to block insert
+																				; persistent marks
+; show marks in gutter
+; c-j xml put cursor in between tags
+; !!! disable tab to emmet expand in minibuffer x.x
+; textobj i l
+;paredit is being overzealous in matching closing
+; copy path to function
 
 "
 todo
