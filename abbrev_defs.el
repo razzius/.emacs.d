@@ -3,7 +3,7 @@
 
 (define-abbrev-table 'Info-edit-mode-abbrev-table '())
 
-(define-abbrev-table 'apropos-mode-abbrev-table '())
+(define-abbrev-table 'bibtex-mode-abbrev-table '())
 
 (define-abbrev-table 'awk-mode-abbrev-table '())
 
@@ -37,7 +37,20 @@
 
 (define-abbrev-table 'emacs-lisp-mode-abbrev-table '())
 
-(define-abbrev-table 'eshell-mode-abbrev-table '())
+(define-abbrev-table 'epa-info-mode-abbrev-table '())
+
+(define-abbrev-table 'epa-key-list-mode-abbrev-table '())
+
+(define-abbrev-table 'epa-key-mode-abbrev-table '())
+
+(define-abbrev-table 'eshell-mode-abbrev-table
+  '(
+    ("bci" "brew cask install" nil 1)
+    ("brw" "brew" nil 1)
+    ("ni" "npm install" nil 1)
+    ("o" "open" nil 1)
+    ("pi" "pip install" nil 5)
+   ))
 
 (define-abbrev-table 'evil-command-window-mode-abbrev-table '())
 
@@ -56,13 +69,18 @@
 (define-abbrev-table 'global-abbrev-table
   '(
     ("closign" "closing" nil 1)
+    ("cmpletino" "completion" nil 1)
     ("disalbe" "disable" nil 0)
     ("dlete" "delete" nil 1)
+    ("ecoh" "echo" nil 1)
+    ("g" "git" nil 2)
+    ("gogole" "google" nil 1)
     ("hiippie" "hippie" nil 1)
     ("ikn" "in" nil 1)
     ("imoprt" "import" nil 1)
     ("improt" "import" nil 1)
     ("kpb" "kbd" nil 1)
+    ("listp" "lisp" nil 0)
     ("locla" "local" nil 0)
     ("maangement" "management" nil 1)
     ("mkaing" "making" nil 0)
@@ -71,10 +89,15 @@
     ("pacage" "package" nil 1)
     ("paht" "path" nil 1)
     ("platofrm" "platform" nil 1)
+    ("pyhton" "python" nil 1)
     ("rwap" "wrap" nil 1)
     ("scheudle" "schedule" nil 0)
     ("scheudles" "schedules" nil 0)
+    ("seach" "search" nil 1)
+    ("symobl" "symbol" nil 1)
+    ("todo" "TODO" nil 1)
     ("utilitiies" "utilities" nil 1)
+    ("vauels" "values" nil 1)
     ("yeild" "yield" nil 1)
    ))
 
@@ -84,7 +107,17 @@
 
 (define-abbrev-table 'haskell-cabal-mode-abbrev-table '())
 
+(define-abbrev-table 'haskell-compilation-mode-abbrev-table '())
+
+(define-abbrev-table 'haskell-debug-mode-abbrev-table '())
+
+(define-abbrev-table 'haskell-error-mode-abbrev-table '())
+
+(define-abbrev-table 'haskell-interactive-mode-abbrev-table '())
+
 (define-abbrev-table 'haskell-mode-abbrev-table '())
+
+(define-abbrev-table 'haskell-presentation-mode-abbrev-table '())
 
 (define-abbrev-table 'helm-grep-mode-abbrev-table '())
 
@@ -103,6 +136,8 @@
 (define-abbrev-table 'image-dired-display-image-mode-abbrev-table '())
 
 (define-abbrev-table 'image-dired-thumbnail-mode-abbrev-table '())
+
+(define-abbrev-table 'inferior-haskell-mode-abbrev-table '())
 
 (define-abbrev-table 'inferior-python-mode-abbrev-table '())
 
@@ -177,6 +212,8 @@
 (define-abbrev-table 'python-mode-skeleton-abbrev-table '())
 
 (define-abbrev-table 'restclient-mode-abbrev-table '())
+
+(define-abbrev-table 'ruby-mode-abbrev-table '())
 
 (define-abbrev-table 'select-tags-table-mode-abbrev-table '())
 

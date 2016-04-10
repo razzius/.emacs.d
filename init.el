@@ -1,16 +1,4 @@
-(require 'package)
-(setq package-enable-at-startup nil)
-(add-to-list 'package-archives
-             '("melpa" . "https://melpa.org/packages/"))
-
-(package-initialize)
-
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-
-(eval-when-compile
-  (require 'use-package))
+(load-file "~/.emacs.d/lisp/init_use_package.el")
 
 (setq
   abbrev-file-name "~/.emacs.d/abbrev_defs.el"
@@ -24,15 +12,20 @@
   ns-pop-up-frames nil
   vc-follow-symlinks t
   frame-title-format "%f"
-	column-number-mode t
-  ;; tags-file-name "~/code/clint/etags"
+  column-number-mode t
+  eshell-rc-script "~/.emacs.d/eshell/profile.el"
+  inhibit-splash-screen t
+  inhibit-startup-message t
   )
 
+(add-to-list 'load-path "lisp")
+(tool-bar-mode 0)
+(menu-bar-mode -1)
+
+(set-face-attribute 'default nil :height 182)
 (server-start)
 (global-hl-line-mode 1)
 (global-auto-revert-mode 1)
-(set-face-attribute 'default nil :height 182)
-;; (global-set-key (kbd "M-v") 'evil-paste-after)
 
 ;; (setq
 ;;   whitespace-display-mappings
@@ -85,8 +78,6 @@
 ;;     )
 ;;   )
 
-
-
 (use-package ido
   :config
   (ido-mode t)
@@ -100,9 +91,9 @@
 (use-package git-gutter
   :config
   (setq
-   git-gutter:update-interval .4
-   git-gutter:hide-gutter t
-   )
+    git-gutter:update-interval .4
+    git-gutter:hide-gutter t
+    )
   (git-gutter:linum-setup)
   (global-git-gutter-mode 1)
   (global-linum-mode)
@@ -149,6 +140,7 @@
 ;; (use-package flycheck-haskell)
 
 (use-package flycheck
+  :disabled t
   :init
   (setq
     flycheck-display-errors-delay .08
@@ -182,15 +174,6 @@
 ;;     )
 ;;   )
 
-;; (use-package fuzzy
-;;   :config
-;;   (setq
-;;     fuzzy-match-accept-error-rate .5
-;;     fuzzy-match-accept-length-difference 20
-;;     )
-;;   )
-
-
 ;; (defun my-company-hook ()
 ;;   (interactive)
 ;;   (define-key company-active-map [return] 'nil)
@@ -218,14 +201,6 @@
 
 (use-package avy)
 
-(use-package shackle
-  :config
-  (shackle-mode)
-  (setq shackle-rules '(("\\`\\*helm.*?\\*\\'" :regexp t :other t :ratio 0.3))
-    ;; shackle-default-rule '(:align t)
-    )
-  )
-
 ;; (use-package mmm-mode
 ;;    :config
 ;;    (setq mmm-global-mode 'maybe)
@@ -245,26 +220,14 @@
   (elpy-enable)
   )
 
-(defun insert-newline-after ()
-  (interactive)
-  (save-excursion
-    (forward-line)
-    (move-beginning-of-line 1)
-    (newline)
-  )
-)
-
-(defun insert-newline-before ()
-  (interactive)
-  (save-excursion
-    (move-beginning-of-line 1)
-    (newline)
-  )
-)
-
 (defun switch-to-scratch ()
   (interactive)
   (switch-to-buffer "*scratch*")
+  )
+
+(defun edit-notes ()
+  (interactive)
+  (find-file "~/notes.org")
   )
 
 (defun edit-init ()
@@ -304,6 +267,11 @@
 (defun razzi/yank-file-name ()
   (interactive)
   (kill-new (buffer-file-name))
+  )
+
+(defun razzi/edit-eshell-profile ()
+  (interactive)
+  (find-file "~/.emacs.d/eshell/profile.el")
   )
 
 (defun razzi/append-comma ()
@@ -346,12 +314,13 @@
     "j" 'avy-goto-char
     "k" 'edit-private-xml
     "m" 'razzi/show-messages
-    "o" 'put-after
+    "n" 'edit-notes
+    "o" 'razzi/put-after
+    "p" 'razzi/edit-eshell-profile
     "q" 'razzi/kill-buffer-and-window
     "r" 'helm-recentf
     "s" 'switch-to-scratch
     "t" 'helm-projectile
-    "v" 'eval-last-sexp
     "v" 'eval-last-sexp
     ;; "b" 'eval-buffer
     )
@@ -359,7 +328,7 @@
 
 (use-package pt)
 
-(defun transpose-prev-chars ()
+(defun razzi/transpose-prev-chars ()
   (interactive)
   (backward-char 1)
   (transpose-chars nil)
@@ -389,7 +358,7 @@
   (define-key evil-insert-state-map (kbd "C-h") 'delete-backward-char)
   (define-key evil-insert-state-map (kbd "C-k") 'kill-line)
   (define-key evil-insert-state-map (kbd "C-p") 'evil-complete-previous)
-  (define-key evil-insert-state-map (kbd "C-t") 'transpose-prev-chars)
+  (define-key evil-insert-state-map (kbd "C-t") 'razzi/transpose-prev-chars)
 
   (define-key evil-normal-state-map (kbd "C-a") 'evil-numbers/inc-at-pt)
   ;; (define-key evil-normal-state-map (kbd "C-x") 'evil-numbers/dec-at-pt)
@@ -405,8 +374,8 @@
   (define-key evil-normal-state-map (kbd "M-n") 'scroll-other-window-down)
   (define-key evil-normal-state-map (kbd "M-q") 'save-buffers-kill-terminal)
   (define-key evil-normal-state-map (kbd "RET") 'razzi/clear)
-  (define-key evil-normal-state-map (kbd "[ SPC") 'insert-newline-before)
-  (define-key evil-normal-state-map (kbd "] SPC") 'insert-newline-after)
+  (define-key evil-normal-state-map (kbd "[ SPC") 'razzi/insert-newline-before)
+  (define-key evil-normal-state-map (kbd "] SPC") 'razzi/insert-newline-after)
   (define-key evil-normal-state-map (kbd "[ c") 'git-gutter:previous-hunk)
   (define-key evil-normal-state-map (kbd "] c") 'git-gutter:next-hunk)
   (define-key evil-normal-state-map (kbd "gc") 'evilnc-comment-operator)
@@ -418,6 +387,11 @@
   ;; (define-key evil-normal-state-map (kbd "/") 'isearch-forward)
 
   (define-key evil-operator-state-map (kbd "V") 'evil-a-paragraph)
+  (define-key evil-normal-state-map (kbd "RET") 'delete-other-windows)
+  (define-key evil-normal-state-map (kbd "] c") 'git-gutter:next-hunk)
+  (define-key evil-normal-state-map (kbd "M-]") 'my-toggle-frame-right)
+  (define-key evil-normal-state-map (kbd "M-[") 'my-toggle-frame-left)
+  (define-key evil-normal-state-map (kbd "M-a") 'mark-whole-buffer)
 
   (define-key evil-visual-state-map (kbd "V") 'evil-a-paragraph)
   (define-key evil-visual-state-map (kbd "s") 'evil-surround-region)
@@ -463,7 +437,6 @@
   (key-chord-mode 1)
   (key-chord-define evil-insert-state-map "kj" 'evil-normal-state)
   (key-chord-define evil-normal-state-map "dp" 'change-inner-parens)
-  ;; (key-chord-define evil-insert-state-map "SPC SPC" 'evil-normal-state)
   (setq
     key-chord-two-keys-delay 0.5
     )
@@ -528,10 +501,59 @@
     )
   )
 
+(defun fish-path (path max-len)
+  "Return a potentially trimmed-down version of the directory PATH, replacing
+parent directories with their initial characters to try to get the character
+length of PATH (sans directory slashes) down to MAX-LEN."
+  (let* ((components (split-string (abbreviate-file-name path) "/"))
+         (len (+ (1- (length components))
+                 (reduce '+ components :key 'length)))
+         (str ""))
+    (while (and (> len max-len)
+                (cdr components))
+      (setq str (concat str
+                        (cond ((= 0 (length (car components))) "/")
+                              ((= 1 (length (car components)))
+                               (concat (car components) "/"))
+                              (t
+                               (if (string= "."
+                                            (string (elt (car components) 0)))
+                                   (concat (substring (car components) 0 2)
+                                           "/")
+                                 (string (elt (car components) 0) ?/)))))
+            len (- len (1- (length (car components))))
+            components (cdr components)))
+    (concat str (reduce (lambda (a b) (concat a "/" b)) components))))
+
 (add-hook 'eshell-mode-hook (lambda ()
     (abbrev-mode)
     ;; (eshell-cmpl-initialize)
     (local-set-key (kbd "C-u") 'eshell-kill-input)
+    (local-set-key (kbd "M-RET") 'my-toggle-frame-maximized)
+    (local-set-key (kbd "C-j") 'nil)
+    (local-set-key (kbd "C-j") 'abbrev-and-return)
+    (local-set-key (kbd "C-a") 'previous-line)
+
+  ;; (local-set-key (kbd "C-p") 'eshell-previous-input)
+  ;; (local-set-key (kbd "<tab>") 'pcomplete-list)
+  ;; (eshell-cmpl-initialize)
+
+  ;; (local-set-key (kbd "<tab>") 'ac-fuzzy-complete)
+  ;; (local-set-key (kbd "C-p") 'nil)
+  ;; (define-key evil-insert-state-map (kbd "C-p") 'eshell-previous-matching-input-from-input)
+  (define-key evil-insert-state-map (kbd "C-n") 'eshell-next-input)
+  (define-key evil-insert-state-map (kbd "C-c") 'eshell-interrupt-process)
+  (define-key evil-insert-state-map (kbd "C-a") 'eshell-bol)
+  ;; (local-set-key (kbd "A") nil)
+  ; todo
+  (evil-define-key 'normal eshell-mode-map (kbd "A") 'razzi/eshell-point-to-prompt)
+  ;; (local-set-key (kbd "<tab>") 'company-complete)
+  (add-to-list 'eshell-output-filter-functions '(lambda ()
+    (save-excursion
+      (replace-regexp "\[[\?0-9]+[hlAGKJ]" "" nil eshell-last-output-start eshell-last-output-end)
+      )
+    )
+  )
 
     (local-set-key (kbd "C-p") 'eshell-previous-input)
 
@@ -560,6 +582,27 @@
     ;;   )
     ;; )
     )
+  (setq eshell-prompt-function
+    (lambda ()
+      (concat
+       (if venv-current-name
+	  (format "(%s) " venv-current-name)
+	  ""
+	)
+	(fish-path (eshell/pwd) 30) " $ ")))
+
+  ;; (setq ac-sources (
+  ;;     append '(
+  ;;       ac-source-abbrev
+  ;;       ; ac-source-words-in-same-mode-buffers
+  ;;       ac-source-files-in-current-dir
+  ;;       ac-source-pcomplete
+  ;;       ac-source-library
+  ;;       )
+  ;;       ;; ac-sources
+  ;;     )
+  ;;   )
+  ;; )
   )
 
 ; todo
@@ -593,13 +636,9 @@
 (defun my-toggle-frame-right ()
   (interactive)
   (set-frame-position nil (/ (display-pixel-width) 2) 0)
+  ;; TODO do the math
   (set-frame-size nil 113 66)
   )
-
-(tool-bar-mode 0)
-(menu-bar-mode -1)
-(setq inhibit-splash-screen t)
-(setq inhibit-startup-message t)
 
 (when (equal system-type 'darwin)
   (setq mac-option-modifier 'super)
@@ -612,12 +651,15 @@
   )
 )
 
+; TODO make these not path dependent
 (require 'utils "~/.emacs.d/lisp/utils.el")
+(require 'razzi/interactive "~/.emacs.d/lisp/interactive.el")
+
 (defun s-trim (s)
   "Remove whitespace at the beginning and end of a string."
   (s-trim-left (s-trim-right s)))
 
-(defun put-after ()
+(defun razzi/put-after ()
   (interactive)
   (evil-with-single-undo
     (evil-insert-newline-below)
@@ -638,15 +680,6 @@
       )
     )
   )
-
-;(use-package icicles
-; (setq eshell-cmpl-cycle-completions t)
-; (setq pcomplete-cycle-completions t)
-;; (require 'eshell)
-;; (require 'em-smart)
-;; (setq eshell-where-to-jump 'begin)
-;; (setq eshell-review-quick-commands nil)
-;; (setq eshell-smart-space-goes-to-end t)
 
 (global-set-key (kbd "C-j") 'newline-and-indent)
 
@@ -725,8 +758,18 @@
 ;paredit is being overzealous in matching closing
 ; copy path to function
 
-"
-todo
+; search c-g cancel ?
+; rename current file
+;persistent undo
+; c-l c-h switch window left / right
+; case insensitive completion eshell
+; evil f case insensitive
+; google search!
+; magit rebind j,k
+; eshell ... up 2 dirs
+; eshell in split
+; have to install from source
+;; https://github.com/bbatsov/helm-projectile
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -739,6 +782,5 @@ todo
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
-"
 
-(my-toggle-frame-right)
+;; (my-toggle-frame-right)

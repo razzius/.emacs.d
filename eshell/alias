@@ -1,2 +1,1 @@
-alias nil  $*
 alias e find-file $1
