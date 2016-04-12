@@ -2,3 +2,9 @@ eshell/history
 eshell/lastdir
 ido.last
 recentf
+elpa
+backups
+auto-save-list
+venvs
+projectile.cache
+projectile-bookmarks.eld
