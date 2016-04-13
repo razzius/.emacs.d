@@ -68,12 +68,16 @@
 
 (define-abbrev-table 'global-abbrev-table
   '(
+    ("bufer" "buffer" nil 1)
     ("closign" "closing" nil 1)
     ("cmpletino" "completion" nil 1)
+    ("deserealize" "deserialize" nil 1)
+    ("disalbe" "disable" nil 0)
     ("disalbe" "disable" nil 0)
     ("dlete" "delete" nil 1)
+    ("dlete" "delete" nil 1)
     ("ecoh" "echo" nil 1)
-    ("g" "git" nil 2)
+    ("francisco" "Francisco" nil 1)
     ("gogole" "google" nil 1)
     ("hiippie" "hippie" nil 1)
     ("ikn" "in" nil 1)
@@ -86,15 +90,23 @@
     ("mkaing" "making" nil 0)
     ("msg" "message" nil 2)
     ("nwo" "now" nil 0)
+    ("ovoerwrite" "overwrite" nil 1)
     ("pacage" "package" nil 1)
     ("paht" "path" nil 1)
+    ("perhas" "perhaps" nil 1)
     ("platofrm" "platform" nil 1)
     ("pyhton" "python" nil 1)
+    ("pytho" "python" nil 1)
+    ("pyton" "python" nil 1)
+    ("rwap" "wrap" nil 1)
     ("rwap" "wrap" nil 1)
     ("scheudle" "schedule" nil 0)
+    ("scheudle" "schedule" nil 0)
+    ("scheudles" "schedules" nil 0)
     ("scheudles" "schedules" nil 0)
     ("seach" "search" nil 1)
     ("symobl" "symbol" nil 1)
+    ("teh" "the" nil 1)
     ("todo" "TODO" nil 1)
     ("utilitiies" "utilities" nil 1)
     ("vauels" "values" nil 1)
@@ -209,7 +221,9 @@
 
 (define-abbrev-table 'python-mode-abbrev-table '())
 
-(define-abbrev-table 'python-mode-skeleton-abbrev-table '())
+(define-abbrev-table 'python-mode-skeleton-abbrev-table
+  '(
+   ))
 
 (define-abbrev-table 'restclient-mode-abbrev-table '())
 

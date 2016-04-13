@@ -1,21 +1,27 @@
 (load-file "~/.emacs.d/lisp/init_use_package.el")
 
 (setq
+  ;; tags-file-name "~/code/clint/etags"
   abbrev-file-name "~/.emacs.d/abbrev_defs.el"
   backup-directory-alist `((".*" . "~/.emacs.d/backups/"))
-  initial-scratch-message nil
-  use-package-always-ensure t
-  isearch-regexp nil
-  save-abbrevs 'silently
-  indent-tabs-mode nil
-  tab-width 2
-  ns-pop-up-frames nil
-  vc-follow-symlinks t
-  frame-title-format "%f"
   column-number-mode t
+  column-number-mode t
+  dired-recursive-deletes 'always
   eshell-rc-script "~/.emacs.d/eshell/profile.el"
+  frame-title-format "%f"
+  frame-title-format "%f"
+  indent-tabs-mode nil
   inhibit-splash-screen t
   inhibit-startup-message t
+  initial-scratch-message nil
+  isearch-regexp nil
+  mouse-wheel-scroll-amount '(1 ((shift) . 1))
+  next-line-add-newlines nil
+  ns-pop-up-frames nil
+  save-abbrevs 'silently
+  tab-width 2
+  use-package-always-ensure t
+  vc-follow-symlinks t
   )
 
 (add-to-list 'load-path "lisp")
@@ -26,6 +32,9 @@
 (server-start)
 (global-hl-line-mode 1)
 (global-auto-revert-mode 1)
+(electric-pair-mode)
+
+;; (global-set-key (kbd "M-v") 'evil-paste-after)
 
 ;; (setq
 ;;   whitespace-display-mappings
@@ -54,11 +63,11 @@
 	)
 
 (use-package hippie-exp
-  ;; :bind ("<tab>" . hippie-expand)
+  :bind ("<tab>" . hippie-expand)
   :config
   (setq hippie-expand-try-functions-list '(
       yas-hippie-try-expand
-      emmet-expand-line
+      ;; emmet-expand-line
       )
     )
   )
@@ -112,18 +121,23 @@
 
 (use-package helm
   :defines
-  helm-M-x-fuzzy-match
-  helm-buffers-fuzzy-match
-  helm-find-file-fuzzy-match
-  helm-recentf-fuzzy-match
+  helm-mode-fuzzy-match
+  ;; helm-M-x-fuzzy-match
+  ;; helm-buffers-fuzzy-match
+  ;; helm-find-file-fuzzy-match
+  ;; helm-recentf-fuzzy-match
   :config
   (global-set-key (kbd "M-x") 'helm-M-x)
   (setq
-    helm-M-x-fuzzy-match t
-    helm-autoresize-max-height 10
-    helm-buffers-fuzzy-match t
-    helm-recentf-fuzzy-match t
-    helm-find-file-fuzzy-match t
+    helm-mode-fuzzy-match t
+    ;; helm-M-x-fuzzy-match t
+    ;; helm-autoresize-max-height 10
+    ;; helm-buffers-fuzzy-match t
+    ;; helm-recentf-fuzzy-match t
+    ;; helm-find-file-fuzzy-match t
+    ;; helm-split-window-in-side-p t
+    ;; helm-split-window-default-side 'below
+    ;; helm-always-two-windows nil
     )
   )
 
@@ -143,7 +157,7 @@
   :disabled t
   :init
   (setq
-    flycheck-display-errors-delay .08
+    flycheck-display-errors-delay .4
     flycheck-highlighting-mode 'lines
     flycheck-disabled-checkers '(emacs-lisp-checkdoc)
     )
@@ -241,15 +255,12 @@
   )
 
 (defun razzi/copy-paragraph ()
-  ; (mark-paragraph) ??
   (interactive)
   (move-beginning-of-line nil)
-  (let ((sentence (thing-at-point 'sentence)))
-    (message "sentence is")
-    (message sentence)
+  (let ((sentence (thing-at-point 'defun)))
     (insert sentence)
-    (insert "\n\n")
-    ; TODO
+    (insert "\n")
+    ; TODO does this work in python?
     )
   )
 
@@ -266,8 +277,8 @@
 
 (defun razzi/yank-file-name ()
   (interactive)
-  (kill-new (buffer-file-name))
-  )
+  (kill-new buffer-file-name)
+  (message (format "Copied %s" buffer-file-name)))
 
 (defun razzi/edit-eshell-profile ()
   (interactive)
@@ -284,7 +295,7 @@
 
 (defun razzi/magit-checkout-file ()
   (interactive)
-  (magit-checkout-file "HEAD" (buffer-file-name))
+  (magit-checkout-file "HEAD" buffer-file-name)
   ;; (git-gutter:update-all-windows)
   )
 
@@ -292,15 +303,22 @@
 (require 'helm-projectile)
 ; (use-package helm-projectile)
 
+;; (add-to-list 'load-path "~/.emacs.d/pytest-el")
+;; (require 'pytest)
+
 (use-package evil-leader
   :config
   (global-evil-leader-mode)
   (evil-leader/set-leader "<SPC>")
   (evil-leader/set-key
     "," 'razzi/append-comma
+    ;; "-" 'razzi/run-test-pytest ; todo move to python mode
+    "=" 'razzi/run-pytest ; todo move to python mode
+    "8" 'razzi/autopep8
     ";" 'previous-buffer
     "A" 'add-global-abbrev
     "C" 'razzi/magit-checkout-file
+    "E" 'eval-buffer
     "DEL" 'restart-emacs
     "SPC" 'save-buffer
     "a" 'add-global-abbrev
@@ -312,11 +330,13 @@
     "h" 'help-command
     "i" 'edit-init
     "j" 'avy-goto-char
-    "k" 'edit-private-xml
+    ;; "k" 'edit-private-xml
+    "l" 'paredit-forward-slurp-sexp
     "m" 'razzi/show-messages
     "n" 'edit-notes
     "o" 'razzi/put-after
-    "p" 'razzi/edit-eshell-profile
+    ; "p" 'razzi/edit-eshell-profile
+    "p" 'razzi/importmagic
     "q" 'razzi/kill-buffer-and-window
     "r" 'helm-recentf
     "s" 'switch-to-scratch
@@ -334,6 +354,25 @@
   (transpose-chars nil)
   )
 
+
+(defun razzi/importmagic ()
+  (interactive)
+  ; todo use the -o flag and prepend the imports
+  (shell-command
+    (format "python ~/code/python_scripts/import_magic.py -i %s" buffer-file-name))
+  )
+
+(defun razzi/run-pytest ()
+  (interactive)
+  (compile "py.test")
+  )
+
+(defun razzi/autopep8 ()
+  (interactive)
+  (shell-command
+    (format "autopep8 -i --max-line-length 100 %s" buffer-file-name))
+  (revert-buffer nil t)
+  )
 
 (defun razzi/clear ()
   (interactive)
@@ -365,6 +404,7 @@
   (define-key evil-normal-state-map (kbd "C-j") 'windmove-down)
   (define-key evil-normal-state-map (kbd "C-k") 'windmove-up)
   (define-key evil-normal-state-map (kbd "C-h") 'windmove-left)
+  (define-key evil-normal-state-map (kbd "<C-i>") 'evil-jump-forward)
   (define-key evil-normal-state-map (kbd "C-l") 'windmove-right)
   (define-key evil-normal-state-map (kbd "M-RET") 'my-toggle-frame-maximized)
   (define-key evil-normal-state-map (kbd "M-[") 'my-toggle-frame-left)
@@ -379,6 +419,7 @@
   (define-key evil-normal-state-map (kbd "[ c") 'git-gutter:previous-hunk)
   (define-key evil-normal-state-map (kbd "] c") 'git-gutter:next-hunk)
   (define-key evil-normal-state-map (kbd "gc") 'evilnc-comment-operator)
+  (define-key evil-normal-state-map (kbd "=") 'razzi/run-pytest)
   (define-key evil-normal-state-map (kbd "TAB") 'previous-buffer)
 
   ; todo n and N don't work with * and #
@@ -683,6 +724,8 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 
 (global-set-key (kbd "C-j") 'newline-and-indent)
 
+(define-key input-decode-map "\C-i" [C-i])
+
 (define-key isearch-mode-map (kbd "C-j") 'isearch-done)
 (define-key isearch-mode-map (kbd "C-h") 'isearch-delete-char)
 ;; (define-key isearch-mode-map (kbd "C-`") 'describe-key)
@@ -735,7 +778,6 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; http://acroca.com/blog/2013/09/13/speed-up-github-connection.html
 ; http://wikemacs.org/wiki/Shell#Shell_completion_with_a_nice_menu_.C3.A0_la_zsh
 ; disable scratch save status indicator
-; autopep8!!
 ;; todo ido... http://stackoverflow.com/questions/7860894/ido-mode-and-tab-key-not-working-as-expected-in-24-0-x0-builds
 ; v a e
 ;; http://emacs.stackexchange.com/questions/4129/how-do-i-make-ido-switch-to-the-buffer-suggested-by-the-tab-completion-candidate
@@ -757,6 +799,8 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; textobj i l
 ;paredit is being overzealous in matching closing
 ; copy path to function
+; in docstring, auto indent after first
+; electric pair mode
 
 ; search c-g cancel ?
 ; rename current file
@@ -782,5 +826,26 @@ length of PATH (sans directory slashes) down to MAX-LEN."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
+; python tab to outdent a level?
+; python newline when already outdented preserve outdent
+; paste during visual should use clipboard
+; rebind c-h to paredit-backward-delete once I figure out what's going on with my init file
+; somehow correct things like pyton_source - perhaps trigger an action on insert _
+; *** reassign variables when I make the same call
+; with open(fn) as f
+;   x = f.read()
+;   y = json.parse(f.read())
+;                   ^ this turns into x
+
+; make spc ; toggle between 2 buffers
+; tab between only file buffers
+;; compile window not overwrite
+;; compile window c-l move window
+; compile remove line that says mode compilehttp://rsiguard.remedyinteractive.com/products/
+; no scroll past end of buffer
+; wtf dabbrevs making completion slow... time to company
+; smarter VV when line has opening paren
+;; prevent scroll past end of buffer
 
 ;; (my-toggle-frame-right)
