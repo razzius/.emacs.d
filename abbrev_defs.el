@@ -3,8 +3,6 @@
 
 (define-abbrev-table 'Info-edit-mode-abbrev-table '())
 
-(define-abbrev-table 'bibtex-mode-abbrev-table '())
-
 (define-abbrev-table 'awk-mode-abbrev-table '())
 
 (define-abbrev-table 'bibtex-mode-abbrev-table '())
@@ -50,6 +48,7 @@
     ("ni" "npm install" nil 1)
     ("o" "open" nil 1)
     ("pi" "pip install" nil 5)
+    ("py.test" "t" nil 0)
    ))
 
 (define-abbrev-table 'evil-command-window-mode-abbrev-table '())
@@ -68,48 +67,63 @@
 
 (define-abbrev-table 'global-abbrev-table
   '(
+    ("accoutn" "account" nil 1)
+    ("acn" "can" nil 1)
+    ("automaic" "automatic" nil 1)
     ("bufer" "buffer" nil 1)
+    ("chracters" "characters" nil 1)
     ("closign" "closing" nil 1)
     ("cmpletino" "completion" nil 1)
+    ("dependences" "dependencies" nil 1)
     ("deserealize" "deserialize" nil 1)
     ("disalbe" "disable" nil 0)
-    ("disalbe" "disable" nil 0)
-    ("dlete" "delete" nil 1)
     ("dlete" "delete" nil 1)
     ("ecoh" "echo" nil 1)
+    ("exapmle" "example" nil 1)
     ("francisco" "Francisco" nil 1)
     ("gogole" "google" nil 1)
     ("hiippie" "hippie" nil 1)
+    ("identifer" "identifier" nil 1)
     ("ikn" "in" nil 1)
     ("imoprt" "import" nil 1)
     ("improt" "import" nil 1)
+    ("indiviuals" "individuals" nil 1)
+    ("jenkisn" "jenkins" nil 1)
     ("kpb" "kbd" nil 1)
     ("listp" "lisp" nil 0)
     ("locla" "local" nil 0)
     ("maangement" "management" nil 1)
+    ("mak" "make" nil 1)
     ("mkaing" "making" nil 0)
     ("msg" "message" nil 2)
+    ("ngineer" "engineer" nil 1)
     ("nwo" "now" nil 0)
     ("ovoerwrite" "overwrite" nil 1)
     ("pacage" "package" nil 1)
     ("paht" "path" nil 1)
+    ("parentehsis" "parenthesis" nil 1)
+    ("paswords" "passwords" nil 1)
     ("perhas" "perhaps" nil 1)
     ("platofrm" "platform" nil 1)
     ("pyhton" "python" nil 1)
     ("pytho" "python" nil 1)
     ("pyton" "python" nil 1)
-    ("rwap" "wrap" nil 1)
+    ("relatoinships" "relationships" nil 1)
+    ("reveiew" "review" nil 1)
     ("rwap" "wrap" nil 1)
     ("scheudle" "schedule" nil 0)
-    ("scheudle" "schedule" nil 0)
-    ("scheudles" "schedules" nil 0)
     ("scheudles" "schedules" nil 0)
     ("seach" "search" nil 1)
+    ("slef" "self" nil 1)
+    ("staet" "State" nil 1)
+    ("steramilned" "streamlined" nil 1)
+    ("strng" "string" nil 1)
     ("symobl" "symbol" nil 1)
     ("teh" "the" nil 1)
     ("todo" "TODO" nil 1)
     ("utilitiies" "utilities" nil 1)
     ("vauels" "values" nil 1)
+    ("ver" "very" nil 1)
     ("yeild" "yield" nil 1)
    ))
 
@@ -219,11 +233,15 @@
 
 (define-abbrev-table 'pt-search-mode-abbrev-table '())
 
+(define-abbrev-table 'py-auto-completion-mode-abbrev-table '())
+
+(define-abbrev-table 'py-ipython-shell-mode-abbrev-table '())
+
+(define-abbrev-table 'py-python-shell-mode-abbrev-table '())
+
 (define-abbrev-table 'python-mode-abbrev-table '())
 
-(define-abbrev-table 'python-mode-skeleton-abbrev-table
-  '(
-   ))
+(define-abbrev-table 'python-mode-skeleton-abbrev-table '())
 
 (define-abbrev-table 'restclient-mode-abbrev-table '())
 
@@ -256,4 +274,3 @@
 (define-abbrev-table 'vc-git-log-edit-mode-abbrev-table '())
 
 (define-abbrev-table 'vc-git-log-view-mode-abbrev-table '())
-

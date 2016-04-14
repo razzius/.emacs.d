@@ -27,6 +27,7 @@
 (add-to-list 'load-path "lisp")
 (tool-bar-mode 0)
 (menu-bar-mode -1)
+(winner-mode 1)
 
 (set-face-attribute 'default nil :height 182)
 (server-start)
@@ -52,6 +53,10 @@
 
 (use-package evil-numbers)
 
+(use-package evil-tabs
+  :config
+  (global-evil-tabs-mode t))
+
 (use-package thingatpt)
 
 (use-package emmet-mode
@@ -74,7 +79,8 @@
 
 (use-package highlight-numbers
   :config
-  (highlight-numbers-mode)
+  (add-hook 'prog-mode-hook 'highlight-numbers-mode)
+  ;; (highlight-numbers-mode)
   )
 
 ;; (use-package fish-mode)
@@ -154,7 +160,6 @@
 ;; (use-package flycheck-haskell)
 
 (use-package flycheck
-  :disabled t
   :init
   (setq
     flycheck-display-errors-delay .4
@@ -233,6 +238,7 @@
 ;;          :back "^```$")))
 ;;    )
 ;;   (mmm-add-mode-ext-class 'markdown-mode nil 'markdown-python)
+(use-package python-mode)
 
 (use-package restart-emacs)
 
@@ -343,7 +349,8 @@
     "o" 'razzi/put-after
     ; "p" 'razzi/edit-eshell-profile
     "p" 'razzi/importmagic
-    "q" 'razzi/kill-buffer-and-window
+    ;; "q" 'razzi/kill-buffer-and-window
+    "q" 'evil-tab-sensitive-quit
     "r" 'helm-recentf
     "s" 'switch-to-scratch
     "t" 'helm-projectile
@@ -404,6 +411,7 @@
   (define-key evil-insert-state-map (kbd "C-k") 'kill-line)
   (define-key evil-insert-state-map (kbd "C-p") 'evil-complete-previous)
   (define-key evil-insert-state-map (kbd "C-t") 'razzi/transpose-prev-chars)
+  (define-key evil-insert-state-map (kbd "C-c a") 'inverse-add-global-abbrev)
 
   (define-key evil-normal-state-map (kbd "C-a") 'evil-numbers/inc-at-pt)
   ;; (define-key evil-normal-state-map (kbd "C-x") 'evil-numbers/dec-at-pt)
@@ -417,7 +425,7 @@
   (define-key evil-normal-state-map (kbd "M-]") 'my-toggle-frame-right)
   (define-key evil-normal-state-map (kbd "M-a") 'mark-whole-buffer)
   (define-key evil-normal-state-map (kbd "M-p") 'scroll-other-window)
-  (define-key evil-normal-state-map (kbd "M-n") 'scroll-other-window-down)
+  (define-key evil-normal-state-map (kbd "M-n") 'elscreen-create)
   (define-key evil-normal-state-map (kbd "M-q") 'save-buffers-kill-terminal)
   (define-key evil-normal-state-map (kbd "RET") 'razzi/clear)
   (define-key evil-normal-state-map (kbd "[ SPC") 'razzi/insert-newline-before)
@@ -853,5 +861,15 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; wtf dabbrevs making completion slow... time to company
 ; smarter VV when line has opening paren
 ;; prevent scroll past end of buffer
+; m-v paste
+; projectile c-w kill word
 
+; switching to eshell messes up keybindings
+; c-c only set to cancel in eshell mode
+; c-n only set in eshell mode
+; make comments way more visible
+; tabnew take filename
+
+; # automatic insert space after python mode
 ;; (my-toggle-frame-right)
+; persistent winner
