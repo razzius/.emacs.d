@@ -194,14 +194,22 @@
 ;;   (define-key company-active-map (kbd "<tab>") 'company-complete-selection)
 ;;   )
 
-;; (use-package company
-;;   :config
-;;   (add-hook 'after-init-hook 'global-company-mode)
-;;   (add-hook 'company-mode-hook 'my-company-hook)
-;;   (setq
-;;     company-minimum-prefix-length 1
-;;     )
-;;   )
+(use-package company
+  :config
+  (add-hook 'after-init-hook 'global-company-mode)
+  ;; (add-hook 'company-mode-hook 'my-company-hook)
+  (setq
+    company-minimum-prefix-length 1
+    )
+  )
+
+(require 'company-simple-complete "~/.emacs.d/company-complete-cycle.el")
+
+(use-package company-flx
+  :config
+  (with-eval-after-load 'company
+    (company-flx-mode +1))
+  )
 
 (use-package markdown-mode
   :config
@@ -299,9 +307,7 @@
   ;; (git-gutter:update-all-windows)
   )
 
-(add-to-list 'load-path "~/.emacs.d/helm-projectile")
-(require 'helm-projectile)
-; (use-package helm-projectile)
+(use-package helm-projectile)
 
 ;; (add-to-list 'load-path "~/.emacs.d/pytest-el")
 ;; (require 'pytest)
