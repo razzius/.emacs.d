@@ -1,14 +1,12 @@
 (load-file "~/.emacs.d/lisp/init_use_package.el")
 
 (setq
-  ;; tags-file-name "~/code/clint/etags"
   abbrev-file-name "~/.emacs.d/abbrev_defs.el"
   backup-directory-alist `((".*" . "~/.emacs.d/backups/"))
   column-number-mode t
   column-number-mode t
   dired-recursive-deletes 'always
   eshell-rc-script "~/.emacs.d/eshell/profile.el"
-  frame-title-format "%f"
   frame-title-format "%f"
   indent-tabs-mode nil
   inhibit-splash-screen t
@@ -23,6 +21,7 @@
   tab-width 2
   use-package-always-ensure t
   vc-follow-symlinks t
+  gc-cons-threshold 20000000
   )
 
 (setq-default abbrev-mode t)
@@ -184,33 +183,9 @@
 ;;   (ido-ubiquitous-mode 1)
 ;;   )
 
-
-; (fuzzy-match-score "cf" "colorful" 'fuzzy-jaro-winkler-score)
-; (fuzzy-match "cf" "colorful")
-
-;; (use-package auto-complete
-;;   :config
-;;   (ac-config-default)
-;;   (add-to-list 'ac-modes 'eshell-mode)
-;;   (setq
-;;     ac-auto-show-menu 0.1
-;;     ac-delay 0.05
-;;     ac-use-fuzzy t
-;;     ac-auto-start 0
-;;     ac-ignore-case t
-;;     )
-;;   )
-
-;; (defun my-company-hook ()
-;;   (interactive)
-;;   (define-key company-active-map [return] 'nil)
-;;   (define-key company-active-map (kbd "<tab>") 'company-complete-selection)
-;;   )
-
 (use-package company
   :config
   (add-hook 'after-init-hook 'global-company-mode)
-  ;; (add-hook 'company-mode-hook 'my-company-hook)
   (setq
     company-minimum-prefix-length 1
     )
@@ -344,6 +319,7 @@
     "a" 'add-global-abbrev
     "b" 'magit-blame
     "c" 'razzi/copy-paragraph
+    "d" 'magit-diff-unstaged
     "e" 'eshell
     "f" 'razzi/yank-file-name
     "g" 'magit-status
@@ -745,7 +721,7 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; insert mode c-l
 ; wip elisp move stuff into own files
 ; hide undo-tree files
-; automatic space after semicolon?
+; automatic space after comment!
                                         ; eshell
 ; highlight valid commands
 ; don't right align stuff
@@ -753,7 +729,6 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; space as first char to switch back to other frame
 
 ; `. goto last changed spot
-; turn off elisp doccheck
 ; paste setq combine
 ; electric pair
 ; http://acroca.com/blog/2013/09/13/speed-up-github-connection.html
@@ -793,8 +768,7 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; magit rebind j,k
 ; eshell ... up 2 dirs
 ; eshell in split
-; have to install from source
-;; https://github.com/bbatsov/helm-projectile
+; rgrep bindings
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
