@@ -18,11 +18,14 @@
   mouse-wheel-scroll-amount '(1 ((shift) . 1))
   next-line-add-newlines nil
   ns-pop-up-frames nil
+  python-python-command "/usr/local/bin/python3.5"
   save-abbrevs 'silently
   tab-width 2
   use-package-always-ensure t
   vc-follow-symlinks t
   )
+
+(setq-default abbrev-mode t)
 
 (add-to-list 'load-path "lisp")
 (tool-bar-mode 0)
@@ -33,7 +36,9 @@
 (server-start)
 (global-hl-line-mode 1)
 (global-auto-revert-mode 1)
-(electric-pair-mode)
+
+; TODO the close parents are too jumpy
+;; (electric-pair-mode)
 
 ;; (global-set-key (kbd "M-v") 'evil-paste-after)
 
@@ -52,6 +57,8 @@
 (add-to-list 'load-path "lisp")
 
 (use-package evil-numbers)
+
+(use-package pyenv-mode)
 
 (use-package evil-tabs
   :config
@@ -127,7 +134,7 @@
 
 (use-package helm
   :defines
-  helm-mode-fuzzy-match
+  ;; helm-mode-fuzzy-match
   ;; helm-M-x-fuzzy-match
   ;; helm-buffers-fuzzy-match
   ;; helm-find-file-fuzzy-match
@@ -135,8 +142,8 @@
   :config
   (global-set-key (kbd "M-x") 'helm-M-x)
   (setq
-    helm-mode-fuzzy-match t
-    ;; helm-M-x-fuzzy-match t
+    ;; helm-mode-fuzzy-match t
+    helm-M-x-fuzzy-match t
     ;; helm-autoresize-max-height 10
     ;; helm-buffers-fuzzy-match t
     ;; helm-recentf-fuzzy-match t
@@ -160,6 +167,7 @@
 ;; (use-package flycheck-haskell)
 
 (use-package flycheck
+  :disabled t
   :init
   (setq
     flycheck-display-errors-delay .4
@@ -434,7 +442,8 @@
   (define-key evil-normal-state-map (kbd "] c") 'git-gutter:next-hunk)
   (define-key evil-normal-state-map (kbd "gc") 'evilnc-comment-operator)
   (define-key evil-normal-state-map (kbd "=") 'razzi/run-pytest)
-  (define-key evil-normal-state-map (kbd "TAB") 'previous-buffer)
+  (define-key evil-normal-state-map (kbd "<tab>") 'evil-tabs-goto-tab)
+  (define-key evil-normal-state-map (kbd "<backtab>") 'elscreen-previous)
 
   ; todo n and N don't work with * and #
 
@@ -581,94 +590,52 @@ length of PATH (sans directory slashes) down to MAX-LEN."
     (concat str (reduce (lambda (a b) (concat a "/" b)) components))))
 
 (add-hook 'eshell-mode-hook (lambda ()
-    (abbrev-mode)
-    ;; (eshell-cmpl-initialize)
     (local-set-key (kbd "C-u") 'eshell-kill-input)
     (local-set-key (kbd "M-RET") 'my-toggle-frame-maximized)
     (local-set-key (kbd "C-j") 'nil)
     (local-set-key (kbd "C-j") 'abbrev-and-return)
     (local-set-key (kbd "C-a") 'previous-line)
 
-  ;; (local-set-key (kbd "C-p") 'eshell-previous-input)
-  ;; (local-set-key (kbd "<tab>") 'pcomplete-list)
-  ;; (eshell-cmpl-initialize)
-
-  ;; (local-set-key (kbd "<tab>") 'ac-fuzzy-complete)
-  ;; (local-set-key (kbd "C-p") 'nil)
-  ;; (define-key evil-insert-state-map (kbd "C-p") 'eshell-previous-matching-input-from-input)
-  (define-key evil-insert-state-map (kbd "C-n") 'eshell-next-input)
-  (define-key evil-insert-state-map (kbd "C-c") 'eshell-interrupt-process)
-  (define-key evil-insert-state-map (kbd "C-a") 'eshell-bol)
-  ;; (local-set-key (kbd "A") nil)
-  ; todo
-  (evil-define-key 'normal eshell-mode-map (kbd "A") 'razzi/eshell-point-to-prompt)
-  ;; (local-set-key (kbd "<tab>") 'company-complete)
-  (add-to-list 'eshell-output-filter-functions '(lambda ()
-    (save-excursion
-      (replace-regexp "\[[\?0-9]+[hlAGKJ]" "" nil eshell-last-output-start eshell-last-output-end)
+    (evil-define-key 'normal eshell-mode-map
+      (kbd "A") 'razzi/eshell-point-to-prompt
       )
-    )
-  )
 
-    (local-set-key (kbd "C-p") 'eshell-previous-input)
+    (evil-define-key 'insert eshell-mode-map
+      (kbd "C-c") 'eshell-interrupt-process
+      (kbd "C-a") 'eshell-bol
+      (kbd "C-n") 'eshell-next-input
+      (kbd "C-p") 'eshell-previous-matching-input-from-input
+      )
 
-    (local-set-key (kbd "C-j") 'nil)
-    (local-set-key (kbd "C-j") 'abbrev-and-return)
-    (local-set-key (kbd "C-a") 'previous-line)
-    ;; (local-set-key (kbd "<tab>") 'ac-fuzzy-complete)
-    (local-set-key (kbd "C-p") 'eshell-previous-matching-input-from-input)
-    ;; (local-set-key (kbd "<tab>") 'pcomplete-list)
-    (define-key evil-insert-state-map (kbd "C-c") 'eshell-interrupt-process)
-    (define-key evil-insert-state-map (kbd "C-a") 'eshell-bol)
-    ;; (local-set-key (kbd "A") nil)
+    ; TODO npm is weird with eshell :O
+    ;; (add-to-list 'eshell-output-filter-functions '(lambda ()
+    ;;   (save-excursion
+    ;;     (replace-regexp "\[[\?0-9]+[hlAGKJ]" "" nil eshell-last-output-start eshell-last-output-end)
+    ;;     )
+    ;;   )
+    ;; )
+
     ; todo
-    ;; (define-key evil-normal-state-map (kbd "A") 'razzi/eshell-point-to-prompt)
-    ;; (local-set-key (kbd "<tab>") 'company-complete)
-    ;; (setq ac-sources (
-    ;; 	append '(
-    ;; 	  ac-source-abbrev
-    ;; 	  ; ac-source-words-in-same-mode-buffers
-    ;; 	  ac-source-files-in-current-dir
-    ;; 	  ac-source-pcomplete
-    ;; 	  ac-source-library
-    ;; 	  )
-    ;; 	  ;; ac-sources
-    ;; 	)
+    ;; (add-hook 'eshell-post-command-hook
+    ;;   (lambda ()
+    ;;     ;; (eshell/ls)
+    ;;     )
+    ;;   )
+
+    ;; (setq
+    ;;   eshell-prompt-function (lambda ()
+    ;;     (concat
+    ;;     (if venv-current-name
+    ;;       (format "(%s) " venv-current-name)
+    ;;       ""
+    ;;       )
+    ;;       (fish-path (eshell/pwd) 30) " $ "))
+    ;;   eshell-prompt-regexp ".*\$ $"
     ;;   )
     ;; )
     )
-  (setq eshell-prompt-function
-    (lambda ()
-      (concat
-       (if venv-current-name
-	  (format "(%s) " venv-current-name)
-	  ""
-	)
-	(fish-path (eshell/pwd) 30) " $ ")))
-
-  ;; (setq ac-sources (
-  ;;     append '(
-  ;;       ac-source-abbrev
-  ;;       ; ac-source-words-in-same-mode-buffers
-  ;;       ac-source-files-in-current-dir
-  ;;       ac-source-pcomplete
-  ;;       ac-source-library
-  ;;       )
-  ;;       ;; ac-sources
-  ;;     )
-  ;;   )
-  ;; )
   )
 
-; todo
-;; (add-hook 'eshell-post-command-hook
-;;   (lambda ()
-;;     ;; (eshell/ls)
-;;     )
-;;   )
-  ;; (local-set-key (kbd "<tab>") 'helm-esh-pcomplete)
-  ;; (setq pcomplete-cycle-completions nil
-  ;;       pcomplete-ignore-case t)))
 
 
 (defun my-toggle-frame-maximized ()
@@ -679,6 +646,7 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   (set-frame-size nil 113 35)
   )
 
+; TODO this is unnecessary?
 (defun my-toggle-frame-left () ;(small)
   (interactive)
   ;; (let screen-size-alist (small . (113 35)))
@@ -726,7 +694,6 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 
 
 (add-hook 'emacs-lisp-mode-hook (lambda ()
-    (abbrev-mode)
     (enable-paredit-mode)
     (setq
       evil-shift-width 2
@@ -873,3 +840,25 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; # automatic insert space after python mode
 ;; (my-toggle-frame-right)
 ; persistent winner
+; spc O put before
+; eshell c-d send exit
+; """ autoclose with formatted docstring
+; newline after (setq should have 2 indents
+; eshell isn't putting the cursor on at eol
+
+; ** do the right close bracket outdent
+        ;; return {
+        ;;     issue['number'] for issue in content}
+
+; why is this happening?
+;; PIPELINE_IDS = {
+;;     'backlog': '54c19ad8f748cd180f07b4b6',
+;;     'in_development': '54c19ad8f748cd180f07b4b4',
+;;     'new_issues': '54c19ad8f748cd180f07b4b7',
+;;     'pr_outstanding': '55c2c7964e6d61ea173a1ce8'
+;; }
+;;     MILESTONE_IDS = { <- indent madness
+;;         }
+
+; xml auto close tag
+; Q repeat macro

@@ -47,7 +47,8 @@
     ("brw" "brew" nil 1)
     ("ni" "npm install" nil 1)
     ("o" "open" nil 1)
-    ("pi" "pip install" nil 5)
+    ("p" "python" nil 2)
+    ("pi" "pip install" nil 1)
     ("py.test" "t" nil 0)
    ))
 
@@ -74,20 +75,25 @@
     ("chracters" "characters" nil 1)
     ("closign" "closing" nil 1)
     ("cmpletino" "completion" nil 1)
+    ("curosr" "cursor" nil 1)
     ("dependences" "dependencies" nil 1)
     ("deserealize" "deserialize" nil 1)
     ("disalbe" "disable" nil 0)
     ("dlete" "delete" nil 1)
+    ("docsting" "docstring" nil 1)
     ("ecoh" "echo" nil 1)
     ("exapmle" "example" nil 1)
     ("francisco" "Francisco" nil 1)
+    ("functino" "function" nil 1)
     ("gogole" "google" nil 1)
+    ("happenign" "happening" nil 1)
     ("hiippie" "hippie" nil 1)
     ("identifer" "identifier" nil 1)
     ("ikn" "in" nil 1)
     ("imoprt" "import" nil 1)
     ("improt" "import" nil 1)
     ("indiviuals" "individuals" nil 1)
+    ("isthis" "is this" nil 1)
     ("jenkisn" "jenkins" nil 1)
     ("kpb" "kbd" nil 1)
     ("listp" "lisp" nil 0)
@@ -102,6 +108,7 @@
     ("pacage" "package" nil 1)
     ("paht" "path" nil 1)
     ("parentehsis" "parenthesis" nil 1)
+    ("pares" "parse" nil 1)
     ("paswords" "passwords" nil 1)
     ("perhas" "perhaps" nil 1)
     ("platofrm" "platform" nil 1)
@@ -121,6 +128,7 @@
     ("symobl" "symbol" nil 1)
     ("teh" "the" nil 1)
     ("todo" "TODO" nil 1)
+    ("tp" "to" nil 1)
     ("utilitiies" "utilities" nil 1)
     ("vauels" "values" nil 1)
     ("ver" "very" nil 1)
@@ -241,7 +249,9 @@
 
 (define-abbrev-table 'python-mode-abbrev-table '())
 
-(define-abbrev-table 'python-mode-skeleton-abbrev-table '())
+(define-abbrev-table 'python-mode-skeleton-abbrev-table
+  '(
+   ))
 
 (define-abbrev-table 'restclient-mode-abbrev-table '())
 
@@ -274,3 +284,4 @@
 (define-abbrev-table 'vc-git-log-edit-mode-abbrev-table '())
 
 (define-abbrev-table 'vc-git-log-view-mode-abbrev-table '())
+
