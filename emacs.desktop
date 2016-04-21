@@ -1,0 +1,63 @@
+;; -*- mode: emacs-lisp; coding: emacs-mule; -*-
+;; --------------------------------------------------------------------------
+;; Desktop File for Emacs
+;; --------------------------------------------------------------------------
+;; Created Tue Apr 19 15:11:33 2016
+;; Desktop file format version 206
+;; Emacs version 24.5.1
+
+;; Global section:
+(setq desktop-saved-frameset [frameset 1 (22294 44309 552337 0) (desktop . "206") "razzi@Razzis-MBP" nil nil ((((font-backend mac-ct ns) (fontsize . 0) (font . "-*-Menlo-normal-normal-normal-*-18-*-*-*-m-0-iso10646-1") (border-width . 0) (internal-border-width . 2) (vertical-scroll-bars . right) (foreground-color . "#F8F8F2") (background-color . "#272822") (line-spacing) (left-fringe . 11) (right-fringe . 11) (menu-bar-lines . 0) (tool-bar-lines . 0) (title) (icon-type) (auto-raise) (auto-lower) (cursor-type . box) (scroll-bar-width . 15) (alpha) (fullscreen . fullboth) (horizontal-scroll-bars . t) (display-type . color) (background-mode . dark) (cursor-color . "#F8F8F2") (environment) (mouse-color . "#F8F8F2") (frameset--id . "749B-750D-0A0A-2A4F") (frameset--mini t . t) (modeline . t) (minibuffer . t) (unsplittable) (right-divider-width . 0) (bottom-divider-width . 0) (icon-name) (display . "Razzis-MBP") (explicit-name) (tool-bar-position . top) (visibility . t) (height . 51) (width . 170) (left . 0) (top . 0)) ((min-height . 4) (min-width . 20) (min-height-ignore . 4) (min-width-ignore . 12) (min-height-safe . 1) (min-width-safe . 4) (min-pixel-height . 84) (min-pixel-width . 220) (min-pixel-height-ignore . 84) (min-pixel-width-ignore . 132) (min-pixel-height-safe . 21) (min-pixel-width-safe . 44)) hc (pixel-width . 1916) (pixel-height . 1055) (total-width . 174) (total-height . 50) (normal-height . 1.0) (normal-width . 1.0) (combination-limit) (leaf (pixel-width . 959) (pixel-height . 1055) (total-width . 87) (total-height . 50) (normal-height . 1.0) (normal-width . 0.5) (buffer "__init__.py" (selected . t) (hscroll . 0) (fringes 11 11 nil) (margins 3) (scroll-bars 15 2 t nil) (vscroll . 0) (dedicated) (point . 1437) (start . 790))) (leaf (last . t) (pixel-width . 957) (pixel-height . 1055) (total-width . 87) (total-height . 50) (normal-height . 1.0) (normal-width . 0.5) (buffer "*compilation*" (selected) (hscroll . 0) (fringes 11 11 nil) (margins 2) (scroll-bars 15 2 t nil) (vscroll . 0) (dedicated) (point . 1072) (start . 1)))))])
+(setq desktop-missing-file-warning nil)
+(setq tags-file-name nil)
+(setq tags-table-list nil)
+(setq search-ring '("flyche"))
+(setq regexp-search-ring nil)
+(setq register-alist nil)
+(setq file-name-history '("~/.emacs.d/init.el" "~/.emacs.d/ido.last" "~/.emacs.d/recentf" "~/code/django-vector/tests/test_composite_metrics.py" "~/code/.emacs.desktop" "~/todo.org" "/usr/local/Cellar/emacs/24.5/share/emacs/24.5/etc/HELLO" "/usr/local/Cellar/emacs/24.5/share/emacs/24.5/etc/TODO" "~/code/django-vector/django_vector/__init__.py" "~/code/django-vector/tests/models.py" "~/code/django-vector/README.md" "~/code/clint/TAGS" "~/code/clint/webapp/apps/solar/system/vectorized_ss_tree.py" "~/code/django-vector/tests/metrics.py" "~/code/django-vector/tests/test_field_metrics.py" "~/code/zenflow/lib.py" "~/Library/Application Support/Karabiner/private.xml" "~/code/zenflow/start.py" "~/code/zenflow/next.py" "~/.emacs.d/elpa/anzu-20160404.2218/anzu-autoloads.el"))
+
+;; Buffer section -- buffers listed in same order as in buffer list:
+(desktop-create-buffer 206
+  "/Users/razzi/code/django-vector/django_vector/__init__.py"
+  "__init__.py"
+  'python-mode
+  '(abbrev-mode override-global-mode auto-revert-mode global-auto-revert-mode undo-tree-mode highlight-numbers-mode git-gutter-mode linum-mode anzu-mode outline-minor-mode projectile-mode yas-minor-mode flycheck-mode)
+  1437
+  '(1509 nil)
+  nil
+  nil
+  '((tab-width . 4) (indent-tabs-mode) (buffer-file-coding-system . undecided-unix) (overwrite-mode)))
+
+(desktop-create-buffer 206
+  "/Users/razzi/.emacs.d/init.el"
+  "init.el"
+  'emacs-lisp-mode
+  '(abbrev-mode override-global-mode auto-revert-mode global-auto-revert-mode undo-tree-mode highlight-numbers-mode git-gutter-mode linum-mode anzu-mode projectile-mode paredit-mode yas-minor-mode flycheck-mode)
+  3846
+  '(3611 nil)
+  nil
+  nil
+  '((tab-width . 2) (indent-tabs-mode) (buffer-file-coding-system . prefer-utf-8-unix) (overwrite-mode)))
+
+(desktop-create-buffer 206
+  "/Users/razzi/code/django-vector/tests/test_composite_metrics.py"
+  "test_composite_metrics.py"
+  'python-mode
+  '(abbrev-mode override-global-mode global-auto-revert-mode undo-tree-mode highlight-numbers-mode git-gutter-mode linum-mode anzu-mode outline-minor-mode projectile-mode yas-minor-mode flycheck-mode)
+  1
+  '(1 nil)
+  nil
+  nil
+  '((tab-width . 4) (indent-tabs-mode) (buffer-file-coding-system . undecided-unix) (overwrite-mode)))
+
+(desktop-create-buffer 206
+  "/Users/razzi/.emacs.d/desktops/emacs.desktop"
+  "emacs.desktop"
+  'emacs-lisp-mode
+  '(abbrev-mode override-global-mode global-auto-revert-mode undo-tree-mode highlight-numbers-mode git-gutter-mode linum-mode anzu-mode projectile-mode paredit-mode yas-minor-mode flycheck-mode)
+  1
+  '(nil nil)
+  nil
+  nil
+  '((tab-width . 2) (indent-tabs-mode) (buffer-file-coding-system . emacs-mule-unix) (overwrite-mode)))
+
