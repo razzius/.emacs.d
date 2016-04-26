@@ -4,9 +4,9 @@
   abbrev-file-name "~/.emacs.d/abbrev_defs.el"
   backup-directory-alist `((".*" . "~/.emacs.d/backups/"))
   column-number-mode t
-  column-number-mode t
   dired-recursive-deletes 'always
   eshell-rc-script "~/.emacs.d/eshell/profile.el"
+  eshell-banner-message ""
   frame-title-format "%f"
   indent-tabs-mode nil
   inhibit-splash-screen t
@@ -397,6 +397,8 @@
   (define-key evil-insert-state-map (kbd "C-t") 'razzi/transpose-prev-chars)
   (define-key evil-insert-state-map (kbd "C-c a") 'inverse-add-global-abbrev)
 
+  (define-key evil-normal-state-map (kbd "*") 'razzi/star-isearch)
+  (define-key evil-normal-state-map (kbd "#") 'razzi/pound-isearch)
   (define-key evil-normal-state-map (kbd "C-a") 'evil-numbers/inc-at-pt)
   ;; (define-key evil-normal-state-map (kbd "C-x") 'evil-numbers/dec-at-pt)
   (define-key evil-normal-state-map (kbd "C-j") 'windmove-down)
@@ -668,6 +670,21 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   )
 )
 
+(defun razzi/star-isearch ()
+  (interactive)
+  (let ((inhibit-redisplay 1))
+    (isearch-mode t)
+    (isearch-yank-word)
+    (isearch-done)
+    (evil-search-next)))
+
+(defun razzi/pound-isearch ()
+  (interactive)
+  (let ((inhibit-redisplay 1))
+    (isearch-mode nil)
+    (isearch-yank-word)
+    (isearch-done)
+    (evil-search-next)))
 
 (add-hook 'emacs-lisp-mode-hook (lambda ()
     (enable-paredit-mode)
@@ -679,7 +696,8 @@ length of PATH (sans directory slashes) down to MAX-LEN."
     )
   )
 
-(global-set-key (kbd "C-j") 'newline-and-indent)
+;; (global-set-key (kbd "C-j") 'newline-and-indent)
+(global-set-key (kbd "C-j") 'indent-new-comment-line)
 
 (define-key input-decode-map "\C-i" [C-i])
 
@@ -799,7 +817,6 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ;; compile window c-l move window
 ; compile remove line that says mode compilehttp://rsiguard.remedyinteractive.com/products/
 ; no scroll past end of buffer
-; wtf dabbrevs making completion slow... time to company
 ; smarter VV when line has opening paren
 ;; prevent scroll past end of buffer
 ; m-v paste
