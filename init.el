@@ -1,33 +1,29 @@
 (load-file "~/.emacs.d/lisp/init_use_package.el")
 
 (setq
-  abbrev-file-name "~/.emacs.d/abbrev_defs.el"
-  backup-directory-alist `((".*" . "~/.emacs.d/backups/"))
-  column-number-mode t
-  dired-recursive-deletes 'always
-  eshell-rc-script "~/.emacs.d/eshell/profile.el"
-  eshell-banner-message ""
-  tags-add-tables nil ; TODO is this a good default? having multiple merged tables could be cool
+  ;; (setq mouse-wheel-progressive-speed nil)
+  ;; auto-revert-tail-mode? might not scroll past eof
+  ;; http://stackoverflow.com/a/4657856/1636613
   ;; tags-file-name "~/code/clint/etags"
   abbrev-file-name "~/.emacs.d/abbrev_defs.el"
   backup-directory-alist `((".*" . "~/.emacs.d/backups/"))
   column-number-mode t
   compilation-scroll-output t
-  ;; auto-revert-tail-mode? might not scroll past eof
-  ;; http://stackoverflow.com/a/4657856/1636613
-  desktop-dirname "~/.emacs.d/desktops/"
+  desktop-auto-save-timeout 100
   desktop-base-file-name "emacs.desktop"
+  desktop-dirname "~/.emacs.d/desktops/"
   desktop-save t
   dired-recursive-deletes 'always
+  eshell-banner-message ""
   eshell-rc-script "~/.emacs.d/eshell/profile.el"
   frame-title-format "%f"
+  gc-cons-threshold 20000000
   indent-tabs-mode nil
   inhibit-splash-screen t
   inhibit-startup-message t
   initial-scratch-message nil
   isearch-regexp nil
   mouse-wheel-scroll-amount '(1 ((shift) . 1))
-  ;; (setq mouse-wheel-progressive-speed nil)
   next-line-add-newlines nil
   ns-pop-up-frames nil
   python-python-command "/usr/local/bin/python3.5"
@@ -39,6 +35,10 @@
   ring-bell-function 'ignore
   ;; scroll-preserve-screen-position t
   desktop-auto-save-timeout 100
+  tab-width 2
+  tags-add-tables nil ; TODO is this a good default? having multiple merged tables could be cool
+  use-package-always-ensure t
+  vc-follow-symlinks t
   )
 
 (setq-default
@@ -136,7 +136,13 @@
     ido-cannot-complete-command 'ido-next-match
   )
 
-(use-package magit)
+(defun razzi/magit-pull ()
+  (interactive)
+  (magit-pull "develop" nil))
+
+(use-package magit
+  :config
+  (define-key magit-status-mode-map (kbd "]") 'razzi/magit-pull))
 
 (use-package git-gutter
   :config
@@ -937,3 +943,4 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; dired c-j open file
 
 ; helm c-w delete word (clear?)
+; brighter comment color

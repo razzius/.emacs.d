@@ -1,6 +1,8 @@
 ;;-*-coding: utf-8;-*-
 (define-abbrev-table 'Buffer-menu-mode-abbrev-table '())
 
+(define-abbrev-table 'Custom-mode-abbrev-table '())
+
 (define-abbrev-table 'Info-edit-mode-abbrev-table '())
 
 (define-abbrev-table 'ag-mode-abbrev-table '())
@@ -157,6 +159,7 @@
     ("strng" "string" nil 1)
     ("symobl" "symbol" nil 1)
     ("teh" "the" nil 1)
+    ("tocmmoent" "comment" nil 1)
     ("todo" "TODO" nil 6)
     ("tp" "to" nil 1)
     ("utilitiies" "utilities" nil 1)
