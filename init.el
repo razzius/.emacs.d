@@ -5,6 +5,7 @@
   ;; auto-revert-tail-mode? might not scroll past eof
   ;; http://stackoverflow.com/a/4657856/1636613
   ;; tags-file-name "~/code/clint/etags"
+  ediff-window-setup-function 'ediff-setup-windows-plain
   abbrev-file-name "~/.emacs.d/abbrev_defs.el"
   backup-directory-alist `((".*" . "~/.emacs.d/backups/"))
   column-number-mode t
@@ -176,7 +177,7 @@
   :config
   (global-set-key (kbd "M-x") 'helm-M-x)
   (setq
-    ;; helm-mode-fuzzy-match t
+    helm-mode-fuzzy-match t
     helm-M-x-fuzzy-match t
     ;; helm-autoresize-max-height 10
     ;; helm-buffers-fuzzy-match t
@@ -216,9 +217,6 @@
 ;;   :config
 ;;   (ido-ubiquitous-mode 1)
 ;;   )
-
-; (fuzzy-match-score "cf" "colorful" 'fuzzy-jaro-winkler-score)
-; (fuzzy-match "cf" "colorful")
 
 ;; (require 'company-simple-complete "~/.emacs.d/company-complete-cycle.el")
 ;; (use-package auto-complete
@@ -757,6 +755,7 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 
 (defun razzi/star-isearch ()
   (interactive)
+  ; TODO this yanks only to the end of the word, not whole word
   (let ((inhibit-redisplay 1))
     (isearch-mode t)
     (isearch-yank-string (thing-at-point 'word))
@@ -944,3 +943,4 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 
 ; helm c-w delete word (clear?)
 ; brighter comment color
+; after magit, update git gutter

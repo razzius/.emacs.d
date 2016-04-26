@@ -159,6 +159,7 @@
     ("strng" "string" nil 1)
     ("symobl" "symbol" nil 1)
     ("teh" "the" nil 1)
+    ("toay" "today" nil 1)
     ("tocmmoent" "comment" nil 1)
     ("todo" "TODO" nil 6)
     ("tp" "to" nil 1)
