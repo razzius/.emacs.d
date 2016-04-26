@@ -7,6 +7,19 @@
   dired-recursive-deletes 'always
   eshell-rc-script "~/.emacs.d/eshell/profile.el"
   eshell-banner-message ""
+  tags-add-tables nil ; TODO is this a good default? having multiple merged tables could be cool
+  ;; tags-file-name "~/code/clint/etags"
+  abbrev-file-name "~/.emacs.d/abbrev_defs.el"
+  backup-directory-alist `((".*" . "~/.emacs.d/backups/"))
+  column-number-mode t
+  compilation-scroll-output t
+  ;; auto-revert-tail-mode? might not scroll past eof
+  ;; http://stackoverflow.com/a/4657856/1636613
+  desktop-dirname "~/.emacs.d/desktops/"
+  desktop-base-file-name "emacs.desktop"
+  desktop-save t
+  dired-recursive-deletes 'always
+  eshell-rc-script "~/.emacs.d/eshell/profile.el"
   frame-title-format "%f"
   indent-tabs-mode nil
   inhibit-splash-screen t
@@ -14,6 +27,7 @@
   initial-scratch-message nil
   isearch-regexp nil
   mouse-wheel-scroll-amount '(1 ((shift) . 1))
+  ;; (setq mouse-wheel-progressive-speed nil)
   next-line-add-newlines nil
   ns-pop-up-frames nil
   python-python-command "/usr/local/bin/python3.5"
@@ -24,6 +38,7 @@
   gc-cons-threshold 20000000
   ring-bell-function 'ignore
   ;; scroll-preserve-screen-position t
+  desktop-auto-save-timeout 100
   )
 
 (setq-default
@@ -40,6 +55,8 @@
 (global-hl-line-mode 1)
 (global-auto-revert-mode 1)
 ;; (scroll-restore-mode)
+(desktop-save-mode 1)
+(display-time)
 
 ; TODO the close parents are jumpy
 (electric-pair-mode)
@@ -60,6 +77,11 @@
 
 (use-package evil-numbers)
 
+(use-package guide-key
+  :config
+  (guide-key-mode)
+  (setq guide-key/guide-key-sequence t))
+
 (use-package pyenv-mode)
 
 (use-package evil-tabs
@@ -67,6 +89,9 @@
   (global-evil-tabs-mode t))
 
 (use-package thingatpt)
+
+; TODO this doesn't work
+(use-package ag)
 
 (use-package emmet-mode
 	:config
@@ -77,7 +102,8 @@
 	)
 
 (use-package hippie-exp
-  :bind ("<tab>" . hippie-expand)
+  ; TODO only in editing modes
+  ;; :bind ("<tab>" . hippie-expand)
   :config
   (setq hippie-expand-try-functions-list '(
       yas-hippie-try-expand
@@ -169,7 +195,6 @@
 ;; (use-package flycheck-haskell)
 
 (use-package flycheck
-  :disabled t
   :init
   (setq
     flycheck-display-errors-delay .4
@@ -186,21 +211,45 @@
 ;;   (ido-ubiquitous-mode 1)
 ;;   )
 
-(use-package company
-  :config
-  (add-hook 'after-init-hook 'global-company-mode)
-  (setq
-    company-minimum-prefix-length 1
-    )
-  )
+; (fuzzy-match-score "cf" "colorful" 'fuzzy-jaro-winkler-score)
+; (fuzzy-match "cf" "colorful")
+
+;; (require 'company-simple-complete "~/.emacs.d/company-complete-cycle.el")
+;; (use-package auto-complete
+;;   :config
+;;   (ac-config-default)
+;;   (add-to-list 'ac-modes 'eshell-mode)
+;;   (setq
+;;     ac-auto-show-menu 0.1
+;;     ac-delay 0.05
+;;     ac-use-fuzzy t
+;;     ac-auto-start 0
+;;     ac-ignore-case t
+;;     )
+;;   )
+
+;; (defun my-company-hook ()
+;;   (interactive)
+;;   (define-key company-active-map [return] 'nil)
+;;   (define-key company-active-map (kbd "<tab>") 'company-complete-selection)
+;;   )
+
+;; (use-package company
+;;   :config
+;;   (add-hook 'after-init-hook 'global-company-mode)
+;;   ;; (add-hook 'company-mode-hook 'my-company-hook)
+;;   (setq
+;;     company-minimum-prefix-length 1
+;;     )
+;;   )
 
 ;; (require 'company-simple-complete "~/.emacs.d/company-complete-cycle.el")
 
-(use-package company-flx
-  :config
-  (with-eval-after-load 'company
-    (company-flx-mode +1))
-  )
+;; (use-package company-flx
+;;   :config
+;;   (with-eval-after-load 'company
+;;     (company-flx-mode +1))
+;;   )
 
 (use-package markdown-mode
   :config
@@ -246,6 +295,7 @@
 
 (defun edit-init ()
   (interactive)
+  ; TODO open in split if there's only one window currently
   (find-file "~/.emacs.d/init.el")
   )
 
@@ -299,7 +349,15 @@
   ;; (git-gutter:update-all-windows)
   )
 
-(use-package helm-projectile)
+(defun razzi/blame ()
+  (interactive)
+  (evil-scroll-line-to-top nil)
+  (magit-blame "HEAD" buffer-file-name))
+
+(use-package helm-projectile
+  :config
+  (setq projectile-switch-project-action 'projectile-dired)
+  )
 
 ;; (add-to-list 'load-path "~/.emacs.d/pytest-el")
 ;; (require 'pytest)
@@ -312,15 +370,15 @@
     "," 'razzi/append-comma
     ;; "-" 'razzi/run-test-pytest ; todo move to python mode
     "=" 'razzi/run-pytest ; todo move to python mode
-    "8" 'razzi/autopep8
+    "8" 'razzi/autopep8 ; python mode
     ";" 'previous-buffer
     "A" 'add-global-abbrev
     "C" 'razzi/magit-checkout-file
     "E" 'eval-buffer
     "DEL" 'restart-emacs
     "SPC" 'save-buffer
-    "a" 'add-global-abbrev
-    "b" 'magit-blame
+    "a" 'add-global-abbrev ; TODO do I use this?
+    "b" 'razzi/blame
     "c" 'razzi/copy-paragraph
     "d" 'magit-diff-unstaged
     "e" 'eshell
@@ -341,12 +399,22 @@
     "r" 'helm-recentf
     "s" 'switch-to-scratch
     "t" 'helm-projectile
-    "v" 'eval-last-sexp
+    "v" 'eval-last-sexp ; TODO move to lisp mode
+    "x" 'compile
+    ; TODO recompile
+    "z" 'razzi/eshell-in-split
     ;; "b" 'eval-buffer
     )
   )
 
 (use-package pt)
+
+(defun razzi/eshell-in-split ()
+  (interactive)
+  (split-window-below)
+  (other-window 1)
+  (eshell)
+  )
 
 (defun razzi/transpose-prev-chars ()
   (interactive)
@@ -376,8 +444,10 @@
 
 (defun razzi/clear ()
   (interactive)
-  (delete-other-windows)
-  (magit-blame-quit)
+  (if magit-blame-mode
+    (magit-blame-quit)
+    (delete-other-windows)
+    )
   )
 
 (use-package paredit)
@@ -417,8 +487,10 @@
   (define-key evil-normal-state-map (kbd "C-s") 'paredit-forward-slurp-sexp)
   (define-key evil-normal-state-map (kbd "C-x") 'evil-numbers/dec-at-pt)
   (define-key evil-normal-state-map (kbd "M-RET") 'my-toggle-frame-maximized)
+  (define-key evil-normal-state-map (kbd "M-RET") 'my-toggle-frame-maximized)
   (define-key evil-normal-state-map (kbd "M-[") 'my-toggle-frame-left)
   (define-key evil-normal-state-map (kbd "M-]") 'my-toggle-frame-right)
+  (define-key evil-normal-state-map (kbd "M-a") 'mark-whole-buffer)
   (define-key evil-normal-state-map (kbd "M-n") 'elscreen-create)
   (define-key evil-normal-state-map (kbd "M-p") 'scroll-other-window)
   (define-key evil-normal-state-map (kbd "M-q") 'save-buffers-kill-terminal)
@@ -428,6 +500,16 @@
   (define-key evil-normal-state-map (kbd "] SPC") 'razzi/insert-newline-after)
   (define-key evil-normal-state-map (kbd "] c") 'git-gutter:next-hunk)
   (define-key evil-normal-state-map (kbd "gc") 'evilnc-comment-operator)
+  ; todo
+  ;; (define-key evil-normal-state-map (kbd "C-]") 'razzi/tag-in-split)
+  ;; (define-key evil-normal-state-map (kbd "C-x") 'evil-numbers/dec-at-pt)
+
+  ; todo n and N don't work with * and #
+
+  ; doesn't seem to wrap
+  ;; (define-key evil-normal-state-map (kbd "/") 'isearch-forward)
+
+  (define-key evil-operator-state-map (kbd "V") 'evil-a-paragraph)
 
   (define-key evil-visual-state-map (kbd "!") 'sort-lines)
   (define-key evil-visual-state-map (kbd "ae") 'mark-whole-buffer)
@@ -573,6 +655,8 @@ length of PATH (sans directory slashes) down to MAX-LEN."
     (local-set-key (kbd "C-j") 'nil)
     (local-set-key (kbd "C-j") 'abbrev-and-return)
     (local-set-key (kbd "C-a") 'previous-line)
+
+    (add-hook 'eshell-preoutput-filter-functions 'ansi-color-apply)
 
     (evil-define-key 'normal eshell-mode-map
       (kbd "A") 'razzi/eshell-point-to-prompt
@@ -729,6 +813,8 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 
 ; todo
 ; VV ?
+                                        ; if the line ends with ( {, jump to it's pair
+; otherwise
 ; insert mode c-l
 ; wip elisp move stuff into own files
 ; hide undo-tree files
@@ -839,7 +925,15 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ;; }
 ;;     MILESTONE_IDS = { <- indent madness
 ;;         }
+; o to indent new line if in class scope - if 2 lines open on toplevel (hard?)
+; treat _ as a word separator for abbrev / spelling
+; ending docstring indent correctly (autopep8?)
 
 ; xml auto close tag
 ; Q repeat macro
 ; c-x c-f autocomplete file
+; eshell smarter tab completion
+; python: ]] isn't going to next class
+; dired c-j open file
+
+; helm c-w delete word (clear?)

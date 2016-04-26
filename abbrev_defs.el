@@ -3,6 +3,8 @@
 
 (define-abbrev-table 'Info-edit-mode-abbrev-table '())
 
+(define-abbrev-table 'ag-mode-abbrev-table '())
+
 (define-abbrev-table 'awk-mode-abbrev-table '())
 
 (define-abbrev-table 'bibtex-mode-abbrev-table '())
@@ -27,6 +29,8 @@
 
 (define-abbrev-table 'diff-mode-abbrev-table '())
 
+(define-abbrev-table 'display-time-world-mode-abbrev-table '())
+
 (define-abbrev-table 'edebug-eval-mode-abbrev-table '())
 
 (define-abbrev-table 'edit-abbrevs-mode-abbrev-table '())
@@ -48,13 +52,15 @@
     ("ni" "npm install" nil 1)
     ("o" "open" nil 1)
     ("p" "python" nil 2)
-    ("pi" "pip install" nil 1)
-    ("py.test" "t" nil 0)
+    ("pi" "pip install" nil 2)
+    ("t" "py.test" nil 1)
    ))
 
 (define-abbrev-table 'evil-command-window-mode-abbrev-table '())
 
 (define-abbrev-table 'evil-list-view-mode-abbrev-table '())
+
+(define-abbrev-table 'finder-mode-abbrev-table '())
 
 (define-abbrev-table 'fish-mode-abbrev-table '())
 
@@ -70,19 +76,30 @@
   '(
     ("accoutn" "account" nil 1)
     ("acn" "can" nil 1)
+<<<<<<< c50731ae8d9f21395f7974fd5c4d9c4526c8d4e5
     ("autocopmlete" "autocomplete" nil 1)
+=======
+    ("attachign" "attaching" nil 1)
+>>>>>>> Disable company for now
     ("automaic" "automatic" nil 1)
     ("bufer" "buffer" nil 1)
     ("chracters" "characters" nil 1)
+    ("claer" "clear" nil 1)
     ("closign" "closing" nil 1)
     ("cmpletino" "completion" nil 1)
+    ("colun" "column" nil 1)
+    ("coud" "could" nil 1)
+    ("craeted" "created" nil 1)
+    ("createsa" "creates a" nil 1)
     ("curosr" "cursor" nil 1)
     ("dependences" "dependencies" nil 1)
     ("deserealize" "deserialize" nil 1)
+    ("dfe" "def" nil 1)
     ("disalbe" "disable" nil 0)
     ("dlete" "delete" nil 1)
     ("docsting" "docstring" nil 1)
     ("ecoh" "echo" nil 1)
+    ("erognomic" "ergonomic" nil 1)
     ("exapmle" "example" nil 1)
     ("francisco" "Francisco" nil 1)
     ("functino" "function" nil 1)
@@ -101,10 +118,15 @@
     ("locla" "local" nil 0)
     ("maangement" "management" nil 1)
     ("mak" "make" nil 1)
+    ("memebers" "members" nil 1)
     ("mkaing" "making" nil 0)
     ("msg" "message" nil 2)
+    ("needef" "needed" nil 1)
     ("ngineer" "engineer" nil 1)
     ("nwo" "now" nil 0)
+    ("otehrwise" "otherwise" nil 1)
+    ("otherise" "otherwise" nil 1)
+    ("outpt" "output" nil 1)
     ("ovoerwrite" "overwrite" nil 1)
     ("pacage" "package" nil 1)
     ("paht" "path" nil 1)
@@ -117,23 +139,30 @@
     ("pytho" "python" nil 1)
     ("pyton" "python" nil 1)
     ("relatoinships" "relationships" nil 1)
+<<<<<<< c50731ae8d9f21395f7974fd5c4d9c4526c8d4e5
     ("restoer" "restore" nil 1)
+=======
+    ("relevat" "relevant" nil 1)
+>>>>>>> Disable company for now
     ("reveiew" "review" nil 1)
     ("rwap" "wrap" nil 1)
+    ("saluattion" "salutation" nil 1)
     ("scheudle" "schedule" nil 0)
     ("scheudles" "schedules" nil 0)
     ("seach" "search" nil 1)
     ("slef" "self" nil 1)
     ("staet" "State" nil 1)
     ("steramilned" "streamlined" nil 1)
+    ("sth" "something" nil 1)
     ("strng" "string" nil 1)
     ("symobl" "symbol" nil 1)
     ("teh" "the" nil 1)
-    ("todo" "TODO" nil 1)
+    ("todo" "TODO" nil 6)
     ("tp" "to" nil 1)
     ("utilitiies" "utilities" nil 1)
     ("vauels" "values" nil 1)
     ("ver" "very" nil 1)
+    ("wor" "work" nil 1)
     ("yeild" "yield" nil 1)
    ))
 
@@ -266,6 +295,8 @@
 
 (define-abbrev-table 'sgml-mode-abbrev-table '())
 
+(define-abbrev-table 'sh-mode-abbrev-table '())
+
 (define-abbrev-table 'shell-mode-abbrev-table '())
 
 (define-abbrev-table 'snippet-mode-abbrev-table '())
@@ -289,4 +320,6 @@
 (define-abbrev-table 'vc-git-log-edit-mode-abbrev-table '())
 
 (define-abbrev-table 'vc-git-log-view-mode-abbrev-table '())
+
+(define-abbrev-table 'vc-svn-log-view-mode-abbrev-table '())
 
