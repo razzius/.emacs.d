@@ -1,0 +1,15 @@
+# -*- mode: snippet -*-
+# name: test
+# key: test
+# --
+
+from django.test import TestCase
+
+
+class Test${1}(TestCase):
+    """${2}"""
+    def setUp(self):
+        ${3:pass}
+
+    def test_${4}(self):
+        ${5:pass}

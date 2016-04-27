@@ -629,6 +629,31 @@
     )
   )
 
+(add-hook 'ediff-startup-hook (lambda ()
+  (local-set-key (kbd "q") 'my-ediff-quit)))
+
+(defun my-ediff-quit ()
+  "If any of the ediff buffers have been modified, ask if changes
+should be saved. Then quit ediff normally, without asking for
+confirmation"
+  (interactive)
+  (ediff-barf-if-not-control-buffer)
+  (let* ((buf-a ediff-buffer-A)
+         (buf-b ediff-buffer-B)
+         (buf-c ediff-buffer-C)
+         (ctl-buf (current-buffer))
+         (modified (remove-if-not 'buffer-modified-p
+                                  (list buf-a buf-b buf-c))))
+    (let ((save (if modified (yes-or-no-p "Save changes?")nil)))
+      (loop for buf in modified do
+            (progn
+              (set-buffer buf)
+              (if save
+                  (save-buffer)
+                (set-buffer-modified-p nil))))
+      (set-buffer ctl-buf)
+      (ediff-really-quit nil))))
+
 (defun fish-path (path max-len)
   "Return a potentially trimmed-down version of the directory PATH, replacing
 parent directories with their initial characters to try to get the character
