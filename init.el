@@ -669,7 +669,7 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   (interactive)
   (let ((inhibit-redisplay 1))
     (isearch-mode t)
-    (isearch-yank-word)
+    (isearch-yank-string (thing-at-point 'word))
     (isearch-done)
     (evil-search-next)))
 
@@ -677,7 +677,7 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   (interactive)
   (let ((inhibit-redisplay 1))
     (isearch-mode nil)
-    (isearch-yank-word)
+    (isearch-yank-string (thing-at-point 'word))
     (isearch-done)
     (evil-search-next)))
 
