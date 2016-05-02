@@ -18,26 +18,31 @@
   ns-pop-up-frames nil
   python-python-command "/usr/local/bin/python3.5"
   save-abbrevs 'silently
-  tab-width 2
   use-package-always-ensure t
   vc-follow-symlinks t
+  visible-bell nil
   gc-cons-threshold 20000000
+  ring-bell-function 'ignore
+  ;; scroll-preserve-screen-position t
   )
 
-(setq-default abbrev-mode t)
+(setq-default
+  abbrev-mode t
+  tab-width 2
+  )
 
 (add-to-list 'load-path "lisp")
 (tool-bar-mode 0)
 (menu-bar-mode -1)
 (winner-mode 1)
-
 (set-face-attribute 'default nil :height 182)
 (server-start)
 (global-hl-line-mode 1)
 (global-auto-revert-mode 1)
+;; (scroll-restore-mode)
 
-; TODO the close parents are too jumpy
-;; (electric-pair-mode)
+; TODO the close parents are jumpy
+(electric-pair-mode)
 
 ;; (global-set-key (kbd "M-v") 'evil-paste-after)
 
@@ -52,8 +57,6 @@
 
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 (add-hook 'focus-out-hook 'save-if-file)
-
-(add-to-list 'load-path "lisp")
 
 (use-package evil-numbers)
 
@@ -89,7 +92,7 @@
   ;; (highlight-numbers-mode)
   )
 
-;; (use-package fish-mode)
+(use-package fish-mode)
 
 ;; (use-package undo-tree
 ;;   :config
@@ -191,7 +194,7 @@
     )
   )
 
-(require 'company-simple-complete "~/.emacs.d/company-complete-cycle.el")
+;; (require 'company-simple-complete "~/.emacs.d/company-complete-cycle.el")
 
 (use-package company-flx
   :config
@@ -387,56 +390,51 @@
   (setq
     evil-regexp-search nil
     evil-cross-lines t
+    evil-ex-substitute-global t
     )
 
+  ;
   (define-key evil-insert-state-map (kbd "C-`") 'describe-key)
+
   (define-key evil-insert-state-map (kbd "C-a") nil)
+  (define-key evil-insert-state-map (kbd "C-c a") 'inverse-add-global-abbrev)
   (define-key evil-insert-state-map (kbd "C-h") 'delete-backward-char)
   (define-key evil-insert-state-map (kbd "C-k") 'kill-line)
   (define-key evil-insert-state-map (kbd "C-p") 'evil-complete-previous)
   (define-key evil-insert-state-map (kbd "C-t") 'razzi/transpose-prev-chars)
-  (define-key evil-insert-state-map (kbd "C-c a") 'inverse-add-global-abbrev)
 
-  (define-key evil-normal-state-map (kbd "*") 'razzi/star-isearch)
   (define-key evil-normal-state-map (kbd "#") 'razzi/pound-isearch)
+  (define-key evil-normal-state-map (kbd "*") 'razzi/star-isearch)
+  (define-key evil-normal-state-map (kbd "<C-i>") 'evil-jump-forward)
+  (define-key evil-normal-state-map (kbd "<backtab>") 'elscreen-previous)
+  (define-key evil-normal-state-map (kbd "<tab>") 'evil-tabs-goto-tab)
+  (define-key evil-normal-state-map (kbd "=") 'razzi/run-pytest)
   (define-key evil-normal-state-map (kbd "C-a") 'evil-numbers/inc-at-pt)
-  ;; (define-key evil-normal-state-map (kbd "C-x") 'evil-numbers/dec-at-pt)
+  (define-key evil-normal-state-map (kbd "C-h") 'windmove-left)
   (define-key evil-normal-state-map (kbd "C-j") 'windmove-down)
   (define-key evil-normal-state-map (kbd "C-k") 'windmove-up)
-  (define-key evil-normal-state-map (kbd "C-h") 'windmove-left)
-  (define-key evil-normal-state-map (kbd "<C-i>") 'evil-jump-forward)
   (define-key evil-normal-state-map (kbd "C-l") 'windmove-right)
+  (define-key evil-normal-state-map (kbd "C-s") 'paredit-forward-slurp-sexp)
+  (define-key evil-normal-state-map (kbd "C-x") 'evil-numbers/dec-at-pt)
   (define-key evil-normal-state-map (kbd "M-RET") 'my-toggle-frame-maximized)
   (define-key evil-normal-state-map (kbd "M-[") 'my-toggle-frame-left)
   (define-key evil-normal-state-map (kbd "M-]") 'my-toggle-frame-right)
-  (define-key evil-normal-state-map (kbd "M-a") 'mark-whole-buffer)
-  (define-key evil-normal-state-map (kbd "M-p") 'scroll-other-window)
   (define-key evil-normal-state-map (kbd "M-n") 'elscreen-create)
+  (define-key evil-normal-state-map (kbd "M-p") 'scroll-other-window)
   (define-key evil-normal-state-map (kbd "M-q") 'save-buffers-kill-terminal)
   (define-key evil-normal-state-map (kbd "RET") 'razzi/clear)
   (define-key evil-normal-state-map (kbd "[ SPC") 'razzi/insert-newline-before)
-  (define-key evil-normal-state-map (kbd "] SPC") 'razzi/insert-newline-after)
   (define-key evil-normal-state-map (kbd "[ c") 'git-gutter:previous-hunk)
+  (define-key evil-normal-state-map (kbd "] SPC") 'razzi/insert-newline-after)
   (define-key evil-normal-state-map (kbd "] c") 'git-gutter:next-hunk)
   (define-key evil-normal-state-map (kbd "gc") 'evilnc-comment-operator)
-  (define-key evil-normal-state-map (kbd "=") 'razzi/run-pytest)
-  (define-key evil-normal-state-map (kbd "<tab>") 'evil-tabs-goto-tab)
-  (define-key evil-normal-state-map (kbd "<backtab>") 'elscreen-previous)
 
-  ; todo n and N don't work with * and #
-
-  ; doesn't seem to wrap
-  ;; (define-key evil-normal-state-map (kbd "/") 'isearch-forward)
-
-  (define-key evil-operator-state-map (kbd "V") 'evil-a-paragraph)
-  (define-key evil-normal-state-map (kbd "RET") 'delete-other-windows)
-  (define-key evil-normal-state-map (kbd "] c") 'git-gutter:next-hunk)
-  (define-key evil-normal-state-map (kbd "M-]") 'my-toggle-frame-right)
-  (define-key evil-normal-state-map (kbd "M-[") 'my-toggle-frame-left)
-  (define-key evil-normal-state-map (kbd "M-a") 'mark-whole-buffer)
-
+  (define-key evil-visual-state-map (kbd "!") 'sort-lines)
+  (define-key evil-visual-state-map (kbd "ae") 'mark-whole-buffer)
   (define-key evil-visual-state-map (kbd "V") 'evil-a-paragraph)
   (define-key evil-visual-state-map (kbd "s") 'evil-surround-region)
+
+  (define-key evil-operator-state-map (kbd "V") 'evil-a-paragraph)
 
   (add-hook 'evil-insert-state-exit-hook 'save-if-file)
 
@@ -501,6 +499,8 @@
   (venv-initialize-eshell)
   (setq venv-location "~/.emacs.d/venvs")
   )
+
+(use-package s)
 
 (defun razzi/eshell-point-to-prompt ()
   (interactive)
@@ -652,13 +652,8 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   )
 )
 
-; TODO make these not path dependent
-(require 'utils "~/.emacs.d/lisp/utils.el")
+; TODO make this not path dependent
 (require 'razzi/interactive "~/.emacs.d/lisp/interactive.el")
-
-(defun s-trim (s)
-  "Remove whitespace at the beginning and end of a string."
-  (s-trim-left (s-trim-right s)))
 
 (defun razzi/put-after ()
   (interactive)
@@ -719,7 +714,6 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   )
 
 (add-hook 'minibuffer-setup-hook 'minibuffer-config)
-(setq visible-bell nil)
 ;; (setq ring-bell-function 'ignore)
 ;; (setq
 ;;  eshell-banner-message ""
@@ -731,8 +725,7 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   (load-theme 'monokai t)
   )
 
-;; (use-package pony-mode)
-
+(electric-indent-mode -1)
 
 ; todo
 ; VV ?
@@ -742,13 +735,9 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; automatic space after comment!
                                         ; eshell
 ; highlight valid commands
-; don't right align stuff
-; jump to next input line
 ; space as first char to switch back to other frame
 
 ; `. goto last changed spot
-; paste setq combine
-; electric pair
 ; http://acroca.com/blog/2013/09/13/speed-up-github-connection.html
 ; http://wikemacs.org/wiki/Shell#Shell_completion_with_a_nice_menu_.C3.A0_la_zsh
 ; disable scratch save status indicator
@@ -853,3 +842,4 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 
 ; xml auto close tag
 ; Q repeat macro
+; c-x c-f autocomplete file

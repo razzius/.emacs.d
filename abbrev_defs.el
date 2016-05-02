@@ -70,6 +70,7 @@
   '(
     ("accoutn" "account" nil 1)
     ("acn" "can" nil 1)
+    ("autocopmlete" "autocomplete" nil 1)
     ("automaic" "automatic" nil 1)
     ("bufer" "buffer" nil 1)
     ("chracters" "characters" nil 1)
@@ -116,6 +117,7 @@
     ("pytho" "python" nil 1)
     ("pyton" "python" nil 1)
     ("relatoinships" "relationships" nil 1)
+    ("restoer" "restore" nil 1)
     ("reveiew" "review" nil 1)
     ("rwap" "wrap" nil 1)
     ("scheudle" "schedule" nil 0)
@@ -213,7 +215,10 @@
 
 (define-abbrev-table 'magit-status-mode-abbrev-table '())
 
-(define-abbrev-table 'markdown-mode-abbrev-table '())
+(define-abbrev-table 'markdown-mode-abbrev-table
+  '(
+    ("datetie" "datetime" nil 1)
+   ))
 
 (define-abbrev-table 'message-mode-abbrev-table '())
 
