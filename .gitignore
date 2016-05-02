@@ -9,3 +9,4 @@ venvs
 projectile.cache
 projectile-bookmarks.eld
 *.desktop
+/.emacs.desktop.lock

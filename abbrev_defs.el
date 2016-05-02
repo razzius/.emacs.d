@@ -39,7 +39,10 @@
 
 (define-abbrev-table 'emacs-lisp-byte-code-mode-abbrev-table '())
 
-(define-abbrev-table 'emacs-lisp-mode-abbrev-table '())
+(define-abbrev-table 'emacs-lisp-mode-abbrev-table
+  '(
+    ("kdb" "kbd" nil 1)
+   ))
 
 (define-abbrev-table 'epa-info-mode-abbrev-table '())
 
@@ -74,6 +77,8 @@
 
 (define-abbrev-table 'gfm-mode-abbrev-table '())
 
+(define-abbrev-table 'git-rebase-mode-abbrev-table '())
+
 (define-abbrev-table 'global-abbrev-table
   '(
     ("accoutn" "account" nil 1)
@@ -103,16 +108,21 @@
     ("ecoh" "echo" nil 1)
     ("erognomic" "ergonomic" nil 1)
     ("exapmle" "example" nil 1)
+    ("feild" "field" nil 1)
+    ("feld" "field" nil 1)
     ("francisco" "Francisco" nil 1)
     ("functino" "function" nil 1)
     ("gogole" "google" nil 1)
     ("happenign" "happening" nil 1)
     ("hiippie" "hippie" nil 1)
     ("identifer" "identifier" nil 1)
+    ("identiiers" "identifiers" nil 1)
     ("ikn" "in" nil 1)
     ("imoprt" "import" nil 1)
     ("improt" "import" nil 1)
     ("indiviuals" "individuals" nil 1)
+    ("instantaited" "instantiated" nil 1)
+    ("intermeidate" "intermediate" nil 1)
     ("isthis" "is this" nil 1)
     ("jenkisn" "jenkins" nil 1)
     ("kpb" "kbd" nil 1)
@@ -121,11 +131,13 @@
     ("maangement" "management" nil 1)
     ("mak" "make" nil 1)
     ("memebers" "members" nil 1)
+    ("mertric" "Metric" nil 1)
     ("mkaing" "making" nil 0)
     ("msg" "message" nil 2)
     ("needef" "needed" nil 1)
     ("ngineer" "engineer" nil 1)
     ("nwo" "now" nil 0)
+    ("odesn" "doesn" nil 1)
     ("otehrwise" "otherwise" nil 1)
     ("otherise" "otherwise" nil 1)
     ("outpt" "output" nil 1)

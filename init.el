@@ -51,6 +51,7 @@
 (tool-bar-mode 0)
 (menu-bar-mode -1)
 (winner-mode 1)
+(show-paren-mode)
 (set-face-attribute 'default nil :height 182)
 (server-start)
 (global-hl-line-mode 1)
@@ -187,6 +188,7 @@
     ;; helm-split-window-default-side 'below
     ;; helm-always-two-windows nil
     )
+  (define-key helm-map (kbd "C-v") 'find-file-other-window)
   )
 
 (use-package haskell-mode
@@ -379,6 +381,7 @@
     "A" 'add-global-abbrev
     "C" 'razzi/magit-checkout-file
     "E" 'eval-buffer
+    "X" 'delete-file-and-buffer
     "DEL" 'restart-emacs
     "SPC" 'save-buffer
     "a" 'add-global-abbrev ; TODO do I use this?
@@ -564,7 +567,7 @@
   (key-chord-define evil-insert-state-map "kj" 'evil-normal-state)
   (key-chord-define evil-normal-state-map "dp" 'change-inner-parens)
   (setq
-    key-chord-two-keys-delay 0.5
+    key-chord-two-keys-delay 0.2
     )
   )
 
@@ -632,6 +635,8 @@
 (add-hook 'ediff-startup-hook (lambda ()
   (local-set-key (kbd "q") 'my-ediff-quit)))
 
+; TODO doesn't work
+;; http://emacs.stackexchange.com/questions/9322/how-can-i-quit-ediff-immediately-without-having-to-type-y
 (defun my-ediff-quit ()
   "If any of the ediff buffers have been modified, ask if changes
 should be saved. Then quit ediff normally, without asking for
@@ -820,8 +825,9 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 
 (defun minibuffer-config ()
   (interactive)
-  (local-set-key (kbd "C-h") 'nil)
-  (local-set-key (kbd "C-h") 'delete-backward-char)
+  ; TODO re-enable once i figure out helm
+  ;; (local-set-key (kbd "C-h") 'nil)
+  ;; (local-set-key (kbd "C-h") 'delete-backward-char)
   (local-set-key (kbd "C-j") 'exit-minibuffer)
   ; todo
   ;; (local-set-key (kbd "M-v") 'isearch-yank-pop)
@@ -839,7 +845,24 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   (load-theme 'monokai t)
   )
 
+<<<<<<< 92c2fc12619d4884d2c68e529f1510b4688aee5b
 (electric-indent-mode -1)
+=======
+; TODO no confirm
+(defun delete-file-and-buffer ()
+  "Kill the current buffer and deletes the file it is visiting."
+  (interactive)
+  (let ((filename (buffer-file-name)))
+    (when filename
+      (if (vc-backend filename)
+          (vc-delete-file filename)
+        (progn
+          (delete-file filename)
+          (message "Deleted file %s" filename)
+          (kill-buffer))))))
+;; (use-package pony-mode)
+
+>>>>>>> Small changes
 
 ; todo
 ; VV ?
@@ -964,8 +987,15 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; c-x c-f autocomplete file
 ; eshell smarter tab completion
 ; python: ]] isn't going to next class
-; dired c-j open file
+; dired c-j open file!
 
 ; helm c-w delete word (clear?)
 ; brighter comment color
 ; after magit, update git gutter
+
+;; recentf not fuzzy
+
+;python if else indenting
+; delete inside parens not working from start of line
+
+; /Users/razzi/.pyenv/versions/3.4.4/bin/python: No module named virtualfish
