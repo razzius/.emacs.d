@@ -5,7 +5,7 @@
   ;; auto-revert-tail-mode? might not scroll past eof
   ;; http://stackoverflow.com/a/4657856/1636613
   ;; tags-file-name "~/code/clint/etags"
-  ediff-window-setup-function 'ediff-setup-windows-plain
+  ;; scroll-preserve-screen-position t
   abbrev-file-name "~/.emacs.d/abbrev_defs.el"
   backup-directory-alist `((".*" . "~/.emacs.d/backups/"))
   column-number-mode t
@@ -15,6 +15,7 @@
   desktop-dirname "~/.emacs.d/desktops/"
   desktop-save t
   dired-recursive-deletes 'always
+  ediff-window-setup-function 'ediff-setup-windows-plain
   eshell-banner-message ""
   eshell-rc-script "~/.emacs.d/eshell/profile.el"
   frame-title-format "%f"
@@ -28,18 +29,13 @@
   next-line-add-newlines nil
   ns-pop-up-frames nil
   python-python-command "/usr/local/bin/python3.5"
-  save-abbrevs 'silently
-  use-package-always-ensure t
-  vc-follow-symlinks t
-  visible-bell nil
-  gc-cons-threshold 20000000
   ring-bell-function 'ignore
-  ;; scroll-preserve-screen-position t
-  desktop-auto-save-timeout 100
+  save-abbrevs 'silently
   tab-width 2
   tags-add-tables nil ; TODO is this a good default? having multiple merged tables could be cool
   use-package-always-ensure t
   vc-follow-symlinks t
+  visible-bell nil
   )
 
 (setq-default
@@ -59,8 +55,6 @@
 ;; (scroll-restore-mode)
 (desktop-save-mode 1)
 (display-time)
-
-; TODO the close parents are jumpy
 (electric-pair-mode)
 
 ;; (global-set-key (kbd "M-v") 'evil-paste-after)
@@ -104,8 +98,6 @@
 	)
 
 (use-package hippie-exp
-  ; TODO only in editing modes
-  ;; :bind ("<tab>" . hippie-expand)
   :config
   (setq hippie-expand-try-functions-list '(
       yas-hippie-try-expand
@@ -117,7 +109,6 @@
 (use-package highlight-numbers
   :config
   (add-hook 'prog-mode-hook 'highlight-numbers-mode)
-  ;; (highlight-numbers-mode)
   )
 
 (use-package fish-mode)
@@ -142,9 +133,23 @@
   (interactive)
   (magit-pull "develop" nil))
 
+(defun razzi/magit-reset-one-commit ()
+  (interactive)
+  (magit-reset "@^")
+  )
+
+(defun razzi/checkout-previous-branch ()
+  (interactive)
+  (magit-checkout "-")
+  )
+
 (use-package magit
   :config
-  (define-key magit-status-mode-map (kbd "]") 'razzi/magit-pull))
+  (define-key magit-status-mode-map (kbd "]") 'razzi/magit-pull)
+  (define-key magit-status-mode-map (kbd "-") 'razzi/checkout-previous-branch)
+  (define-key magit-status-mode-map (kbd "_") 'magit-diff-less-context)
+  (define-key magit-status-mode-map (kbd "C-`") 'describe-key)
+  (define-key magit-status-mode-map (kbd "@") 'razzi/magit-reset-one-commit))
 
 (use-package git-gutter
   :config
@@ -182,8 +187,8 @@
     helm-M-x-fuzzy-match t
     ;; helm-autoresize-max-height 10
     ;; helm-buffers-fuzzy-match t
-    ;; helm-recentf-fuzzy-match t
-    ;; helm-find-file-fuzzy-match t
+    helm-recentf-fuzzy-match t
+    helm-find-file-fuzzy-match t
     ;; helm-split-window-in-side-p t
     ;; helm-split-window-default-side 'below
     ;; helm-always-two-windows nil
@@ -261,11 +266,6 @@
   :config
   (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
   )
-
-;; (use-package helm
-;;   :config
-;;   (setq helm-autoresize-max-height 20)
-;;   )
 
 (use-package avy)
 
@@ -362,7 +362,7 @@
 
 (use-package helm-projectile
   :config
-  (setq projectile-switch-project-action 'projectile-dired)
+  (setq projectile-switch-project-action 'projectile-find-file)
   )
 
 ;; (add-to-list 'load-path "~/.emacs.d/pytest-el")
@@ -457,6 +457,12 @@
     )
   )
 
+(defun razzi/simple-newline ()
+  "Insert a newline and indent"
+  (interactive)
+  (electric-indent-just-newline nil)
+  (indent-according-to-mode))
+
 (use-package paredit)
 ; todo no delete closing parens
 
@@ -472,13 +478,17 @@
 
   ;
   (define-key evil-insert-state-map (kbd "C-`") 'describe-key)
-
   (define-key evil-insert-state-map (kbd "C-a") nil)
   (define-key evil-insert-state-map (kbd "C-c a") 'inverse-add-global-abbrev)
   (define-key evil-insert-state-map (kbd "C-h") 'delete-backward-char)
+  (define-key evil-insert-state-map (kbd "C-j") 'razzi/simple-newline)
   (define-key evil-insert-state-map (kbd "C-k") 'kill-line)
   (define-key evil-insert-state-map (kbd "C-p") 'evil-complete-previous)
   (define-key evil-insert-state-map (kbd "C-t") 'razzi/transpose-prev-chars)
+  (define-key evil-insert-state-map (kbd "<tab>") 'hippie-expand)
+; hiasdfadfs
+
+
 
   (define-key evil-normal-state-map (kbd "#") 'razzi/pound-isearch)
   (define-key evil-normal-state-map (kbd "*") 'razzi/star-isearch)
@@ -509,12 +519,6 @@
   (define-key evil-normal-state-map (kbd "gc") 'evilnc-comment-operator)
   ; todo
   ;; (define-key evil-normal-state-map (kbd "C-]") 'razzi/tag-in-split)
-  ;; (define-key evil-normal-state-map (kbd "C-x") 'evil-numbers/dec-at-pt)
-
-  ; todo n and N don't work with * and #
-
-  ; doesn't seem to wrap
-  ;; (define-key evil-normal-state-map (kbd "/") 'isearch-forward)
 
   (define-key evil-operator-state-map (kbd "V") 'evil-a-paragraph)
 
@@ -608,13 +612,17 @@
     )
   )
 
-(add-hook 'js-mode-hook (lambda ()
-    (modify-syntax-entry ?_ "w")
-    (setq
-      js-indent-level 2
-      evil-shift-width 2
-      )
-    )
+;; (add-hook 'js-mode-hook (lambda ()
+;;     (modify-syntax-entry ?_ "w")
+;;     (setq
+;;       js-indent-level 2
+;;       evil-shift-width 2
+;;       )
+;;     )
+;;   )
+(use-package js2-mode
+  :config
+  (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
   )
 
 (add-hook 'nxml-mode-hook (lambda ()
@@ -785,7 +793,6 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 
 (defun razzi/star-isearch ()
   (interactive)
-  ; TODO this yanks only to the end of the word, not whole word
   (let ((inhibit-redisplay 1))
     (isearch-mode t)
     (isearch-yank-string (thing-at-point 'word))
@@ -810,14 +817,14 @@ length of PATH (sans directory slashes) down to MAX-LEN."
     )
   )
 
-;; (global-set-key (kbd "C-j") 'newline-and-indent)
-(global-set-key (kbd "C-j") 'indent-new-comment-line)
+;; (global-set-key (kbd "C-j") 'indent-new-comment-line)
 
 (define-key input-decode-map "\C-i" [C-i])
 
 (define-key isearch-mode-map (kbd "C-j") 'isearch-done)
 (define-key isearch-mode-map (kbd "C-h") 'isearch-delete-char)
-;; (define-key isearch-mode-map (kbd "C-`") 'describe-key)
+(define-key isearch-mode-map (kbd "C-`") 'describe-key)
+
 (global-set-key (kbd "M-v") 'nil)
 (global-set-key (kbd "M-v") 'isearch-yank-pop)
 (define-key minibuffer-local-isearch-map (kbd "M-v") 'nil)
@@ -825,29 +832,18 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 
 (defun minibuffer-config ()
   (interactive)
-  ; TODO re-enable once i figure out helm
-  ;; (local-set-key (kbd "C-h") 'nil)
-  ;; (local-set-key (kbd "C-h") 'delete-backward-char)
   (local-set-key (kbd "C-j") 'exit-minibuffer)
   ; todo
   ;; (local-set-key (kbd "M-v") 'isearch-yank-pop)
   )
 
 (add-hook 'minibuffer-setup-hook 'minibuffer-config)
-;; (setq ring-bell-function 'ignore)
-;; (setq
-;;  eshell-banner-message ""
-;;  eshell-scroll-to-bottom-on-input t
-;;  )
 
 (use-package monokai-theme
   :config
   (load-theme 'monokai t)
   )
 
-<<<<<<< 92c2fc12619d4884d2c68e529f1510b4688aee5b
-(electric-indent-mode -1)
-=======
 ; TODO no confirm
 (defun delete-file-and-buffer ()
   "Kill the current buffer and deletes the file it is visiting."
@@ -862,11 +858,9 @@ length of PATH (sans directory slashes) down to MAX-LEN."
           (kill-buffer))))))
 ;; (use-package pony-mode)
 
->>>>>>> Small changes
-
 ; todo
 ; VV ?
-                                        ; if the line ends with ( {, jump to it's pair
+; if the line ends with ( {, jump to it's pair
 ; otherwise
 ; insert mode c-l
 ; wip elisp move stuff into own files
@@ -881,13 +875,10 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; http://wikemacs.org/wiki/Shell#Shell_completion_with_a_nice_menu_.C3.A0_la_zsh
 ; disable scratch save status indicator
 ;; todo ido... http://stackoverflow.com/questions/7860894/ido-mode-and-tab-key-not-working-as-expected-in-24-0-x0-builds
-; v a e
 ;; http://emacs.stackexchange.com/questions/4129/how-do-i-make-ido-switch-to-the-buffer-suggested-by-the-tab-completion-candidate
 					; clever parens >:(
 ; set|var -> set(var)
-; don't move to the right like that emacs...
 ; search c-t transpose chars
-; search c-g cancel
 ; :tag command
 ; open most recent by default?
 ; open recentf list in scratch buffer? x
@@ -897,14 +888,12 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 																				; persistent marks
 ; show marks in gutter
 ; c-j xml put cursor in between tags
-; !!! disable tab to emmet expand in minibuffer x.x
 ; textobj i l
 ;paredit is being overzealous in matching closing
 ; copy path to function
 ; in docstring, auto indent after first
 ; electric pair mode
 
-; search c-g cancel ?
 ; rename current file
 ;persistent undo
 ; c-l c-h switch window left / right
@@ -915,18 +904,6 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; eshell ... up 2 dirs
 ; eshell in split
 ; rgrep bindings
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(ido-cannot-complete-command (quote ido-next-match)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
 
 ; python tab to outdent a level?
 ; python newline when already outdented preserve outdent
@@ -993,9 +970,8 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; brighter comment color
 ; after magit, update git gutter
 
-;; recentf not fuzzy
-
 ;python if else indenting
 ; delete inside parens not working from start of line
 
 ; /Users/razzi/.pyenv/versions/3.4.4/bin/python: No module named virtualfish
+; paredit no delete matching

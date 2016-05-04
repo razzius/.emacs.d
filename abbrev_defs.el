@@ -83,11 +83,8 @@
   '(
     ("accoutn" "account" nil 1)
     ("acn" "can" nil 1)
-<<<<<<< c50731ae8d9f21395f7974fd5c4d9c4526c8d4e5
-    ("autocopmlete" "autocomplete" nil 1)
-=======
     ("attachign" "attaching" nil 1)
->>>>>>> Disable company for now
+    ("autocopmlete" "autocomplete" nil 1)
     ("automaic" "automatic" nil 1)
     ("bufer" "buffer" nil 1)
     ("chracters" "characters" nil 1)
@@ -119,7 +116,9 @@
     ("identiiers" "identifiers" nil 1)
     ("ikn" "in" nil 1)
     ("imoprt" "import" nil 1)
+    ("impor" "import" nil 1)
     ("improt" "import" nil 1)
+    ("ina" "in a" nil 1)
     ("indiviuals" "individuals" nil 1)
     ("instantaited" "instantiated" nil 1)
     ("intermeidate" "intermediate" nil 1)
@@ -127,9 +126,11 @@
     ("jenkisn" "jenkins" nil 1)
     ("kpb" "kbd" nil 1)
     ("listp" "lisp" nil 0)
+    ("loadn" "loan" nil 1)
     ("locla" "local" nil 0)
     ("maangement" "management" nil 1)
     ("mak" "make" nil 1)
+    ("mathing" "matching" nil 1)
     ("memebers" "members" nil 1)
     ("mertric" "Metric" nil 1)
     ("mkaing" "making" nil 0)
@@ -152,12 +153,10 @@
     ("pyhton" "python" nil 1)
     ("pytho" "python" nil 1)
     ("pyton" "python" nil 1)
+    ("rateh" "rate" nil 1)
     ("relatoinships" "relationships" nil 1)
-<<<<<<< c50731ae8d9f21395f7974fd5c4d9c4526c8d4e5
-    ("restoer" "restore" nil 1)
-=======
     ("relevat" "relevant" nil 1)
->>>>>>> Disable company for now
+    ("restoer" "restore" nil 1)
     ("reveiew" "review" nil 1)
     ("rwap" "wrap" nil 1)
     ("saluattion" "salutation" nil 1)
@@ -165,7 +164,7 @@
     ("scheudles" "schedules" nil 0)
     ("seach" "search" nil 1)
     ("slef" "self" nil 1)
-    ("staet" "State" nil 1)
+    ("staet" "state" nil 1)
     ("steramilned" "streamlined" nil 1)
     ("sth" "something" nil 1)
     ("strng" "string" nil 1)
@@ -188,17 +187,7 @@
 
 (define-abbrev-table 'haskell-cabal-mode-abbrev-table '())
 
-(define-abbrev-table 'haskell-compilation-mode-abbrev-table '())
-
-(define-abbrev-table 'haskell-debug-mode-abbrev-table '())
-
-(define-abbrev-table 'haskell-error-mode-abbrev-table '())
-
-(define-abbrev-table 'haskell-interactive-mode-abbrev-table '())
-
 (define-abbrev-table 'haskell-mode-abbrev-table '())
-
-(define-abbrev-table 'haskell-presentation-mode-abbrev-table '())
 
 (define-abbrev-table 'helm-grep-mode-abbrev-table '())
 
@@ -218,13 +207,15 @@
 
 (define-abbrev-table 'image-dired-thumbnail-mode-abbrev-table '())
 
-(define-abbrev-table 'inferior-haskell-mode-abbrev-table '())
-
 (define-abbrev-table 'inferior-python-mode-abbrev-table '())
 
 (define-abbrev-table 'java-mode-abbrev-table '())
 
 (define-abbrev-table 'js-mode-abbrev-table '())
+
+(define-abbrev-table 'js2-jsx-mode-abbrev-table '())
+
+(define-abbrev-table 'js2-mode-abbrev-table '())
 
 (define-abbrev-table 'lisp-mode-abbrev-table '())
 
@@ -260,24 +251,17 @@
 
 (define-abbrev-table 'magit-status-mode-abbrev-table '())
 
-(define-abbrev-table 'markdown-mode-abbrev-table
-  '(
-    ("datetie" "datetime" nil 1)
-   ))
+(define-abbrev-table 'markdown-mode-abbrev-table '())
 
 (define-abbrev-table 'message-mode-abbrev-table '())
 
 (define-abbrev-table 'messages-buffer-mode-abbrev-table '())
-
-(define-abbrev-table 'nxml-mode-abbrev-table '())
 
 (define-abbrev-table 'objc-mode-abbrev-table '())
 
 (define-abbrev-table 'occur-edit-mode-abbrev-table '())
 
 (define-abbrev-table 'occur-mode-abbrev-table '())
-
-(define-abbrev-table 'org-mode-abbrev-table '())
 
 (define-abbrev-table 'outline-mode-abbrev-table '())
 
@@ -299,19 +283,13 @@
 
 (define-abbrev-table 'python-mode-abbrev-table '())
 
-(define-abbrev-table 'python-mode-skeleton-abbrev-table
-  '(
-   ))
+(define-abbrev-table 'python-mode-skeleton-abbrev-table '())
 
 (define-abbrev-table 'restclient-mode-abbrev-table '())
-
-(define-abbrev-table 'ruby-mode-abbrev-table '())
 
 (define-abbrev-table 'select-tags-table-mode-abbrev-table '())
 
 (define-abbrev-table 'sgml-mode-abbrev-table '())
-
-(define-abbrev-table 'sh-mode-abbrev-table '())
 
 (define-abbrev-table 'shell-mode-abbrev-table '())
 
@@ -321,13 +299,7 @@
 
 (define-abbrev-table 'speedbar-mode-abbrev-table '())
 
-(define-abbrev-table 'sql-mode-abbrev-table '())
-
 (define-abbrev-table 'tabulated-list-mode-abbrev-table '())
-
-(define-abbrev-table 'tar-mode-abbrev-table '())
-
-(define-abbrev-table 'term-mode-abbrev-table '())
 
 (define-abbrev-table 'text-mode-abbrev-table '())
 
@@ -338,4 +310,3 @@
 (define-abbrev-table 'vc-git-log-view-mode-abbrev-table '())
 
 (define-abbrev-table 'vc-svn-log-view-mode-abbrev-table '())
-
