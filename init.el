@@ -464,7 +464,6 @@
   (indent-according-to-mode))
 
 (use-package paredit)
-; todo no delete closing parens
 
 (use-package evil
   :config
@@ -482,13 +481,10 @@
   (define-key evil-insert-state-map (kbd "C-c a") 'inverse-add-global-abbrev)
   (define-key evil-insert-state-map (kbd "C-h") 'delete-backward-char)
   (define-key evil-insert-state-map (kbd "C-j") 'razzi/simple-newline)
-  (define-key evil-insert-state-map (kbd "C-k") 'kill-line)
+  (define-key evil-insert-state-map (kbd "C-k") 'paredit-kill)
   (define-key evil-insert-state-map (kbd "C-p") 'evil-complete-previous)
   (define-key evil-insert-state-map (kbd "C-t") 'razzi/transpose-prev-chars)
   (define-key evil-insert-state-map (kbd "<tab>") 'hippie-expand)
-; hiasdfadfs
-
-
 
   (define-key evil-normal-state-map (kbd "#") 'razzi/pound-isearch)
   (define-key evil-normal-state-map (kbd "*") 'razzi/star-isearch)
@@ -504,7 +500,6 @@
   (define-key evil-normal-state-map (kbd "C-s") 'paredit-forward-slurp-sexp)
   (define-key evil-normal-state-map (kbd "C-x") 'evil-numbers/dec-at-pt)
   (define-key evil-normal-state-map (kbd "M-RET") 'my-toggle-frame-maximized)
-  (define-key evil-normal-state-map (kbd "M-RET") 'my-toggle-frame-maximized)
   (define-key evil-normal-state-map (kbd "M-[") 'my-toggle-frame-left)
   (define-key evil-normal-state-map (kbd "M-]") 'my-toggle-frame-right)
   (define-key evil-normal-state-map (kbd "M-a") 'mark-whole-buffer)
@@ -517,6 +512,7 @@
   (define-key evil-normal-state-map (kbd "] SPC") 'razzi/insert-newline-after)
   (define-key evil-normal-state-map (kbd "] c") 'git-gutter:next-hunk)
   (define-key evil-normal-state-map (kbd "gc") 'evilnc-comment-operator)
+  (define-key evil-normal-state-map (kbd "D") 'paredit-kill)
   ; todo
   ;; (define-key evil-normal-state-map (kbd "C-]") 'razzi/tag-in-split)
 
@@ -530,9 +526,6 @@
   (define-key evil-operator-state-map (kbd "V") 'evil-a-paragraph)
 
   (add-hook 'evil-insert-state-exit-hook 'save-if-file)
-
-  ;; todo
-  ;; (define-key evil-insert-state-map (kbd "C-j") 'newline-and-indent)
   )
 
 (use-package evil-nerd-commenter)
@@ -634,11 +627,12 @@
     )
   )
 
-(add-hook 'python-mode-hook (lambda ()
-    ;; (superword-mode)
-    (modify-syntax-entry ?_ "w" python-mode-syntax-table)
-    )
+(defun razzi/python-mode ()
+  (interactive)
+  (modify-syntax-entry ?_ "w" python-mode-syntax-table)
   )
+
+(add-hook 'python-mode-hook 'razzi/python-mode)
 
 (add-hook 'ediff-startup-hook (lambda ()
   (local-set-key (kbd "q") 'my-ediff-quit)))
@@ -900,7 +894,6 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; case insensitive completion eshell
 ; evil f case insensitive
 ; google search!
-; magit rebind j,k
 ; eshell ... up 2 dirs
 ; eshell in split
 ; rgrep bindings
