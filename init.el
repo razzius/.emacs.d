@@ -375,13 +375,15 @@
     "=" 'razzi/run-pytest ; todo move to python mode
     "8" 'razzi/autopep8 ; python mode
     ";" 'previous-buffer
-    "A" 'add-global-abbrev
+    ;; "A" 'add-global-abbrev ; TODO ag current word
     "C" 'razzi/magit-checkout-file
     "E" 'eval-buffer
     "O" 'razzi/put-before
     "X" 'delete-file-and-buffer
     "DEL" 'restart-emacs
     "SPC" 'save-buffer
+    ;; "a" 'add-global-abbrev ; TODO do I use this?
+    ; TODO search
     "b" 'razzi/blame
     "c" 'razzi/copy-paragraph
     "d" 'magit-diff-unstaged
@@ -654,7 +656,7 @@
   (modify-syntax-entry ?_ "w" python-mode-syntax-table)
   (evil-define-key 'insert python-mode-map
       (kbd "#") 'razzi/python-pound-and-space)
-  )
+  (evil-define-key 'insert python-mode-map (kbd "C-h") 'py-electric-backspace))
 
 (add-hook 'python-mode-hook 'razzi/python-mode)
 
@@ -1007,3 +1009,8 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ;; * and # with region
 ; yp yank inside parens
 ; S to kill within quotes for example
+; /Users/razzi/.pyenv/versions/3.4.4/bin/python: No module named virtualfish
+; paredit no delete matching
+; add :tag cmd (find-tag)
+; """ autocomplete python
+; recentf sort
