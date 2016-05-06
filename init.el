@@ -40,6 +40,7 @@
 
 (setq-default
   abbrev-mode t
+  indent-tabs-mode nil
   tab-width 2
   )
 
@@ -59,14 +60,19 @@
 
 ;; (global-set-key (kbd "M-v") 'evil-paste-after)
 
-;; (setq
-;;   whitespace-display-mappings
-;;   '(
-;;     (space-mark 32)
-;;     (newline-mark 10)
-;;   )
-;; )
-;; (global-whitespace-mode)
+(use-package whitespace
+  :config
+  (setq
+    whitespace-display-mappings
+    '(
+      (tab-mark ?\t [?\,A;(B ?\t]))
+    )
+  (setq-default
+    whitespace-style '(face space-after-tab tabs tab-mark)
+  )
+  (global-whitespace-mode)
+  )
+
 
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 (add-hook 'focus-out-hook 'save-if-file)
@@ -175,11 +181,11 @@
 
 (use-package helm
   :defines
-  ;; helm-mode-fuzzy-match
-  ;; helm-M-x-fuzzy-match
+  helm-mode-fuzzy-match
+  helm-M-x-fuzzy-match
   ;; helm-buffers-fuzzy-match
-  ;; helm-find-file-fuzzy-match
-  ;; helm-recentf-fuzzy-match
+  helm-find-file-fuzzy-match
+  helm-recentf-fuzzy-match
   :config
   (global-set-key (kbd "M-x") 'helm-M-x)
   (setq
@@ -303,11 +309,6 @@
   (interactive)
   ; TODO open in split if there's only one window currently
   (find-file "~/.emacs.d/init.el")
-  )
-
-(defun edit-private-xml ()
-  (interactive)
-  (find-file "~/Library/Application Support/Karabiner/private.xml")
   )
 
 (defun razzi/copy-paragraph ()
@@ -473,6 +474,7 @@
     evil-regexp-search nil
     evil-cross-lines t
     evil-ex-substitute-global t
+    evil-shift-width 2
     )
 
   ;
@@ -870,7 +872,6 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; disable scratch save status indicator
 ;; todo ido... http://stackoverflow.com/questions/7860894/ido-mode-and-tab-key-not-working-as-expected-in-24-0-x0-builds
 ;; http://emacs.stackexchange.com/questions/4129/how-do-i-make-ido-switch-to-the-buffer-suggested-by-the-tab-completion-candidate
-					; clever parens >:(
 ; set|var -> set(var)
 ; search c-t transpose chars
 ; :tag command
@@ -879,7 +880,7 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 
 ; search c-w delete word, not paste...
 ; visual block i to block insert
-																				; persistent marks
+; persistent marks
 ; show marks in gutter
 ; c-j xml put cursor in between tags
 ; textobj i l
