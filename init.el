@@ -1,3 +1,4 @@
+; TODO make init.el a series of load-file / require and split things out nicely
 (load-file "~/.emacs.d/lisp/init_use_package.el")
 
 (setq
@@ -891,12 +892,12 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 
 ; todo
 ; VV ?
-; if the line ends with ( {, jump to it's pair
-; otherwise
+; if the line ends with (starts with?) ( {, jump to it's pair
+; otherwise select paragraph
 ; insert mode c-l non-lisp modes
 ; wip elisp move stuff into own files
-; hide undo-tree files
                                         ; eshell
+; C-e eol
 ; highlight valid commands
 ; space as first char to switch back to other frame
 
@@ -916,7 +917,7 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; persistent marks
 ; show marks in gutter
 ; c-j xml put cursor in between tags
-; textobj i l
+; textobj i l !
 ;paredit is being overzealous in matching closing
 ; copy path to function
 ; in docstring, auto indent after first
@@ -994,4 +995,3 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; gf open file at point no confirm
 ;; * and # with region
 ; yp yank inside parens
-;; v i l
