@@ -98,6 +98,7 @@
     ("closign" "closing" nil 1)
     ("cmpletino" "completion" nil 1)
     ("colun" "column" nil 1)
+    ("comand" "command" nil 1)
     ("coud" "could" nil 1)
     ("craeted" "created" nil 1)
     ("createsa" "creates a" nil 1)
@@ -109,13 +110,16 @@
     ("dlete" "delete" nil 1)
     ("docsting" "docstring" nil 1)
     ("ecoh" "echo" nil 1)
+    ("eixt" "exit" nil 1)
     ("erognomic" "ergonomic" nil 1)
     ("exapmle" "example" nil 1)
     ("feild" "field" nil 1)
     ("feld" "field" nil 1)
     ("francisco" "Francisco" nil 1)
+    ("fro" "for" nil 1)
     ("functino" "function" nil 1)
     ("gogole" "google" nil 1)
+    ("gonfirm" "confirm" nil 1)
     ("happenign" "happening" nil 1)
     ("hiippie" "hippie" nil 1)
     ("identifer" "identifier" nil 1)
@@ -129,6 +133,7 @@
     ("instantaited" "instantiated" nil 1)
     ("intermeidate" "intermediate" nil 1)
     ("isthis" "is this" nil 1)
+    ("iwth" "with" nil 1)
     ("jenkisn" "jenkins" nil 1)
     ("kpb" "kbd" nil 1)
     ("listp" "lisp" nil 0)
@@ -145,6 +150,7 @@
     ("ngineer" "engineer" nil 1)
     ("nwo" "now" nil 0)
     ("odesn" "doesn" nil 1)
+    ("oopenin" "opening" nil 1)
     ("otehrwise" "otherwise" nil 1)
     ("otherise" "otherwise" nil 1)
     ("outpt" "output" nil 1)
@@ -160,6 +166,7 @@
     ("pytho" "python" nil 1)
     ("pyton" "python" nil 1)
     ("rateh" "rate" nil 1)
+    ("razi" "razzi" nil 1)
     ("relatoinships" "relationships" nil 1)
     ("relevat" "relevant" nil 1)
     ("requier" "require" nil 1)
@@ -179,12 +186,14 @@
     ("teh" "the" nil 1)
     ("toay" "today" nil 1)
     ("tocmmoent" "comment" nil 1)
-    ("todo" "TODO" nil 6)
+    ("todo" "TODO" nil 10)
     ("tp" "to" nil 1)
     ("utilitiies" "utilities" nil 1)
     ("vauels" "values" nil 1)
     ("ver" "very" nil 1)
+    ("whitepace" "whitespace" nil 1)
     ("wor" "work" nil 1)
+    ("wthout" "without" nil 1)
     ("yeild" "yield" nil 1)
    ))
 
@@ -266,6 +275,8 @@
 
 (define-abbrev-table 'messages-buffer-mode-abbrev-table '())
 
+(define-abbrev-table 'nxml-mode-abbrev-table '())
+
 (define-abbrev-table 'objc-mode-abbrev-table
   '(
    ))
@@ -318,6 +329,8 @@
 
 (define-abbrev-table 'tabulated-list-mode-abbrev-table '())
 
+(define-abbrev-table 'term-mode-abbrev-table '())
+
 (define-abbrev-table 'text-mode-abbrev-table '())
 
 (define-abbrev-table 'url-cookie-mode-abbrev-table '())
@@ -327,4 +340,3 @@
 (define-abbrev-table 'vc-git-log-view-mode-abbrev-table '())
 
 (define-abbrev-table 'vc-svn-log-view-mode-abbrev-table '())
-

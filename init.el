@@ -4,7 +4,6 @@
   ;; (setq mouse-wheel-progressive-speed nil)
   ;; auto-revert-tail-mode? might not scroll past eof
   ;; http://stackoverflow.com/a/4657856/1636613
-  ;; tags-file-name "~/code/clint/etags"
   ;; scroll-preserve-screen-position t
   abbrev-file-name "~/.emacs.d/abbrev_defs.el"
   backup-directory-alist `((".*" . "~/.emacs.d/backups/"))
@@ -33,7 +32,7 @@
   save-abbrevs 'silently
   tab-width 2
   tags-add-tables nil ; TODO is this a good default? having multiple merged tables could be cool
-  use-package-always-ensure t
+  use-package-always-ensure t ; move to init_use_package.el
   vc-follow-symlinks t
   visible-bell nil
   )
@@ -53,12 +52,10 @@
 (server-start)
 (global-hl-line-mode 1)
 (global-auto-revert-mode 1)
-;; (scroll-restore-mode)
 (desktop-save-mode 1)
 (display-time)
 (electric-pair-mode)
-
-;; (global-set-key (kbd "M-v") 'evil-paste-after)
+;; (scroll-restore-mode)
 
 (use-package whitespace
   :config
@@ -96,12 +93,11 @@
 (use-package ag)
 
 (use-package emmet-mode
-	:config
-	(add-hook 'nxml-mode-hook (lambda () (emmet-mode)))
-	(add-hook 'html-mode-hook (lambda () (emmet-mode)))
-
-	(define-key emmet-mode-keymap (kbd "C-j") nil)
-	)
+  :config
+  (add-hook 'nxml-mode-hook (lambda () (emmet-mode)))
+  (add-hook 'html-mode-hook (lambda () (emmet-mode)))
+  (define-key emmet-mode-keymap (kbd "C-j") nil)
+  )
 
 (use-package hippie-exp
   :config
@@ -131,8 +127,8 @@
   :config
   (ido-mode t)
   (setq
-    ido-everywhere t)
-    ido-cannot-complete-command 'ido-next-match
+    ido-everywhere t
+    ido-cannot-complete-command 'ido-next-match)
   )
 
 (defun razzi/magit-pull ()
@@ -289,6 +285,7 @@
 
 (use-package restart-emacs)
 
+; TODO mine for ideas
 (use-package elpy
   :disabled t
   :config
@@ -327,11 +324,6 @@
   (delete-window)
   )
 
-(defun razzi/show-messages ()
-  (interactive)
-  (message "TODO")
-  )
-
 (defun razzi/yank-file-name ()
   (interactive)
   (kill-new buffer-file-name)
@@ -358,7 +350,8 @@
 
 (defun razzi/blame ()
   (interactive)
-  (evil-scroll-line-to-top nil)
+  ; todo
+  ;; (evil-scroll-line-to-top nil)
   (magit-blame "HEAD" buffer-file-name))
 
 (use-package helm-projectile
@@ -385,7 +378,6 @@
     "X" 'delete-file-and-buffer
     "DEL" 'restart-emacs
     "SPC" 'save-buffer
-    "a" 'add-global-abbrev ; TODO do I use this?
     "b" 'razzi/blame
     "c" 'razzi/copy-paragraph
     "d" 'magit-diff-unstaged
@@ -396,7 +388,6 @@
     "i" 'edit-init
     "j" 'avy-goto-char
     ;; "k" 'edit-private-xml
-    "l" 'paredit-forward-slurp-sexp
     "m" 'razzi/show-messages
     "n" 'edit-notes
     "o" 'razzi/put-after
@@ -464,6 +455,23 @@
   (electric-indent-just-newline nil)
   (indent-according-to-mode))
 
+(defun razzi/paredit-change ()
+  "Paredit kill then insert mode"
+  (interactive)
+  (paredit-kill)
+  (evil-insert 0))
+
+(defun razzi/replay-q-macro ()
+  "Insert a newline and indent"
+  (interactive)
+  ; TODO could run @q directly rather than executing those chars as a command
+  (evil-execute-macro 1 "@q"))
+
+(defun razzi/kill-line-and-whitespace ()
+  (interactive)
+  (paredit-kill)
+  (delete-trailing-whitespace))
+
 (use-package paredit)
 
 (use-package evil
@@ -484,6 +492,7 @@
   (define-key evil-insert-state-map (kbd "C-h") 'delete-backward-char)
   (define-key evil-insert-state-map (kbd "C-j") 'razzi/simple-newline)
   (define-key evil-insert-state-map (kbd "C-k") 'paredit-kill)
+  (define-key evil-insert-state-map (kbd "C-l") 'paredit-forward-slurp-sexp)
   (define-key evil-insert-state-map (kbd "C-p") 'evil-complete-previous)
   (define-key evil-insert-state-map (kbd "C-t") 'razzi/transpose-prev-chars)
   (define-key evil-insert-state-map (kbd "<tab>") 'hippie-expand)
@@ -499,7 +508,6 @@
   (define-key evil-normal-state-map (kbd "C-j") 'windmove-down)
   (define-key evil-normal-state-map (kbd "C-k") 'windmove-up)
   (define-key evil-normal-state-map (kbd "C-l") 'windmove-right)
-  (define-key evil-normal-state-map (kbd "C-s") 'paredit-forward-slurp-sexp)
   (define-key evil-normal-state-map (kbd "C-x") 'evil-numbers/dec-at-pt)
   (define-key evil-normal-state-map (kbd "M-RET") 'my-toggle-frame-maximized)
   (define-key evil-normal-state-map (kbd "M-[") 'my-toggle-frame-left)
@@ -514,7 +522,9 @@
   (define-key evil-normal-state-map (kbd "] SPC") 'razzi/insert-newline-after)
   (define-key evil-normal-state-map (kbd "] c") 'git-gutter:next-hunk)
   (define-key evil-normal-state-map (kbd "gc") 'evilnc-comment-operator)
-  (define-key evil-normal-state-map (kbd "D") 'paredit-kill)
+  (define-key evil-normal-state-map (kbd "C") 'razzi/paredit-change)
+  (define-key evil-normal-state-map (kbd "D") 'razzi/kill-line-and-whitespace)
+  (define-key evil-normal-state-map (kbd "Q") 'razzi/replay-q-macro)
   ; todo
   ;; (define-key evil-normal-state-map (kbd "C-]") 'razzi/tag-in-split)
 
@@ -575,12 +585,10 @@
   (yas-global-mode 1)
   )
 
-(defun abbrev-and-return ()
+(defun razzi/eshell-abbrev-and-return ()
   (interactive)
   (expand-abbrev)
-  (eshell-send-input)
-  )
-
+  (eshell-send-input))
 
 (use-package virtualenvwrapper
   :config
@@ -592,7 +600,7 @@
 
 (defun razzi/eshell-point-to-prompt ()
   (interactive)
-  (end-of-buffer)
+  (goto-char (point-max))
   (evil-append 0 0 nil)
   )
 
@@ -663,6 +671,7 @@ confirmation"
       (set-buffer ctl-buf)
       (ediff-really-quit nil))))
 
+; TODO move eshell stuff to own file
 (defun fish-path (path max-len)
   "Return a potentially trimmed-down version of the directory PATH, replacing
 parent directories with their initial characters to try to get the character
@@ -687,55 +696,74 @@ length of PATH (sans directory slashes) down to MAX-LEN."
             components (cdr components)))
     (concat str (reduce (lambda (a b) (concat a "/" b)) components))))
 
-(add-hook 'eshell-mode-hook (lambda ()
-    (local-set-key (kbd "C-u") 'eshell-kill-input)
-    (local-set-key (kbd "M-RET") 'my-toggle-frame-maximized)
-    (local-set-key (kbd "C-j") 'nil)
-    (local-set-key (kbd "C-j") 'abbrev-and-return)
-    (local-set-key (kbd "C-a") 'previous-line)
+;; (defun eshell-rename-buffer-before-command ()
+;;   (let* ((last-input (buffer-substring eshell-last-input-start eshell-last-input-end)))
+;;     (rename-buffer (format "*eshell[%s]$ %s...*" default-directory last-input) t)))
 
-    (add-hook 'eshell-preoutput-filter-functions 'ansi-color-apply)
+;; (defun eshell-rename-buffer-after-command ()
+;;   (rename-buffer (format "*eshell[%s]$ %s*" default-directory (eshell-previous-input-string 0)) t))
 
-    (evil-define-key 'normal eshell-mode-map
-      (kbd "A") 'razzi/eshell-point-to-prompt
-      )
+;; (add-hook 'eshell-pre-command-hook  'eshell-rename-buffer-before-command)
+;; (add-hook 'eshell-post-command-hook 'eshell-rename-buffer-after-command)
 
-    (evil-define-key 'insert eshell-mode-map
-      (kbd "C-c") 'eshell-interrupt-process
-      (kbd "C-a") 'eshell-bol
-      (kbd "C-n") 'eshell-next-input
-      (kbd "C-p") 'eshell-previous-matching-input-from-input
-      )
+(defun razzi/eshell-eof-or-delete (&optional use-region)
+  (interactive)
+  (if (eobp)
+    (eshell-send-eof-to-process)
+    (paredit-forward-delete)))
 
-    ; TODO npm is weird with eshell :O
-    ;; (add-to-list 'eshell-output-filter-functions '(lambda ()
-    ;;   (save-excursion
-    ;;     (replace-regexp "\[[\?0-9]+[hlAGKJ]" "" nil eshell-last-output-start eshell-last-output-end)
-    ;;     )
-    ;;   )
-    ;; )
+(defun razzi/eshell-up-window-or-kill-line ()
+  (interactive)
+  (if (eobp)
+    (windmove-up)
+    (paredit-kill)))
 
-    ; todo
-    ;; (add-hook 'eshell-post-command-hook
-    ;;   (lambda ()
-    ;;     ;; (eshell/ls)
-    ;;     )
-    ;;   )
+(add-hook 'eshell-preoutput-filter-functions 'ansi-color-apply)
 
-    ;; (setq
-    ;;   eshell-prompt-function (lambda ()
-    ;;     (concat
-    ;;     (if venv-current-name
-    ;;       (format "(%s) " venv-current-name)
-    ;;       ""
-    ;;       )
-    ;;       (fish-path (eshell/pwd) 30) " $ "))
-    ;;   eshell-prompt-regexp ".*\$ $"
-    ;;   )
-    ;; )
-    )
-  )
+(evil-define-key 'normal eshell-mode-map
+  (kbd "A") 'razzi/eshell-point-to-prompt
+)
 
+(evil-define-key 'insert eshell-mode-map
+  (kbd "C-a") 'eshell-bol
+  (kbd "C-c") 'eshell-interrupt-process
+  (kbd "C-d") 'razzi/eshell-eof-or-delete
+  (kbd "C-j") 'razzi/eshell-abbrev-and-return
+  (kbd "C-k") 'razzi/eshell-up-window-or-kill-line
+  (kbd "C-n") 'eshell-next-input
+  (kbd "C-p") 'eshell-previous-matching-input-from-input
+  (kbd "C-u") 'eshell-kill-input
+  (kbd "<tab>") 'eshell-pcomplete
+)
+
+  ; TODO npm is weird with eshell :O
+  ;; (add-to-list 'eshell-output-filter-functions '(lambda ()
+  ;;   (save-excursion
+  ;;     (replace-regexp "\[[\?0-9]+[hlAGKJ]" "" nil eshell-last-output-start eshell-last-output-end)
+  ;;     )
+  ;;   )
+  ;; )
+
+; TODO make this ls without showing the prompt and ls
+(add-hook 'eshell-post-command-hook
+  (lambda ()
+    (when (s-starts-with? "cd" (eshell-previous-input-string 0))
+    (with-current-buffer "*eshell*"
+      (eshell-return-to-prompt)
+      (insert "ls")
+      (eshell-send-input)))))
+
+  ;; (setq
+  ;;   eshell-prompt-function (lambda ()
+  ;;     (concat
+  ;;     (if venv-current-name
+  ;;       (format "(%s) " venv-current-name)
+  ;;       ""
+  ;;       )
+  ;;       (fish-path (eshell/pwd) 30) " $ "))
+  ;;   eshell-prompt-regexp ".*\$ $"
+  ;;   )
+  ;; )
 
 
 (defun my-toggle-frame-maximized ()
@@ -803,17 +831,22 @@ length of PATH (sans directory slashes) down to MAX-LEN."
     (isearch-done)
     (evil-search-next)))
 
+(defun razzi/elisp-semicolon-and-space ()
+  (interactive)
+  (insert "; ")
+  )
+
 (add-hook 'emacs-lisp-mode-hook (lambda ()
     (enable-paredit-mode)
+
     (setq
       evil-shift-width 2
       tab-width 2
-      indent-tabs-mode nil
-      )
-    )
-  )
+      indent-tabs-mode nil)
 
-;; (global-set-key (kbd "C-j") 'indent-new-comment-line)
+    (evil-define-key 'insert emacs-lisp-mode-map
+      (kbd ";") 'razzi/elisp-semicolon-and-space)
+  ))
 
 (define-key input-decode-map "\C-i" [C-i])
 
@@ -822,7 +855,7 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 (define-key isearch-mode-map (kbd "C-`") 'describe-key)
 
 (global-set-key (kbd "M-v") 'nil)
-(global-set-key (kbd "M-v") 'isearch-yank-pop)
+(global-set-key (kbd "M-v") 'evil-paste-after)
 (define-key minibuffer-local-isearch-map (kbd "M-v") 'nil)
 (define-key minibuffer-local-isearch-map (kbd "M-v") 'isearch-yank-pop)
 
@@ -852,16 +885,17 @@ length of PATH (sans directory slashes) down to MAX-LEN."
           (delete-file filename)
           (message "Deleted file %s" filename)
           (kill-buffer))))))
+
+; (this is a django mode for emacs)
 ;; (use-package pony-mode)
 
 ; todo
 ; VV ?
 ; if the line ends with ( {, jump to it's pair
 ; otherwise
-; insert mode c-l
+; insert mode c-l non-lisp modes
 ; wip elisp move stuff into own files
 ; hide undo-tree files
-; automatic space after comment!
                                         ; eshell
 ; highlight valid commands
 ; space as first char to switch back to other frame
@@ -876,7 +910,6 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; search c-t transpose chars
 ; :tag command
 ; open most recent by default?
-; open recentf list in scratch buffer? x
 
 ; search c-w delete word, not paste...
 ; visual block i to block insert
@@ -887,7 +920,6 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ;paredit is being overzealous in matching closing
 ; copy path to function
 ; in docstring, auto indent after first
-; electric pair mode
 
 ; rename current file
 ;persistent undo
@@ -895,14 +927,12 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; case insensitive completion eshell
 ; evil f case insensitive
 ; google search!
-; eshell ... up 2 dirs
 ; eshell in split
 ; rgrep bindings
 
 ; python tab to outdent a level?
 ; python newline when already outdented preserve outdent
-; paste during visual should use clipboard
-; rebind c-h to paredit-backward-delete once I figure out what's going on with my init file
+; paste during visual should replace with clipboard
 ; somehow correct things like pyton_source - perhaps trigger an action on insert _
 ; *** reassign variables when I make the same call
 ; with open(fn) as f
@@ -914,26 +944,20 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; tab between only file buffers
 ;; compile window not overwrite
 ;; compile window c-l move window
-; compile remove line that says mode compilehttp://rsiguard.remedyinteractive.com/products/
+; compile remove line that says mode compile
 ; no scroll past end of buffer
 ; smarter VV when line has opening paren
 ;; prevent scroll past end of buffer
 ; m-v paste
 ; projectile c-w kill word
-
-; switching to eshell messes up keybindings
-; c-c only set to cancel in eshell mode
-; c-n only set in eshell mode
-; make comments way more visible
-; tabnew take filename
+; make comments way more visible!
+; :tabnew take filename
 
 ; # automatic insert space after python mode
-;; (my-toggle-frame-right)
 ; persistent winner
 ; spc O put before
-; eshell c-d send exit
 ; """ autoclose with formatted docstring
-; newline after (setq should have 2 indents
+; newline after (setq should have a 2 space indent
 ; eshell isn't putting the cursor on at eol
 
 ; ** do the right close bracket outdent
@@ -954,14 +978,12 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; ending docstring indent correctly (autopep8?)
 
 ; xml auto close tag
-; Q repeat macro
 ; c-x c-f autocomplete file
 ; eshell smarter tab completion
 ; python: ]] isn't going to next class
 ; dired c-j open file!
 
 ; helm c-w delete word (clear?)
-; brighter comment color
 ; after magit, update git gutter
 
 ;python if else indenting
@@ -969,3 +991,7 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 
 ; /Users/razzi/.pyenv/versions/3.4.4/bin/python: No module named virtualfish
 ; paredit no delete matching
+; gf open file at point no confirm
+;; * and # with region
+; yp yank inside parens
+;; v i l
