@@ -33,6 +33,20 @@
 
 (define-abbrev-table 'completion-list-mode-abbrev-table '())
 
+(define-abbrev-table 'conf-colon-mode-abbrev-table '())
+
+(define-abbrev-table 'conf-javaprop-mode-abbrev-table '())
+
+(define-abbrev-table 'conf-ppd-mode-abbrev-table '())
+
+(define-abbrev-table 'conf-space-mode-abbrev-table '())
+
+(define-abbrev-table 'conf-unix-mode-abbrev-table '())
+
+(define-abbrev-table 'conf-windows-mode-abbrev-table '())
+
+(define-abbrev-table 'conf-xdefaults-mode-abbrev-table '())
+
 (define-abbrev-table 'debugger-mode-abbrev-table '())
 
 (define-abbrev-table 'diff-mode-abbrev-table '())
@@ -124,6 +138,7 @@
     ("hiippie" "hippie" nil 1)
     ("identifer" "identifier" nil 1)
     ("identiiers" "identifiers" nil 1)
+    ("idnenting" "indenting" nil 1)
     ("ikn" "in" nil 1)
     ("imoprt" "import" nil 1)
     ("impor" "import" nil 1)
@@ -141,6 +156,7 @@
     ("locla" "local" nil 0)
     ("maangement" "management" nil 1)
     ("mak" "make" nil 1)
+    ("makethis" "make this" nil 1)
     ("mathing" "matching" nil 1)
     ("memebers" "members" nil 1)
     ("mertric" "Metric" nil 1)
@@ -186,12 +202,13 @@
     ("teh" "the" nil 1)
     ("toay" "today" nil 1)
     ("tocmmoent" "comment" nil 1)
-    ("todo" "TODO" nil 10)
+    ("todo" "TODO" nil 13)
     ("tp" "to" nil 1)
     ("utilitiies" "utilities" nil 1)
     ("vauels" "values" nil 1)
     ("ver" "very" nil 1)
     ("whitepace" "whitespace" nil 1)
+    ("wiht" "with" nil 1)
     ("wor" "work" nil 1)
     ("wthout" "without" nil 1)
     ("yeild" "yield" nil 1)
@@ -340,3 +357,4 @@
 (define-abbrev-table 'vc-git-log-view-mode-abbrev-table '())
 
 (define-abbrev-table 'vc-svn-log-view-mode-abbrev-table '())
+

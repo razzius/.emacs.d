@@ -50,6 +50,8 @@
 (winner-mode 1)
 (show-paren-mode)
 (set-face-attribute 'default nil :height 182)
+(set-face-foreground 'font-lock-comment-face "grey")
+(set-face-foreground 'font-lock-doc-face "grey")
 (server-start)
 (global-hl-line-mode 1)
 (global-auto-revert-mode 1)
@@ -376,6 +378,7 @@
     "A" 'add-global-abbrev
     "C" 'razzi/magit-checkout-file
     "E" 'eval-buffer
+    "O" 'razzi/put-before
     "X" 'delete-file-and-buffer
     "DEL" 'restart-emacs
     "SPC" 'save-buffer
@@ -452,12 +455,13 @@
 
 (defun razzi/simple-newline ()
   "Insert a newline and indent"
+  ; TODO indenting in a comment adds too much indentation
   (interactive)
   (electric-indent-just-newline nil)
   (indent-according-to-mode))
 
 (defun razzi/paredit-change ()
-  "Paredit kill then insert mode"
+  "Make vim C use paredit-kill"
   (interactive)
   (paredit-kill)
   (evil-insert 0))
@@ -472,6 +476,13 @@
   (interactive)
   (paredit-kill)
   (delete-trailing-whitespace))
+
+(defun razzi/mark-line-text ()
+  (interactive)
+  (move-end-of-line nil)
+  (set-mark-command nil)
+  (back-to-indentation)
+  )
 
 (use-package paredit)
 
@@ -513,6 +524,7 @@
   (define-key evil-normal-state-map (kbd "M-RET") 'my-toggle-frame-maximized)
   (define-key evil-normal-state-map (kbd "M-[") 'my-toggle-frame-left)
   (define-key evil-normal-state-map (kbd "M-]") 'my-toggle-frame-right)
+  ; TODO make this keep point where it is
   (define-key evil-normal-state-map (kbd "M-a") 'mark-whole-buffer)
   (define-key evil-normal-state-map (kbd "M-n") 'elscreen-create)
   (define-key evil-normal-state-map (kbd "M-p") 'scroll-other-window)
@@ -529,10 +541,9 @@
   ; todo
   ;; (define-key evil-normal-state-map (kbd "C-]") 'razzi/tag-in-split)
 
-  (define-key evil-operator-state-map (kbd "V") 'evil-a-paragraph)
-
   (define-key evil-visual-state-map (kbd "!") 'sort-lines)
   (define-key evil-visual-state-map (kbd "ae") 'mark-whole-buffer)
+  (define-key evil-visual-state-map (kbd "il") 'razzi/mark-line-text)
   (define-key evil-visual-state-map (kbd "V") 'evil-a-paragraph)
   (define-key evil-visual-state-map (kbd "s") 'evil-surround-region)
 
@@ -559,6 +570,7 @@
   (setq
     projectile-enable-caching t
     projectile-completion-system 'helm
+    projectile-switch-project-action #'projectile-commander
     )
   )
 
@@ -568,7 +580,6 @@
   (interactive)
   (change-inner* nil "(")
   ; TODO fails in the middle of words
-  ;; (command-execute 'change-inner nil ["("])
   )
 
 (use-package key-chord
@@ -641,6 +652,8 @@
 (defun razzi/python-mode ()
   (interactive)
   (modify-syntax-entry ?_ "w" python-mode-syntax-table)
+  (evil-define-key 'insert python-mode-map
+      (kbd "#") 'razzi/python-pound-and-space)
   )
 
 (add-hook 'python-mode-hook 'razzi/python-mode)
@@ -729,6 +742,7 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   (kbd "C-a") 'eshell-bol
   (kbd "C-c") 'eshell-interrupt-process
   (kbd "C-d") 'razzi/eshell-eof-or-delete
+  (kbd "C-e") 'end-of-line
   (kbd "C-j") 'razzi/eshell-abbrev-and-return
   (kbd "C-k") 'razzi/eshell-up-window-or-kill-line
   (kbd "C-n") 'eshell-next-input
@@ -816,11 +830,21 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   )
 )
 
+(defun razzi/put-before ()
+  (interactive)
+  (evil-with-single-undo
+    (evil-insert-newline-above)
+    (indent-for-tab-command)
+    (insert (s-trim (current-kill 0)))
+    (forward-line)
+  )
+)
+
 (defun razzi/star-isearch ()
   (interactive)
   (let ((inhibit-redisplay 1))
     (isearch-mode t)
-    (isearch-yank-string (thing-at-point 'word))
+    (isearch-yank-string (thing-at-point 'symbol))
     (isearch-done)
     (evil-search-next)))
 
@@ -828,13 +852,18 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   (interactive)
   (let ((inhibit-redisplay 1))
     (isearch-mode nil)
-    (isearch-yank-string (thing-at-point 'word))
+    (isearch-yank-string (thing-at-point 'symbol))
     (isearch-done)
     (evil-search-next)))
 
 (defun razzi/elisp-semicolon-and-space ()
   (interactive)
   (insert "; ")
+  )
+
+(defun razzi/python-pound-and-space ()
+  (interactive)
+  (insert "# ")
   )
 
 (add-hook 'emacs-lisp-mode-hook (lambda ()
@@ -854,6 +883,7 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 (define-key isearch-mode-map (kbd "C-j") 'isearch-done)
 (define-key isearch-mode-map (kbd "C-h") 'isearch-delete-char)
 (define-key isearch-mode-map (kbd "C-`") 'describe-key)
+(define-key dired-mode-map (kbd "C-j") 'dired-find-file)
 
 (global-set-key (kbd "M-v") 'nil)
 (global-set-key (kbd "M-v") 'evil-paste-after)
@@ -891,42 +921,31 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ;; (use-package pony-mode)
 
 ; todo
+; smarter VV when line has opening paren
 ; VV ?
 ; if the line ends with (starts with?) ( {, jump to it's pair
 ; otherwise select paragraph
 ; insert mode c-l non-lisp modes
 ; wip elisp move stuff into own files
-                                        ; eshell
-; C-e eol
+
+; eshell
 ; highlight valid commands
-; space as first char to switch back to other frame
 
 ; `. goto last changed spot
-; http://acroca.com/blog/2013/09/13/speed-up-github-connection.html
-; http://wikemacs.org/wiki/Shell#Shell_completion_with_a_nice_menu_.C3.A0_la_zsh
-; disable scratch save status indicator
-;; todo ido... http://stackoverflow.com/questions/7860894/ido-mode-and-tab-key-not-working-as-expected-in-24-0-x0-builds
-;; http://emacs.stackexchange.com/questions/4129/how-do-i-make-ido-switch-to-the-buffer-suggested-by-the-tab-completion-candidate
 ; set|var -> set(var)
 ; search c-t transpose chars
 ; :tag command
-; open most recent by default?
 
 ; search c-w delete word, not paste...
 ; visual block i to block insert
 ; persistent marks
 ; show marks in gutter
 ; c-j xml put cursor in between tags
-; textobj i l !
-;paredit is being overzealous in matching closing
-; copy path to function
 ; in docstring, auto indent after first
 
 ; rename current file
 ;persistent undo
-; c-l c-h switch window left / right
 ; case insensitive completion eshell
-; evil f case insensitive
 ; google search!
 ; eshell in split
 ; rgrep bindings
@@ -934,8 +953,9 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; python tab to outdent a level?
 ; python newline when already outdented preserve outdent
 ; paste during visual should replace with clipboard
-; somehow correct things like pyton_source - perhaps trigger an action on insert _
-; *** reassign variables when I make the same call
+; somehow correct things like pyton_source - perhaps using syntax for word versus symbol
+; *** razzi/extract-as-variable
+; reassign variables when I make the same call
 ; with open(fn) as f
 ;   x = f.read()
 ;   y = json.parse(f.read())
@@ -947,16 +967,10 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ;; compile window c-l move window
 ; compile remove line that says mode compile
 ; no scroll past end of buffer
-; smarter VV when line has opening paren
 ;; prevent scroll past end of buffer
-; m-v paste
 ; projectile c-w kill word
-; make comments way more visible!
 ; :tabnew take filename
 
-; # automatic insert space after python mode
-; persistent winner
-; spc O put before
 ; """ autoclose with formatted docstring
 ; newline after (setq should have a 2 space indent
 ; eshell isn't putting the cursor on at eol
@@ -982,16 +996,14 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; c-x c-f autocomplete file
 ; eshell smarter tab completion
 ; python: ]] isn't going to next class
-; dired c-j open file!
 
 ; helm c-w delete word (clear?)
 ; after magit, update git gutter
 
 ;python if else indenting
-; delete inside parens not working from start of line
+; delete inside parens (dp) not working from inside parens
 
-; /Users/razzi/.pyenv/versions/3.4.4/bin/python: No module named virtualfish
-; paredit no delete matching
 ; gf open file at point no confirm
 ;; * and # with region
 ; yp yank inside parens
+; S to kill within quotes for example
