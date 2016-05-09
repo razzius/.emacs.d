@@ -403,7 +403,7 @@
     "q" 'evil-tab-sensitive-quit
     "r" 'helm-recentf
     "s" 'switch-to-scratch
-    "t" 'helm-projectile
+    "t" 'projectile-find-file
     "v" 'eval-last-sexp ; TODO move to lisp mode
     "x" 'compile
     ; TODO recompile
@@ -488,6 +488,14 @@
 
 (use-package paredit)
 
+(defun razzi/transpose-lines ( )
+  "Switch the current and next lines"
+  (interactive)
+  (forward-line 1)
+  (transpose-lines 1)
+  (forward-line -1)
+  )
+
 (use-package evil
   :config
   (evil-mode 1)
@@ -517,6 +525,9 @@
   (define-key evil-normal-state-map (kbd "<backtab>") 'elscreen-previous)
   (define-key evil-normal-state-map (kbd "<tab>") 'evil-tabs-goto-tab)
   (define-key evil-normal-state-map (kbd "=") 'razzi/run-pytest)
+  (define-key evil-normal-state-map (kbd "-") 'razzi/transpose-lines)
+  (define-key evil-normal-state-map (kbd "j") 'evil-next-line-first-non-blank) ; TODO are these good?
+  (define-key evil-normal-state-map (kbd "k") 'evil-previous-line-first-non-blank)
   (define-key evil-normal-state-map (kbd "C-a") 'evil-numbers/inc-at-pt)
   (define-key evil-normal-state-map (kbd "C-h") 'windmove-left)
   (define-key evil-normal-state-map (kbd "C-j") 'windmove-down)
@@ -1017,4 +1028,16 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; paredit no delete matching
 ; add :tag cmd (find-tag)
 ; """ autocomplete python
+; (see http://stackoverflow.com/questions/19676181/electric-pair-mode-and-python-triple-quotes?rq=1)
 ; recentf sort
+; smerge mode bindings
+; projectile find file isn't fuzzy
+; rebind c-h to backspace in evil-ex
+; simpler defun yasnippet
+; ~ move to first char that can have its case switched?
+; magit commit autopopulate with ref, and go straight into insert mode
+; magit Z stash no message
+; magit some way to pop most recent stash
+; bind substitute that looks like
+; (define-key evil-normal-state-map (kbd "g / r") (lambda () (evil-ex "%s/")))
+; magit k magit-discard-item no confirm
