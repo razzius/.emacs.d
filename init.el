@@ -640,6 +640,10 @@
 (use-package js2-mode
   :config
   (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+    (setq
+      js-indent-level 2
+      evil-shift-width 2
+      )
   )
 
 (add-hook 'nxml-mode-hook (lambda ()
@@ -890,7 +894,7 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 (global-set-key (kbd "M-v") 'nil)
 (global-set-key (kbd "M-v") 'evil-paste-after)
 (define-key minibuffer-local-isearch-map (kbd "M-v") 'nil)
-(define-key minibuffer-local-isearch-map (kbd "M-v") 'isearch-yank-pop)
+(define-key minibuffer-local-isearch-map (kbd "M-v") 'isearch-yank-kill)
 
 (defun minibuffer-config ()
   (interactive)
