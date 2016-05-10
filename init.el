@@ -44,6 +44,10 @@
   tab-width 2
   )
 
+(use-package monokai-theme
+  :config
+  (load-theme 'monokai t))
+
 (add-to-list 'load-path "lisp")
 (tool-bar-mode 0)
 (menu-bar-mode -1)
@@ -58,7 +62,6 @@
 (desktop-save-mode 1)
 (display-time)
 (electric-pair-mode)
-;; (scroll-restore-mode)
 
 (use-package whitespace
   :config
@@ -548,6 +551,7 @@
   (define-key evil-normal-state-map (kbd "] SPC") 'razzi/insert-newline-after)
   (define-key evil-normal-state-map (kbd "] c") 'git-gutter:next-hunk)
   (define-key evil-normal-state-map (kbd "gc") 'evilnc-comment-operator)
+  (define-key evil-normal-state-map (kbd "gf") 'razzi/file-at-point)
   (define-key evil-normal-state-map (kbd "C") 'razzi/paredit-change)
   (define-key evil-normal-state-map (kbd "D") 'razzi/kill-line-and-whitespace)
   (define-key evil-normal-state-map (kbd "Q") 'razzi/replay-q-macro)
@@ -559,6 +563,8 @@
   (define-key evil-visual-state-map (kbd "il") 'razzi/mark-line-text)
   (define-key evil-visual-state-map (kbd "V") 'evil-a-paragraph)
   (define-key evil-visual-state-map (kbd "s") 'evil-surround-region)
+  (define-key evil-visual-state-map (kbd "*") 'razzi/star-isearch)
+  (define-key evil-visual-state-map (kbd "#") 'razzi/pound-isearch)
 
   (define-key evil-operator-state-map (kbd "V") 'evil-a-paragraph)
 
@@ -847,6 +853,10 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   )
 )
 
+(defun razzi/file-at-point ()
+  (interactive)
+  (find-file-at-point (thing-at-point 'symbol)))
+
 (defun razzi/put-before ()
   (interactive)
   (evil-with-single-undo
@@ -857,22 +867,48 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   )
 )
 
+; TODO refactor
 (defun razzi/star-isearch ()
   (interactive)
-  (let ((inhibit-redisplay 1))
+  (let ((inhibit-redisplay 1)
+        (text (if (use-region-p)
+                (buffer-substring-no-properties (region-beginning) (region-end))
+                (thing-at-point 'symbol))))
+    (evil-exit-visual-state)
     (isearch-mode t)
-    (isearch-yank-string (thing-at-point 'symbol))
+    ;; (isearch-toggle-regexp)
+    (isearch-yank-string text)
     (isearch-done)
     (evil-search-next)))
 
 (defun razzi/pound-isearch ()
   (interactive)
-  (let ((inhibit-redisplay 1))
+  (let ((inhibit-redisplay 1)
+        (text (if (use-region-p)
+                (buffer-substring-no-properties (region-beginning) (region-end))
+                (thing-at-point 'symbol))))
+    (evil-exit-visual-state)
     (isearch-mode nil)
-    (isearch-yank-string (thing-at-point 'symbol))
+    ;; (isearch-toggle-regexp)
+    (isearch-yank-string text)
     (isearch-done)
     (evil-search-next)))
 
+;; (defun razzi/pound-isearch ()
+;;   (interactive)
+;;   (let ((inhibit-redisplay 1)
+;;         (text (if (use-region-p)
+;;                 (buffer-substring-no-properties (region-beginning) (region-end))
+;;                 (thing-at-point 'symbol))))
+;;     (evil-exit-visual-state)
+;;     (isearch-mode nil)
+;;     ;; (isearch-toggle-regexp)
+;;     (setq isearch-regexp nil)
+;;     (isearch-yank-string text)
+;;     (isearch-done)
+;;     (evil-search-next)))
+
+; TODO paredit-semicolon
 (defun razzi/elisp-semicolon-and-space ()
   (interactive)
   (insert "; ")
@@ -915,11 +951,6 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   )
 
 (add-hook 'minibuffer-setup-hook 'minibuffer-config)
-
-(use-package monokai-theme
-  :config
-  (load-theme 'monokai t)
-  )
 
 ; TODO no confirm
 (defun delete-file-and-buffer ()
@@ -1020,11 +1051,8 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ;python if else indenting
 ; delete inside parens (dp) not working from inside parens
 
-; gf open file at point no confirm
-;; * and # with region
 ; yp yank inside parens
 ; S to kill within quotes for example
-; /Users/razzi/.pyenv/versions/3.4.4/bin/python: No module named virtualfish
 ; paredit no delete matching
 ; add :tag cmd (find-tag)
 ; """ autocomplete python
@@ -1041,3 +1069,4 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; bind substitute that looks like
 ; (define-key evil-normal-state-map (kbd "g / r") (lambda () (evil-ex "%s/")))
 ; magit k magit-discard-item no confirm
+; star-isearch in middle of long symbol such as razzi/x
