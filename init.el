@@ -520,6 +520,7 @@
   (define-key evil-insert-state-map (kbd "C-l") 'paredit-forward-slurp-sexp)
   (define-key evil-insert-state-map (kbd "C-p") 'evil-complete-previous)
   (define-key evil-insert-state-map (kbd "C-t") 'razzi/transpose-prev-chars)
+  (define-key evil-insert-state-map (kbd "C-;") 'paredit-semicolon) ; TODO emacs only
   (define-key evil-insert-state-map (kbd "<tab>") 'hippie-expand)
 
   (define-key evil-normal-state-map (kbd "#") 'razzi/pound-isearch)
@@ -570,6 +571,11 @@
 
   (add-hook 'evil-insert-state-exit-hook 'save-if-file)
   )
+
+; TODO use to refactor star-isearch
+;; (use-package evil-visualstar
+;;   :config
+;;   (global-evil-visualstar-mode t))
 
 (use-package evil-nerd-commenter)
 
@@ -867,32 +873,54 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   )
 )
 
+;; asdf/a
+;; asdf/hi
+;; asdf/a
+;; sadf
+;; asdf/h
+
 ; TODO refactor
 (defun razzi/star-isearch ()
   (interactive)
   (let ((inhibit-redisplay 1)
+        (selection (evil-visual-state-p))
+        (visual-type (evil-visual-type))
         (text (if (use-region-p)
                 (buffer-substring-no-properties (region-beginning) (region-end))
                 (thing-at-point 'symbol))))
+    ; Go to the start of the word if not in visual and not already at the start
+    (when (and (not selection)
+               (not (looking-at "\\<")))
+      (backward-word))
     (evil-exit-visual-state)
     (isearch-mode t)
-    ;; (isearch-toggle-regexp)
     (isearch-yank-string text)
     (isearch-done)
-    (evil-search-next)))
+    (evil-search-next)
+    (when (and
+            selection
+            (not (eq visual-type 'line)))
+      (evil-search-previous))))
 
 (defun razzi/pound-isearch ()
   (interactive)
   (let ((inhibit-redisplay 1)
+        (selection (evil-visual-state-p))
         (text (if (use-region-p)
                 (buffer-substring-no-properties (region-beginning) (region-end))
                 (thing-at-point 'symbol))))
+    (when (and (not selection)
+               (not (looking-at "\\<")))
+      (backward-word))
     (evil-exit-visual-state)
     (isearch-mode nil)
-    ;; (isearch-toggle-regexp)
     (isearch-yank-string text)
     (isearch-done)
-    (evil-search-next)))
+    (evil-search-next)
+    (when (and
+            selection
+            (not (eq visual-type 'line)))
+      (evil-search-previous))))
 
 ;; (defun razzi/pound-isearch ()
 ;;   (interactive)
