@@ -11,7 +11,7 @@
   column-number-mode t
   compilation-scroll-output t
   desktop-auto-save-timeout 100
-  desktop-base-file-name "emacs.desktop"
+  ;; desktop-base-file-name "emacs.desktop"
   desktop-dirname "~/.emacs.d/desktops/"
   desktop-save t
   dired-recursive-deletes 'always
@@ -51,7 +51,7 @@
 (add-to-list 'load-path "lisp")
 (tool-bar-mode 0)
 (menu-bar-mode -1)
-(winner-mode 1)
+;; (winner-mode 1)
 (show-paren-mode)
 (set-face-attribute 'default nil :height 182)
 (set-face-foreground 'font-lock-comment-face "grey")
@@ -59,7 +59,7 @@
 (server-start)
 (global-hl-line-mode 1)
 (global-auto-revert-mode 1)
-(desktop-save-mode 1)
+;; (desktop-save-mode 1)
 (display-time)
 (electric-pair-mode)
 
@@ -89,9 +89,9 @@
 
 (use-package pyenv-mode)
 
-(use-package evil-tabs
-  :config
-  (global-evil-tabs-mode t))
+;; (use-package evil-tabs
+;;   :config
+;;   (global-evil-tabs-mode t))
 
 (use-package thingatpt)
 
@@ -361,8 +361,8 @@
 
 (use-package helm-projectile
   :config
-  (setq projectile-switch-project-action 'projectile-find-file)
-  )
+  (setq
+    projectile-switch-project-action 'projectile-find-file))
 
 ;; (add-to-list 'load-path "~/.emacs.d/pytest-el")
 ;; (require 'pytest)
@@ -401,7 +401,7 @@
     ; "p" 'razzi/edit-eshell-profile
     "p" 'razzi/importmagic
     ;; "q" 'razzi/kill-buffer-and-window
-    "q" 'evil-tab-sensitive-quit
+    "q" 'kill-buffer
     "r" 'helm-recentf
     "s" 'switch-to-scratch
     "t" 'projectile-find-file
@@ -537,7 +537,7 @@
   (define-key evil-normal-state-map (kbd "#") 'razzi/pound-isearch)
   (define-key evil-normal-state-map (kbd "*") 'razzi/star-isearch)
   (define-key evil-normal-state-map (kbd "<C-i>") 'evil-jump-forward)
-  (define-key evil-normal-state-map (kbd "<backtab>") 'elscreen-previous)
+  ;; (define-key evil-normal-state-map (kbd "<backtab>") 'elscreen-previous)
   (define-key evil-normal-state-map (kbd "<tab>") 'evil-tabs-goto-tab)
   (define-key evil-normal-state-map (kbd "=") 'razzi/run-pytest)
   (define-key evil-normal-state-map (kbd "-") 'razzi/transpose-next-line)
@@ -555,7 +555,7 @@
   (define-key evil-normal-state-map (kbd "M-]") 'my-toggle-frame-right)
   ; TODO make this keep point where it is
   (define-key evil-normal-state-map (kbd "M-a") 'mark-whole-buffer)
-  (define-key evil-normal-state-map (kbd "M-n") 'elscreen-create)
+  ;; (define-key evil-normal-state-map (kbd "M-n") 'elscreen-create)
   (define-key evil-normal-state-map (kbd "M-p") 'scroll-other-window)
   (define-key evil-normal-state-map (kbd "M-q") 'save-buffers-kill-terminal)
   (define-key evil-normal-state-map (kbd "RET") 'razzi/clear)
@@ -701,7 +701,8 @@
   (interactive)
   (modify-syntax-entry ?_ "w" python-mode-syntax-table)
   (evil-define-key 'insert python-mode-map
-    (kbd "#") 'razzi/python-pound-and-space)
+    (kbd "#") 'razzi/python-pound-and-space
+    (kbd ";") 'razzi/python-pound-and-space)
   (evil-define-key 'insert python-mode-map (kbd "C-h") 'py-electric-backspace))
 
 (add-hook 'python-mode-hook 'razzi/python-mode)
@@ -1080,3 +1081,6 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; visual ' surround in quotes
 ; visual ) surround in parens
 ; c-' " insert mode
+; Y y$
+; helm fuzzy findn file
+; * and # show numbers
