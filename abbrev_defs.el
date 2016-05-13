@@ -212,6 +212,7 @@
     ("steramilned" "streamlined" nil 1)
     ("sth" "something" nil 1)
     ("strng" "string" nil 1)
+    ("symboc" "symbol" nil 1)
     ("symobl" "symbol" nil 1)
     ("teh" "the" nil 4)
     ("toay" "today" nil 1)

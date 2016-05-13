@@ -433,7 +433,6 @@
 
 (defun razzi/importmagic ()
   (interactive)
-  ; todo use the -o flag and prepend the imports
   (shell-command
     (format "python ~/code/python_scripts/import_magic.py -i %s" buffer-file-name))
   )
@@ -472,7 +471,6 @@
   (evil-insert 0))
 
 (defun razzi/replay-q-macro ()
-  "Insert a newline and indent"
   (interactive)
   ; TODO could run @q directly rather than executing those chars as a command
   (evil-execute-macro 1 "@q"))
@@ -491,12 +489,27 @@
 
 (use-package paredit)
 
-(defun razzi/transpose-lines ( )
+(defun razzi/transpose-next-lines ()
   "Switch the current and next lines"
   (interactive)
   (forward-line 1)
   (transpose-lines 1)
   (forward-line -1)
+  )
+
+(defun razzi/transpose-previous-line ()
+  "Switch the current and previous lines"
+  (interactive)
+  (transpose-lines 1)
+  (forward-line -2)
+  )
+
+(defun razzi/wrap-in-parens ()
+  "set|var -> set(var)"
+  (interactive)
+  (insert "(")
+  (forward-symbol 1)
+  (insert ")")
   )
 
 (use-package evil
@@ -510,7 +523,6 @@
     evil-shift-width 2
     )
 
-  ;
   (define-key evil-insert-state-map (kbd "C-`") 'describe-key)
   (define-key evil-insert-state-map (kbd "C-a") nil)
   (define-key evil-insert-state-map (kbd "C-c a") 'inverse-add-global-abbrev)
@@ -522,6 +534,7 @@
   (define-key evil-insert-state-map (kbd "C-t") 'razzi/transpose-prev-chars)
   (define-key evil-insert-state-map (kbd "C-;") 'paredit-semicolon) ; TODO emacs only
   (define-key evil-insert-state-map (kbd "<tab>") 'hippie-expand)
+  (define-key evil-insert-state-map (kbd "<C-return>") 'razzi/wrap-in-parens) ; consider rebinding to c-(
 
   (define-key evil-normal-state-map (kbd "#") 'razzi/pound-isearch)
   (define-key evil-normal-state-map (kbd "*") 'razzi/star-isearch)
@@ -529,9 +542,10 @@
   (define-key evil-normal-state-map (kbd "<backtab>") 'elscreen-previous)
   (define-key evil-normal-state-map (kbd "<tab>") 'evil-tabs-goto-tab)
   (define-key evil-normal-state-map (kbd "=") 'razzi/run-pytest)
-  (define-key evil-normal-state-map (kbd "-") 'razzi/transpose-lines)
-  (define-key evil-normal-state-map (kbd "j") 'evil-next-line-first-non-blank) ; TODO are these good?
-  (define-key evil-normal-state-map (kbd "k") 'evil-previous-line-first-non-blank)
+  (define-key evil-normal-state-map (kbd "-") 'razzi/transpose-next-line)
+  (define-key evil-normal-state-map (kbd "_") 'razzi/transpose-previous-line)
+  ;; (define-key evil-normal-state-map (kbd "j") 'evil-next-line-first-non-blank) ; TODO only if in whitespace already
+  ;; (define-key evil-normal-state-map (kbd "k") 'evil-previous-line-first-non-blank)
   (define-key evil-normal-state-map (kbd "C-a") 'evil-numbers/inc-at-pt)
   (define-key evil-normal-state-map (kbd "C-h") 'windmove-left)
   (define-key evil-normal-state-map (kbd "C-j") 'windmove-down)
@@ -553,6 +567,8 @@
   (define-key evil-normal-state-map (kbd "] c") 'git-gutter:next-hunk)
   (define-key evil-normal-state-map (kbd "gc") 'evilnc-comment-operator)
   (define-key evil-normal-state-map (kbd "gf") 'razzi/file-at-point)
+  (define-key evil-normal-state-map (kbd "g;") 'evilnc-comment-or-uncomment-lines)
+  (define-key evil-normal-state-map (kbd "g'") 'goto-last-change)
   (define-key evil-normal-state-map (kbd "C") 'razzi/paredit-change)
   (define-key evil-normal-state-map (kbd "D") 'razzi/kill-line-and-whitespace)
   (define-key evil-normal-state-map (kbd "Q") 'razzi/replay-q-macro)
@@ -682,7 +698,7 @@
   (interactive)
   (modify-syntax-entry ?_ "w" python-mode-syntax-table)
   (evil-define-key 'insert python-mode-map
-      (kbd "#") 'razzi/python-pound-and-space)
+    (kbd "#") 'razzi/python-pound-and-space)
   (evil-define-key 'insert python-mode-map (kbd "C-h") 'py-electric-backspace))
 
 (add-hook 'python-mode-hook 'razzi/python-mode)
@@ -809,36 +825,9 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   ;;   )
   ;; )
 
-
-(defun my-toggle-frame-maximized ()
-  (interactive)
-  ;; (setq ns-auto-hide-menu-bar nil)
-  (set-frame-position nil 0 0)
-  ;; (set-frame-size nil 113 66)
-  (set-frame-size nil 113 35)
-  )
-
-; TODO this is unnecessary?
-(defun my-toggle-frame-left () ;(small)
-  (interactive)
-  ;; (let screen-size-alist (small . (113 35)))
-  ;; (if (small))
-  (set-frame-position nil 0 0)
-  ;; (set-frame-size nil 113 66)
-  (set-frame-size nil 113 35)
-  )
-
-(defun my-toggle-frame-right ()
-  (interactive)
-  (set-frame-position nil (/ (display-pixel-width) 2) 0)
-  ;; TODO do the math
-  (set-frame-size nil 113 66)
-  )
-
 (when (equal system-type 'darwin)
   (setq mac-option-modifier 'super)
   (setq mac-command-modifier 'meta))
-
 
 (defun save-if-file ()
   (if (buffer-file-name)
@@ -906,6 +895,7 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   (interactive)
   (let ((inhibit-redisplay 1)
         (selection (evil-visual-state-p))
+        (visual-type (evil-visual-type))
         (text (if (use-region-p)
                 (buffer-substring-no-properties (region-beginning) (region-end))
                 (thing-at-point 'symbol))))
@@ -922,25 +912,12 @@ length of PATH (sans directory slashes) down to MAX-LEN."
             (not (eq visual-type 'line)))
       (evil-search-previous))))
 
-;; (defun razzi/pound-isearch ()
-;;   (interactive)
-;;   (let ((inhibit-redisplay 1)
-;;         (text (if (use-region-p)
-;;                 (buffer-substring-no-properties (region-beginning) (region-end))
-;;                 (thing-at-point 'symbol))))
-;;     (evil-exit-visual-state)
-;;     (isearch-mode nil)
-;;     ;; (isearch-toggle-regexp)
-;;     (setq isearch-regexp nil)
-;;     (isearch-yank-string text)
-;;     (isearch-done)
-;;     (evil-search-next)))
-
 ; TODO paredit-semicolon
 (defun razzi/elisp-semicolon-and-space ()
   (interactive)
-  (insert "; ")
-  )
+  (if (and (not (bolp)) (eolp))
+    (insert " ; ")
+    (insert "; ")))
 
 (defun razzi/python-pound-and-space ()
   (interactive)
@@ -1007,7 +984,6 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; eshell
 ; highlight valid commands
 
-; `. goto last changed spot
 ; set|var -> set(var)
 ; search c-t transpose chars
 ; :tag command
@@ -1097,4 +1073,4 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; bind substitute that looks like
 ; (define-key evil-normal-state-map (kbd "g / r") (lambda () (evil-ex "%s/")))
 ; magit k magit-discard-item no confirm
-; star-isearch in middle of long symbol such as razzi/x
+; star-isearch on whitespace should jump to last symbol
