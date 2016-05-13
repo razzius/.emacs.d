@@ -310,7 +310,6 @@
 
 (defun edit-init ()
   (interactive)
-  ; TODO open in split if there's only one window currently
   (find-file "~/.emacs.d/init.el")
   )
 
@@ -320,7 +319,7 @@
   (let ((sentence (thing-at-point 'defun)))
     (insert sentence)
     (insert "\n")
-    ; TODO does this work in python?
+    ; TODO in python make this copy a method rather than class!
     )
   )
 
@@ -385,8 +384,7 @@
     "X" 'delete-file-and-buffer
     "DEL" 'restart-emacs
     "SPC" 'save-buffer
-    ;; "a" 'add-global-abbrev ; TODO do I use this?
-    ; TODO search
+    ;; "a" 'add-global-abbrev ; TODO search
     "b" 'razzi/blame
     "c" 'razzi/copy-paragraph
     "d" 'magit-diff-unstaged
@@ -619,8 +617,13 @@
 
 (defun change-inner-parens ()
   (interactive)
-  (change-inner* nil "(")
-  ; TODO fails in the middle of words
+  (let ((text (buffer-substring (point) (line-end-position))))
+    (if (s-contains? "(" text)
+      (change-inner* nil "(")
+      (progn
+        (search-backward "(" (line-beginning-position) nil 1)
+        (change-inner* nil "("))
+      ))
   )
 
 (use-package key-chord
@@ -1074,3 +1077,6 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; (define-key evil-normal-state-map (kbd "g / r") (lambda () (evil-ex "%s/")))
 ; magit k magit-discard-item no confirm
 ; star-isearch on whitespace should jump to last symbol
+; visual ' surround in quotes
+; visual ) surround in parens
+; c-' " insert mode
