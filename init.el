@@ -62,6 +62,7 @@
 ;; (desktop-save-mode 1)
 (display-time)
 (electric-pair-mode)
+(toggle-debug-on-error)
 
 (use-package whitespace
   :config
@@ -176,6 +177,8 @@
   (global-anzu-mode 1)
   )
 
+(use-package fzf)
+
 (use-package helm-flx
   :config
   (helm-flx-mode 1)
@@ -287,6 +290,7 @@
 ;;          :back "^```$")))
 ;;    )
 ;;   (mmm-add-mode-ext-class 'markdown-mode nil 'markdown-python)
+
 (use-package python-mode)
 
 (use-package restart-emacs)
@@ -319,7 +323,7 @@
   (let ((sentence (thing-at-point 'defun)))
     (insert sentence)
     (insert "\n")
-    ; TODO in python make this copy a method rather than class!
+    ; TODO in python make this copy a method _or_ class!
     )
   )
 
@@ -401,7 +405,7 @@
     ; "p" 'razzi/edit-eshell-profile
     "p" 'razzi/importmagic
     ;; "q" 'razzi/kill-buffer-and-window
-    "q" 'kill-buffer
+    "q" 'kill-this-buffer
     "r" 'helm-recentf
     "s" 'switch-to-scratch
     "t" 'projectile-find-file
@@ -565,6 +569,8 @@
   (define-key evil-normal-state-map (kbd "] c") 'git-gutter:next-hunk)
   (define-key evil-normal-state-map (kbd "gc") 'evilnc-comment-operator)
   (define-key evil-normal-state-map (kbd "gf") 'razzi/file-at-point)
+  (define-key evil-normal-state-map (kbd "gt") 'next-buffer) ; TODO file buffers only
+  (define-key evil-normal-state-map (kbd "gT") 'previous-buffer)
   (define-key evil-normal-state-map (kbd "g;") 'evilnc-comment-or-uncomment-lines)
   (define-key evil-normal-state-map (kbd "g'") 'goto-last-change)
   (define-key evil-normal-state-map (kbd "C") 'razzi/paredit-change)
