@@ -44,6 +44,10 @@
   tab-width 2
   )
 
+; Global vars
+(defvar razzi/pre-visual-kill)
+(setq razzi/pre-visual-kill nil)
+
 (use-package monokai-theme
   :config
   (load-theme 'monokai t))
@@ -229,6 +233,10 @@
   :config
   (global-flycheck-mode nil)
   )
+
+(use-package flycheck-mypy
+  :config
+  (add-hook 'python-mode-hook 'flycheck-mode))
 
 ; todo....
 ;; (use-package ido-ubiquitous
@@ -514,6 +522,36 @@
   (insert ")")
   )
 
+(defun razzi/paste-replace (start end)
+  "replace visual selection with last yank"
+   ; TODO if clipboard has changed to not selection then use that instead
+  (interactive "r")
+  (goto-char end)
+  (message razzi/pre-visual-kill)
+  (if razzi/pre-visual-kill
+      (insert razzi/pre-visual-kill)
+      (evil-paste-after 1)
+      ;; (insert "uyo")
+      ;; (insert razzi/pre-visual-kill)
+      ;; (evil-paste-after 1)
+      )
+  (kill-region start end))
+
+(defun razzi/save-kill-visual ()
+  "Before entering visual mode, save the last kill"
+  (interactive)
+  (setq razzi/pre-visual-kill (ns-get-pasteboard))
+  (message razzi/pre-visual-kill)
+  (evil-visual-char)
+  )
+
+(defun razzi/erase-kill-visual ()
+  "Before exiting visual mode, erase the last kill"
+  (interactive)
+  (setq razzi/pre-visual-kill nil)
+  (evil-visual-char)
+  )
+
 (use-package evil
   :config
   (evil-mode 1)
@@ -540,50 +578,55 @@
 
   (define-key evil-normal-state-map (kbd "#") 'razzi/pound-isearch)
   (define-key evil-normal-state-map (kbd "*") 'razzi/star-isearch)
+  (define-key evil-normal-state-map (kbd "-") 'razzi/transpose-next-line)
   (define-key evil-normal-state-map (kbd "<C-i>") 'evil-jump-forward)
-  ;; (define-key evil-normal-state-map (kbd "<backtab>") 'elscreen-previous)
   (define-key evil-normal-state-map (kbd "<tab>") 'evil-tabs-goto-tab)
   (define-key evil-normal-state-map (kbd "=") 'razzi/run-pytest)
-  (define-key evil-normal-state-map (kbd "-") 'razzi/transpose-next-line)
-  (define-key evil-normal-state-map (kbd "_") 'razzi/transpose-previous-line)
-  ;; (define-key evil-normal-state-map (kbd "j") 'evil-next-line-first-non-blank) ; TODO only if in whitespace already
-  ;; (define-key evil-normal-state-map (kbd "k") 'evil-previous-line-first-non-blank)
+  (define-key evil-normal-state-map (kbd "C") 'razzi/paredit-change)
+  (define-key evil-normal-state-map (kbd "C") 'razzi/paredit-change)
   (define-key evil-normal-state-map (kbd "C-a") 'evil-numbers/inc-at-pt)
   (define-key evil-normal-state-map (kbd "C-h") 'windmove-left)
   (define-key evil-normal-state-map (kbd "C-j") 'windmove-down)
   (define-key evil-normal-state-map (kbd "C-k") 'windmove-up)
   (define-key evil-normal-state-map (kbd "C-l") 'windmove-right)
   (define-key evil-normal-state-map (kbd "C-x") 'evil-numbers/dec-at-pt)
+  (define-key evil-normal-state-map (kbd "D") 'razzi/kill-line-and-whitespace)
+  (define-key evil-normal-state-map (kbd "D") 'razzi/kill-line-and-whitespace)
   (define-key evil-normal-state-map (kbd "M-RET") 'my-toggle-frame-maximized)
   (define-key evil-normal-state-map (kbd "M-[") 'my-toggle-frame-left)
   (define-key evil-normal-state-map (kbd "M-]") 'my-toggle-frame-right)
-  ; TODO make this keep point where it is
-  (define-key evil-normal-state-map (kbd "M-a") 'mark-whole-buffer)
-  ;; (define-key evil-normal-state-map (kbd "M-n") 'elscreen-create)
+  (define-key evil-normal-state-map (kbd "M-a") 'mark-whole-buffer) ; TODO make this keep point where it is
   (define-key evil-normal-state-map (kbd "M-p") 'scroll-other-window)
   (define-key evil-normal-state-map (kbd "M-q") 'save-buffers-kill-terminal)
+  (define-key evil-normal-state-map (kbd "Q") 'razzi/replay-q-macro)
+  (define-key evil-normal-state-map (kbd "Q") 'razzi/replay-q-macro)
   (define-key evil-normal-state-map (kbd "RET") 'razzi/clear)
   (define-key evil-normal-state-map (kbd "[ SPC") 'razzi/insert-newline-before)
   (define-key evil-normal-state-map (kbd "[ c") 'git-gutter:previous-hunk)
   (define-key evil-normal-state-map (kbd "] SPC") 'razzi/insert-newline-after)
   (define-key evil-normal-state-map (kbd "] c") 'git-gutter:next-hunk)
+  (define-key evil-normal-state-map (kbd "_") 'razzi/transpose-previous-line)
+  (define-key evil-normal-state-map (kbd "g'") 'goto-last-change)
+  (define-key evil-normal-state-map (kbd "g;") 'evilnc-comment-or-uncomment-lines)
+  (define-key evil-normal-state-map (kbd "g;") 'evilnc-comment-or-uncomment-lines)
+  (define-key evil-normal-state-map (kbd "gT") 'previous-buffer)
   (define-key evil-normal-state-map (kbd "gc") 'evilnc-comment-operator)
   (define-key evil-normal-state-map (kbd "gf") 'razzi/file-at-point)
   (define-key evil-normal-state-map (kbd "gt") 'next-buffer) ; TODO file buffers only
-  (define-key evil-normal-state-map (kbd "gT") 'previous-buffer)
-  (define-key evil-normal-state-map (kbd "g;") 'evilnc-comment-or-uncomment-lines)
-  (define-key evil-normal-state-map (kbd "g'") 'goto-last-change)
-  (define-key evil-normal-state-map (kbd "C") 'razzi/paredit-change)
-  (define-key evil-normal-state-map (kbd "D") 'razzi/kill-line-and-whitespace)
-  (define-key evil-normal-state-map (kbd "Q") 'razzi/replay-q-macro)
+  (define-key evil-normal-state-map (kbd "v") 'razzi/save-kill-visual)
+  ;; (define-key evil-normal-state-map (kbd "<backtab>") 'elscreen-previous)
   ; todo
   ;; (define-key evil-normal-state-map (kbd "C-]") 'razzi/tag-in-split)
+  ;; (define-key evil-normal-state-map (kbd "j") 'evil-next-line-first-non-blank) ; TODO only if in whitespace already
+  ;; (define-key evil-normal-state-map (kbd "k") 'evil-previous-line-first-non-blank)
 
   (define-key evil-visual-state-map (kbd "!") 'sort-lines)
   (define-key evil-visual-state-map (kbd "ae") 'mark-whole-buffer)
   (define-key evil-visual-state-map (kbd "il") 'razzi/mark-line-text)
   (define-key evil-visual-state-map (kbd "V") 'evil-a-paragraph)
+  (define-key evil-visual-state-map (kbd "p") 'razzi/paste-replace)
   (define-key evil-visual-state-map (kbd "s") 'evil-surround-region)
+  (define-key evil-visual-state-map (kbd "v") 'razzi/erase-kill-visual)
   (define-key evil-visual-state-map (kbd "*") 'razzi/star-isearch)
   (define-key evil-visual-state-map (kbd "#") 'razzi/pound-isearch)
 
@@ -655,7 +698,7 @@
 (use-package virtualenvwrapper
   :config
   (venv-initialize-eshell)
-  (setq venv-location "~/.emacs.d/venvs")
+  (setq venv-location "~/.virtualenvs")
   )
 
 (use-package s)
@@ -931,8 +974,9 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 
 (defun razzi/python-pound-and-space ()
   (interactive)
-  (insert "# ")
-  )
+  (if (and (not (bolp)) (eolp))
+    (insert "  # ")
+    (insert "# ")))
 
 (add-hook 'emacs-lisp-mode-hook (lambda ()
     (enable-paredit-mode)
@@ -1086,7 +1130,9 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; star-isearch on whitespace should jump to last symbol
 ; visual ' surround in quotes
 ; visual ) surround in parens
+; visual p paste
 ; c-' " insert mode
 ; Y y$
 ; helm fuzzy findn file
 ; * and # show numbers
+; lisp emacs ; no space before if only whitespace prior
