@@ -158,6 +158,8 @@
 
 (use-package magit
   :config
+  (add-to-list 'same-window-regexps "\*magit: .*\*")
+  ;; (setq magit-display-buffer-function 'switch-to-buffer)
   (define-key magit-status-mode-map (kbd "]") 'razzi/magit-pull)
   (define-key magit-status-mode-map (kbd "-") 'razzi/checkout-previous-branch)
   (define-key magit-status-mode-map (kbd "_") 'magit-diff-less-context)
@@ -211,6 +213,8 @@
   (define-key helm-map (kbd "C-v") 'find-file-other-window)
   )
 
+(use-package helm-ag)
+
 (use-package haskell-mode
   :config
   (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
@@ -237,7 +241,6 @@
 (use-package flycheck-mypy
   :config
   (add-hook 'python-mode-hook 'flycheck-mode))
-
 ; todo....
 ;; (use-package ido-ubiquitous
 ;;   :config
@@ -416,7 +419,7 @@
     "q" 'kill-this-buffer
     "r" 'helm-recentf
     "s" 'switch-to-scratch
-    "t" 'projectile-find-file
+    "t" 'helm-projectile-find-file
     "v" 'eval-last-sexp ; TODO move to lisp mode
     "x" 'compile
     ; TODO recompile
@@ -439,7 +442,6 @@
   (backward-char 1)
   (transpose-chars nil)
   )
-
 
 (defun razzi/importmagic ()
   (interactive)
@@ -580,7 +582,8 @@
   (define-key evil-normal-state-map (kbd "*") 'razzi/star-isearch)
   (define-key evil-normal-state-map (kbd "-") 'razzi/transpose-next-line)
   (define-key evil-normal-state-map (kbd "<C-i>") 'evil-jump-forward)
-  (define-key evil-normal-state-map (kbd "<tab>") 'evil-tabs-goto-tab)
+  ;; (define-key evil-normal-state-map (kbd "<backtab>") 'elscreen-previous)
+  (define-key evil-normal-state-map (kbd "<tab>") 'next-buffer)
   (define-key evil-normal-state-map (kbd "=") 'razzi/run-pytest)
   (define-key evil-normal-state-map (kbd "C") 'razzi/paredit-change)
   (define-key evil-normal-state-map (kbd "C") 'razzi/paredit-change)
@@ -612,6 +615,7 @@
   (define-key evil-normal-state-map (kbd "gT") 'previous-buffer)
   (define-key evil-normal-state-map (kbd "gc") 'evilnc-comment-operator)
   (define-key evil-normal-state-map (kbd "gf") 'razzi/file-at-point)
+  (define-key evil-normal-state-map (kbd "gs") 'magit-status)
   (define-key evil-normal-state-map (kbd "gt") 'next-buffer) ; TODO file buffers only
   (define-key evil-normal-state-map (kbd "v") 'razzi/save-kill-visual)
   ;; (define-key evil-normal-state-map (kbd "<backtab>") 'elscreen-previous)
@@ -748,7 +752,7 @@
 
 (defun razzi/python-mode ()
   (interactive)
-  (modify-syntax-entry ?_ "w" python-mode-syntax-table)
+  ;; (modify-syntax-entry ?_ "w" python-mode-syntax-table)
   (evil-define-key 'insert python-mode-map
     (kbd "#") 'razzi/python-pound-and-space
     (kbd ";") 'razzi/python-pound-and-space)
@@ -1052,13 +1056,11 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; rename current file
 ;persistent undo
 ; case insensitive completion eshell
-; google search!
 ; eshell in split
-; rgrep bindings
+; ag bindings
 
 ; python tab to outdent a level?
 ; python newline when already outdented preserve outdent
-; paste during visual should replace with clipboard
 ; somehow correct things like pyton_source - perhaps using syntax for word versus symbol
 ; *** razzi/extract-as-variable
 ; reassign variables when I make the same call
@@ -1073,13 +1075,11 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ;; compile window c-l move window
 ; compile remove line that says mode compile
 ; no scroll past end of buffer
-;; prevent scroll past end of buffer
 ; projectile c-w kill word
-; :tabnew take filename
 
-; """ autoclose with formatted docstring
+; """ autoclose with formatted docstring!
+; (see http://stackoverflow.com/questions/19676181/electric-pair-mode-and-python-triple-quotes?rq=1)
 ; newline after (setq should have a 2 space indent
-; eshell isn't putting the cursor on at eol
 
 ; ** do the right close bracket outdent
         ;; return {
@@ -1110,21 +1110,18 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; delete inside parens (dp) not working from inside parens
 
 ; yp yank inside parens
-; S to kill within quotes for example
-; paredit no delete matching
-; add :tag cmd (find-tag)
-; """ autocomplete python
-; (see http://stackoverflow.com/questions/19676181/electric-pair-mode-and-python-triple-quotes?rq=1)
+; S to kill within quotes for example (maybe)
+; use helm for find-tag
 ; recentf sort
 ; smerge mode bindings
 ; projectile find file isn't fuzzy
 ; rebind c-h to backspace in evil-ex
 ; simpler defun yasnippet
-; ~ move to first char that can have its case switched?
+; ~ move to first char that can have its case switched? rather j / k move to nonblan
 ; magit commit autopopulate with ref, and go straight into insert mode
 ; magit Z stash no message
 ; magit some way to pop most recent stash
-; bind substitute that looks like
+; bind substitute - looks like
 ; (define-key evil-normal-state-map (kbd "g / r") (lambda () (evil-ex "%s/")))
 ; magit k magit-discard-item no confirm
 ; star-isearch on whitespace should jump to last symbol
@@ -1133,6 +1130,10 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; visual p paste
 ; c-' " insert mode
 ; Y y$
-; helm fuzzy findn file
 ; * and # show numbers
 ; lisp emacs ; no space before if only whitespace prior
+;
+; [|ret] throw the close bracket on the correct line
+; spc q close split
+; cs[ on a line before [ doesn't work
+; no debug on error in eshell
