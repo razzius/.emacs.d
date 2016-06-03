@@ -5,6 +5,8 @@
 
 (define-abbrev-table 'Info-edit-mode-abbrev-table '())
 
+(define-abbrev-table 'Man-mode-abbrev-table '())
+
 (define-abbrev-table 'ag-mode-abbrev-table '())
 
 (define-abbrev-table 'awk-mode-abbrev-table
@@ -141,6 +143,7 @@
     ("curosr" "cursor" nil 1)
     ("dcionary" "dictionary" nil 1)
     ("delet" "delete" nil 1)
+    ("denormailzed" "denormalized" nil 1)
     ("depencencies" "dependencies" nil 1)
     ("dependences" "dependencies" nil 1)
     ("deserealize" "deserialize" nil 1)
@@ -175,8 +178,10 @@
     ("imoprt" "import" nil 3)
     ("impoosble" "impossible" nil 1)
     ("impor" "import" nil 1)
+    ("imporot" "import" nil 1)
     ("imporr" "import" nil 1)
     ("improt" "import" nil 1)
+    ("imprt" "import" nil 1)
     ("imprtant" "important" nil 1)
     ("ina" "in a" nil 1)
     ("indiviuals" "individuals" nil 1)
@@ -199,6 +204,7 @@
     ("lista" "list" nil 1)
     ("listp" "lisp" nil 0)
     ("lits" "list" nil 1)
+    ("lmit" "limit" nil 1)
     ("loadn" "loan" nil 1)
     ("localhst" "localhost" nil 1)
     ("locla" "local" nil 0)
@@ -220,6 +226,7 @@
     ("nullabke" "nullable" nil 1)
     ("nwo" "now" nil 0)
     ("ocmposite" "composite" nil 1)
+    ("oculd" "could" nil 1)
     ("odesn" "doesn" nil 1)
     ("oopenin" "opening" nil 1)
     ("otehrwise" "otherwise" nil 1)
@@ -240,6 +247,7 @@
     ("pyton" "python" nil 2)
     ("quoes" "quotes" nil 1)
     ("qutes" "quotes" nil 1)
+    ("qutoe" "Quote" nil 1)
     ("rateh" "rate" nil 1)
     ("razi" "razzi" nil 1)
     ("reeturn" "return" nil 1)
@@ -280,6 +288,7 @@
     ("tocmmoent" "comment" nil 1)
     ("todo" "TODO" nil 26)
     ("tood" "TODO" nil 1)
+    ("toodo" "TODO" nil 1)
     ("tp" "to" nil 1)
     ("udpate" "update" nil 1)
     ("utilitiies" "utilities" nil 1)
