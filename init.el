@@ -28,7 +28,7 @@
   mouse-wheel-scroll-amount '(1 ((shift) . 1))
   next-line-add-newlines nil
   ns-pop-up-frames nil
-  python-python-command "/usr/local/bin/python3.5"
+  python-python-command "/Users/razzi/.pyenv/shims/python"
   ring-bell-function 'ignore
   save-abbrevs 'silently
   tab-width 2
@@ -87,16 +87,14 @@
 
 (use-package evil-numbers)
 
+(use-package python-environment) ; pyenv
+
 (use-package guide-key
   :config
   (guide-key-mode)
   (setq guide-key/guide-key-sequence t))
 
 (use-package pyenv-mode)
-
-;; (use-package evil-tabs
-;;   :config
-;;   (global-evil-tabs-mode t))
 
 (use-package thingatpt)
 
@@ -121,8 +119,7 @@
 
 (use-package highlight-numbers
   :config
-  (add-hook 'prog-mode-hook 'highlight-numbers-mode)
-  )
+  (add-hook 'prog-mode-hook 'highlight-numbers-mode))
 
 (use-package fish-mode)
 
@@ -247,42 +244,43 @@
 ;;   (ido-ubiquitous-mode 1)
 ;;   )
 
-;; (require 'company-simple-complete "~/.emacs.d/company-complete-cycle.el")
-;; (use-package auto-complete
-;;   :config
-;;   (ac-config-default)
-;;   (add-to-list 'ac-modes 'eshell-mode)
-;;   (setq
-;;     ac-auto-show-menu 0.1
-;;     ac-delay 0.05
-;;     ac-use-fuzzy t
-;;     ac-auto-start 0
-;;     ac-ignore-case t
-;;     )
-;;   )
+(require 'company-simple-complete "~/.emacs.d/company-complete-cycle.el")
 
-;; (defun my-company-hook ()
-;;   (interactive)
-;;   (define-key company-active-map [return] 'nil)
-;;   (define-key company-active-map (kbd "<tab>") 'company-complete-selection)
-;;   )
+(defun my-company-hook ()
+  (interactive)
+  ;; (define-key company-active-map [return] 'nil)
+  ;; (define-key company-active-map (kbd "<tab>") 'company-complete-selection)
+  ; TODO turn off c-h
+  )
 
 ;; (use-package company
 ;;   :config
-;;   (add-hook 'after-init-hook 'global-company-mode)
+;;   (global-company-mode)
 ;;   ;; (add-hook 'company-mode-hook 'my-company-hook)
 ;;   (setq
-;;     company-minimum-prefix-length 1
+;;     company-minimum-prefix-length 2
+;;     ;; company-backends '(company-ycmd)
 ;;     )
 ;;   )
 
-;; (require 'company-simple-complete "~/.emacs.d/company-complete-cycle.el")
-
 ;; (use-package company-flx
 ;;   :config
-;;   (with-eval-after-load 'company
-;;     (company-flx-mode +1))
+;;   (company-flx-mode 1))
+
+;; (use-package ycmd
+;;   :config
+;;   (add-hook 'python-mode-hook
+;;     (lambda ()
+;;       (add-to-list 'flycheck-disabled-checkers 'ycmd)))
+;;   (global-ycmd-mode)
 ;;   )
+
+;; (use-package company-ycmd
+;;   :config
+;;   (company-ycmd-setup)
+;;   (setq
+;;     ycmd-server-command '("/Users/razzi/.pyenv/shims/python3" "/Users/razzi/forks/YouCompleteMe/third_party/ycmd/ycmd/__main__.py")
+;;    ))
 
 (use-package markdown-mode
   :config
@@ -302,7 +300,8 @@
 ;;    )
 ;;   (mmm-add-mode-ext-class 'markdown-mode nil 'markdown-python)
 
-(use-package python-mode)
+; sets the python interpreter to python2
+;; (use-package python-mode)
 
 (use-package restart-emacs)
 
@@ -376,6 +375,7 @@
 
 (use-package helm-projectile
   :config
+  (helm-projectile-on)
   (setq
     projectile-switch-project-action 'projectile-find-file))
 
@@ -487,6 +487,13 @@
   ; TODO could run @q directly rather than executing those chars as a command
   (evil-execute-macro 1 "@q"))
 
+
+(defun razzi/replay-q-macro-new ()
+  (interactive)
+  ; TODO run q directly rather than executing those chars as a command
+  ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Interactive-Call.html
+  (call-interactively 'evil-execute-macro nil [\q]))
+
 (defun razzi/kill-line-and-whitespace ()
   (interactive)
   (paredit-kill)
@@ -501,20 +508,18 @@
 
 (use-package paredit)
 
-(defun razzi/transpose-next-lines ()
+(defun razzi/transpose-next-line ()
   "Switch the current and next lines"
   (interactive)
   (forward-line 1)
   (transpose-lines 1)
-  (forward-line -1)
-  )
+  (forward-line -1))
 
 (defun razzi/transpose-previous-line ()
   "Switch the current and previous lines"
   (interactive)
   (transpose-lines 1)
-  (forward-line -2)
-  )
+  (forward-line -2))
 
 (defun razzi/wrap-in-parens ()
   "set|var -> set(var)"
@@ -543,7 +548,7 @@
   "Before entering visual mode, save the last kill"
   (interactive)
   (setq razzi/pre-visual-kill (ns-get-pasteboard))
-  (message razzi/pre-visual-kill)
+  ;; (message razzi/pre-visual-kill)
   (evil-visual-char)
   )
 
@@ -553,6 +558,17 @@
   (setq razzi/pre-visual-kill nil)
   (evil-visual-char)
   )
+
+
+(defun razzi/surround-with-single-quotes (start end)
+  (interactive "r")
+  (evil-surround-region start end nil ?'))
+
+
+(defun razzi/surround-with-double-quotes (start end)
+  (interactive "r")
+  (evil-surround-region start end nil ?\"))
+
 
 (use-package evil
   :config
@@ -574,16 +590,16 @@
   (define-key evil-insert-state-map (kbd "C-l") 'paredit-forward-slurp-sexp)
   (define-key evil-insert-state-map (kbd "C-p") 'evil-complete-previous)
   (define-key evil-insert-state-map (kbd "C-t") 'razzi/transpose-prev-chars)
-  (define-key evil-insert-state-map (kbd "C-;") 'paredit-semicolon) ; TODO emacs only
-  (define-key evil-insert-state-map (kbd "<tab>") 'hippie-expand)
+  (define-key evil-insert-state-map (kbd "C- ;") 'paredit-semicolon) ; TODO emacs only
+  ;; (define-key evil-insert-state-map (kbd "<tab>") 'company-complete-selection)
   (define-key evil-insert-state-map (kbd "<C-return>") 'razzi/wrap-in-parens) ; consider rebinding to c-(
 
   (define-key evil-normal-state-map (kbd "#") 'razzi/pound-isearch)
   (define-key evil-normal-state-map (kbd "*") 'razzi/star-isearch)
   (define-key evil-normal-state-map (kbd "-") 'razzi/transpose-next-line)
   (define-key evil-normal-state-map (kbd "<C-i>") 'evil-jump-forward)
-  ;; (define-key evil-normal-state-map (kbd "<backtab>") 'elscreen-previous)
   (define-key evil-normal-state-map (kbd "<tab>") 'next-buffer)
+  (define-key evil-normal-state-map (kbd "<backtab>") 'previous-buffer)
   (define-key evil-normal-state-map (kbd "=") 'razzi/run-pytest)
   (define-key evil-normal-state-map (kbd "C") 'razzi/paredit-change)
   (define-key evil-normal-state-map (kbd "C") 'razzi/paredit-change)
@@ -594,8 +610,7 @@
   (define-key evil-normal-state-map (kbd "C-l") 'windmove-right)
   (define-key evil-normal-state-map (kbd "C-x") 'evil-numbers/dec-at-pt)
   (define-key evil-normal-state-map (kbd "D") 'razzi/kill-line-and-whitespace)
-  (define-key evil-normal-state-map (kbd "D") 'razzi/kill-line-and-whitespace)
-  (define-key evil-normal-state-map (kbd "M-RET") 'my-toggle-frame-maximized)
+  (define-key evil-normal-state-map (kbd "M-RET") 'delete-window)
   (define-key evil-normal-state-map (kbd "M-[") 'my-toggle-frame-left)
   (define-key evil-normal-state-map (kbd "M-]") 'my-toggle-frame-right)
   (define-key evil-normal-state-map (kbd "M-a") 'mark-whole-buffer) ; TODO make this keep point where it is
@@ -611,12 +626,12 @@
   (define-key evil-normal-state-map (kbd "_") 'razzi/transpose-previous-line)
   (define-key evil-normal-state-map (kbd "g'") 'goto-last-change)
   (define-key evil-normal-state-map (kbd "g;") 'evilnc-comment-or-uncomment-lines)
-  (define-key evil-normal-state-map (kbd "g;") 'evilnc-comment-or-uncomment-lines)
   (define-key evil-normal-state-map (kbd "gT") 'previous-buffer)
   (define-key evil-normal-state-map (kbd "gc") 'evilnc-comment-operator)
   (define-key evil-normal-state-map (kbd "gf") 'razzi/file-at-point)
   (define-key evil-normal-state-map (kbd "gs") 'magit-status)
   (define-key evil-normal-state-map (kbd "gt") 'next-buffer) ; TODO file buffers only
+  (define-key evil-normal-state-map (kbd "go") 'evil-open-above)
   (define-key evil-normal-state-map (kbd "v") 'razzi/save-kill-visual)
   ;; (define-key evil-normal-state-map (kbd "<backtab>") 'elscreen-previous)
   ; todo
@@ -630,9 +645,11 @@
   (define-key evil-visual-state-map (kbd "V") 'evil-a-paragraph)
   (define-key evil-visual-state-map (kbd "p") 'razzi/paste-replace)
   (define-key evil-visual-state-map (kbd "s") 'evil-surround-region)
-  (define-key evil-visual-state-map (kbd "v") 'razzi/erase-kill-visual)
+  ;; (define-key evil-visual-state-map (kbd "v") 'razzi/erase-kill-visual)
   (define-key evil-visual-state-map (kbd "*") 'razzi/star-isearch)
   (define-key evil-visual-state-map (kbd "#") 'razzi/pound-isearch)
+  (define-key evil-visual-state-map (kbd "'") 'razzi/surround-with-single-quotes)
+  (define-key evil-visual-state-map (kbd "\"") 'razzi/surround-with-double-quotes)
 
   (define-key evil-operator-state-map (kbd "V") 'evil-a-paragraph)
 
@@ -684,9 +701,7 @@
   (key-chord-mode 1)
   (key-chord-define evil-insert-state-map "kj" 'evil-normal-state)
   (key-chord-define evil-normal-state-map "dp" 'change-inner-parens)
-  (setq
-    key-chord-two-keys-delay 0.2
-    )
+  (setq key-chord-two-keys-delay 0.3)
   )
 
 (use-package yasnippet
@@ -750,9 +765,12 @@
     )
   )
 
+(use-package company-jedi)
+
 (defun razzi/python-mode ()
   (interactive)
   ;; (modify-syntax-entry ?_ "w" python-mode-syntax-table)
+  ;; (add-to-list 'company-backends 'company-jedi)
   (evil-define-key 'insert python-mode-map
     (kbd "#") 'razzi/python-pound-and-space
     (kbd ";") 'razzi/python-pound-and-space)
@@ -949,6 +967,7 @@ length of PATH (sans directory slashes) down to MAX-LEN."
       (evil-search-previous))))
 
 (defun razzi/pound-isearch ()
+   ; TODO it doesn't work in the middle of a word
   (interactive)
   (let ((inhibit-redisplay 1)
         (selection (evil-visual-state-p))
@@ -1107,14 +1126,12 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; after magit, update git gutter
 
 ;python if else indenting
-; delete inside parens (dp) not working from inside parens
 
 ; yp yank inside parens
 ; S to kill within quotes for example (maybe)
 ; use helm for find-tag
 ; recentf sort
-; smerge mode bindings
-; projectile find file isn't fuzzy
+; smerge mode bindings: next, rebind return, keep both
 ; rebind c-h to backspace in evil-ex
 ; simpler defun yasnippet
 ; ~ move to first char that can have its case switched? rather j / k move to nonblan
@@ -1125,15 +1142,13 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; (define-key evil-normal-state-map (kbd "g / r") (lambda () (evil-ex "%s/")))
 ; magit k magit-discard-item no confirm
 ; star-isearch on whitespace should jump to last symbol
-; visual ' surround in quotes
 ; visual ) surround in parens
-; visual p paste
-; c-' " insert mode
 ; Y y$
 ; * and # show numbers
 ; lisp emacs ; no space before if only whitespace prior
-;
 ; [|ret] throw the close bracket on the correct line
 ; spc q close split
 ; cs[ on a line before [ doesn't work
 ; no debug on error in eshell
+; if I already have an abbrev, make c-c a just insert it
+; consider turning off paredit-backslash
