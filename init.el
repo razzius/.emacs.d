@@ -33,7 +33,6 @@
   save-abbrevs 'silently
   tab-width 2
   tags-add-tables nil ; TODO is this a good default? having multiple merged tables could be cool
-  use-package-always-ensure t ; move to init_use_package.el
   vc-follow-symlinks t
   visible-bell nil
   )
@@ -155,11 +154,9 @@
 
 (use-package magit
   :config
-  (add-to-list 'same-window-regexps "\*magit: .*\*")
-  ;; (setq magit-display-buffer-function 'switch-to-buffer)
+  (setq same-window-regexps (append same-window-regexps '("\*magit: .*\*" "\*magit-diff: .*\*")))
   (define-key magit-status-mode-map (kbd "]") 'razzi/magit-pull)
-  (define-key magit-status-mode-map (kbd "-") 'razzi/checkout-previous-branch)
-  (define-key magit-status-mode-map (kbd "_") 'magit-diff-less-context)
+  (define-key magit-status-mode-map (kbd "=") 'magit-diff-more-context)
   (define-key magit-status-mode-map (kbd "C-`") 'describe-key)
   (define-key magit-status-mode-map (kbd "@") 'razzi/magit-reset-one-commit))
 
@@ -179,6 +176,8 @@
   :config
   (global-anzu-mode 1)
   )
+
+(use-package evil-anzu)
 
 (use-package fzf)
 
@@ -625,6 +624,7 @@
   (define-key evil-normal-state-map (kbd "] c") 'git-gutter:next-hunk)
   (define-key evil-normal-state-map (kbd "_") 'razzi/transpose-previous-line)
   (define-key evil-normal-state-map (kbd "g'") 'goto-last-change)
+  (define-key evil-normal-state-map (kbd "g-") 'razzi/checkout-previous-branch)
   (define-key evil-normal-state-map (kbd "g;") 'evilnc-comment-or-uncomment-lines)
   (define-key evil-normal-state-map (kbd "gT") 'previous-buffer)
   (define-key evil-normal-state-map (kbd "gc") 'evilnc-comment-operator)
@@ -707,6 +707,7 @@
 (use-package yasnippet
   :config
   (yas-global-mode 1)
+  (define-key yas-keymap (kbd "<tab>") nil)
   )
 
 (defun razzi/eshell-abbrev-and-return ()
@@ -1055,15 +1056,15 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; VV ?
 ; if the line ends with (starts with?) ( {, jump to it's pair
 ; otherwise select paragraph
-; insert mode c-l non-lisp modes
+
+; insert mode complete line non-lisp modes
+
 ; wip elisp move stuff into own files
 
-; eshell
-; highlight valid commands
+; eshell highlight valid commands
 
-; set|var -> set(var)
+; automatic set|var -> set(var)
 ; search c-t transpose chars
-; :tag command
 
 ; search c-w delete word, not paste...
 ; visual block i to block insert
@@ -1071,9 +1072,8 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; show marks in gutter
 ; c-j xml put cursor in between tags
 ; in docstring, auto indent after first
-
 ; rename current file
-;persistent undo
+; persistent undo
 ; case insensitive completion eshell
 ; eshell in split
 ; ag bindings
@@ -1130,7 +1130,6 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; yp yank inside parens
 ; S to kill within quotes for example (maybe)
 ; use helm for find-tag
-; recentf sort
 ; smerge mode bindings: next, rebind return, keep both
 ; rebind c-h to backspace in evil-ex
 ; simpler defun yasnippet
@@ -1140,11 +1139,9 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; magit some way to pop most recent stash
 ; bind substitute - looks like
 ; (define-key evil-normal-state-map (kbd "g / r") (lambda () (evil-ex "%s/")))
-; magit k magit-discard-item no confirm
 ; star-isearch on whitespace should jump to last symbol
 ; visual ) surround in parens
 ; Y y$
-; * and # show numbers
 ; lisp emacs ; no space before if only whitespace prior
 ; [|ret] throw the close bracket on the correct line
 ; spc q close split
