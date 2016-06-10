@@ -545,7 +545,7 @@
   "Before exiting visual mode, erase the last kill"
   (interactive)
   (setq razzi/pre-visual-kill nil)
-  (evil-visual-char))
+  (evil-exit-visual-state))
 
 (defun razzi/surround-with-single-quotes (start end)
   (interactive "r")
@@ -609,9 +609,9 @@
   (define-key evil-insert-state-map (kbd "C-l") 'paredit-forward-slurp-sexp)
   (define-key evil-insert-state-map (kbd "C-p") 'evil-complete-previous)
   (define-key evil-insert-state-map (kbd "C-t") 'razzi/transpose-prev-chars)
-  (define-key evil-insert-state-map (kbd "C- ;") 'paredit-semicolon) ; TODO emacs only
-  ;; (define-key evil-insert-state-map (kbd "<tab>") 'company-complete-selection)
+  (define-key evil-insert-state-map (kbd "C-;") 'paredit-semicolon) ; TODO emacs only
   (define-key evil-insert-state-map (kbd "<C-return>") 'razzi/wrap-in-parens) ; consider rebinding to c-(
+  ;; (define-key evil-insert-state-map (kbd "<tab>") 'company-complete-selection)
 
   (define-key evil-normal-state-map (kbd "#") 'razzi/pound-isearch)
   (define-key evil-normal-state-map (kbd "*") 'razzi/star-isearch)
@@ -620,7 +620,6 @@
   (define-key evil-normal-state-map (kbd "<backtab>") 'previous-buffer)
   (define-key evil-normal-state-map (kbd "<tab>") 'next-buffer)
   (define-key evil-normal-state-map (kbd "=") 'razzi/run-pytest)
-  (define-key evil-normal-state-map (kbd "C") 'razzi/paredit-change)
   (define-key evil-normal-state-map (kbd "C") 'razzi/paredit-change)
   (define-key evil-normal-state-map (kbd "C-a") 'evil-numbers/inc-at-pt)
   (define-key evil-normal-state-map (kbd "C-h") 'windmove-left)
@@ -661,18 +660,18 @@
   ;; (define-key evil-normal-state-map (kbd "k") 'evil-previous-line-first-non-blank)
 
   (define-key evil-visual-state-map (kbd "!") 'sort-lines)
+  (define-key evil-visual-state-map (kbd "#") 'razzi/pound-isearch)
   ;; (define-key evil-visual-state-map (kbd "$") 'end-of-line)
+  (define-key evil-visual-state-map (kbd "'") 'razzi/surround-with-single-quotes)
   (define-key evil-visual-state-map (kbd ")") 'razzi/surround-with-parens)
+  (define-key evil-visual-state-map (kbd "*") 'razzi/star-isearch)
+  (define-key evil-visual-state-map (kbd "V") 'razzi/increase-region)
+  (define-key evil-visual-state-map (kbd "\"") 'razzi/surround-with-double-quotes)
   (define-key evil-visual-state-map (kbd "ae") 'mark-whole-buffer)
   (define-key evil-visual-state-map (kbd "il") 'razzi/mark-line-text)
-  (define-key evil-visual-state-map (kbd "V") 'razzi/increase-region)
   (define-key evil-visual-state-map (kbd "p") 'razzi/paste-replace)
   (define-key evil-visual-state-map (kbd "s") 'evil-surround-region)
-  ;; (define-key evil-visual-state-map (kbd "v") 'razzi/erase-kill-visual)
-  (define-key evil-visual-state-map (kbd "*") 'razzi/star-isearch)
-  (define-key evil-visual-state-map (kbd "#") 'razzi/pound-isearch)
-  (define-key evil-visual-state-map (kbd "'") 'razzi/surround-with-single-quotes)
-  (define-key evil-visual-state-map (kbd "\"") 'razzi/surround-with-double-quotes)
+  (define-key evil-visual-state-map (kbd "v") 'razzi/erase-kill-visual)
 
   (define-key evil-operator-state-map (kbd "V") 'evil-a-paragraph)
 
@@ -727,17 +726,17 @@
   (yas-global-mode 1)
   (define-key yas-keymap (kbd "<tab>") nil))
 
-(defun razzi/eshell-abbrev-and-return ()
-  (interactive)
-  (expand-abbrev)
-  (eshell-send-input))
-
 (use-package virtualenvwrapper
   :config
   (venv-initialize-eshell)
   (setq venv-location "~/.virtualenvs"))
 
 (use-package s)
+
+(defun razzi/eshell-abbrev-and-return ()
+  (interactive)
+  (expand-abbrev)
+  (eshell-send-input))
 
 (defun razzi/eshell-point-to-prompt ()
   (interactive)
@@ -952,7 +951,7 @@ length of PATH (sans directory slashes) down to MAX-LEN."
     ; Go to the start of the word if not in visual and not already at the start
     (when (and (not selection)
                (not (looking-at "\\<")))
-      (backward-word))
+      (backward-sexp))
     (evil-exit-visual-state)
     (isearch-mode t)
     (isearch-yank-string text)
