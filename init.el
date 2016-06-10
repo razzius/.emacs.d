@@ -237,11 +237,6 @@
 (use-package flycheck-mypy
   :config
   (add-hook 'python-mode-hook 'flycheck-mode))
-; todo....
-;; (use-package ido-ubiquitous
-;;   :config
-;;   (ido-ubiquitous-mode 1)
-;;   )
 
 (require 'company-simple-complete "~/.emacs.d/company-complete-cycle.el")
 
@@ -375,11 +370,12 @@
 (use-package helm-projectile
   :config
   (helm-projectile-on)
-  (setq
-    projectile-switch-project-action 'projectile-find-file))
+  (setq projectile-switch-project-action 'projectile-find-file))
 
 ;; (add-to-list 'load-path "~/.emacs.d/pytest-el")
 ;; (require 'pytest)
+
+(use-package paredit)
 
 (use-package evil-leader
   :config
@@ -502,10 +498,7 @@
   (interactive)
   (move-end-of-line nil)
   (set-mark-command nil)
-  (back-to-indentation)
-  )
-
-(use-package paredit)
+  (back-to-indentation))
 
 (defun razzi/transpose-next-line ()
   "Switch the current and next lines"
@@ -524,9 +517,8 @@
   "set|var -> set(var)"
   (interactive)
   (insert "(")
-  (forward-symbol 1)
-  (insert ")")
-  )
+  (move-end-of-line nil)
+  (insert ")"))
 
 (defun razzi/paste-replace (start end)
   "replace visual selection with last yank"
@@ -547,27 +539,52 @@
   "Before entering visual mode, save the last kill"
   (interactive)
   (setq razzi/pre-visual-kill (ns-get-pasteboard))
-  ;; (message razzi/pre-visual-kill)
-  (evil-visual-char)
-  )
+  (evil-visual-char))
 
 (defun razzi/erase-kill-visual ()
   "Before exiting visual mode, erase the last kill"
   (interactive)
   (setq razzi/pre-visual-kill nil)
-  (evil-visual-char)
-  )
-
+  (evil-visual-char))
 
 (defun razzi/surround-with-single-quotes (start end)
   (interactive "r")
   (evil-surround-region start end nil ?'))
 
-
 (defun razzi/surround-with-double-quotes (start end)
   (interactive "r")
   (evil-surround-region start end nil ?\"))
 
+(defun razzi/surround-with-parens (start end)
+  (interactive "r")
+  (evil-surround-region start end nil ?\))
+  (goto-char (+ 1 end)))
+
+(defun razzi/increase-region (start end)
+  (interactive "r")
+  ;; TODO use (evil-jump-item)
+  (let* ((matching-chars (list ?\( ?\{ ?\[ ?\) ?\} ?\]))
+        (opening-chars (list ?\( ?\{ ?\[))
+        (visual-type (evil-visual-type))
+        (char (char-before (point)))
+        (line (if (eq visual-type 'line)
+                  (progn
+                    (forward-line -1)
+                    (thing-at-point 'line)
+                    )
+                (thing-at-point 'line)))
+        (last-line-char (car (last (string-to-list line) 2)))
+        (first-line-char (string-to-char line)))
+    (cond
+      ((member char matching-chars) (evil-execute-macro 1 "%"))
+      ((member last-line-char opening-chars) (evil-execute-macro 1 "$%"))
+      ((member first-line-char opening-chars) (evil-execute-macro 1 "^%"))
+      (t (forward-paragraph)))
+    ))
+
+(defun razzi/copy-to-end-of-line ()
+  (interactive)
+  (evil-yank (point) (point-at-eol)))
 
 (use-package evil
   :config
@@ -577,8 +594,11 @@
     evil-regexp-search nil
     evil-cross-lines t
     evil-ex-substitute-global t
+  )
+
+  (setq-default
     evil-shift-width 2
-    )
+   )
 
   (define-key evil-insert-state-map (kbd "C-`") 'describe-key)
   (define-key evil-insert-state-map (kbd "C-a") nil)
@@ -597,8 +617,8 @@
   (define-key evil-normal-state-map (kbd "*") 'razzi/star-isearch)
   (define-key evil-normal-state-map (kbd "-") 'razzi/transpose-next-line)
   (define-key evil-normal-state-map (kbd "<C-i>") 'evil-jump-forward)
-  (define-key evil-normal-state-map (kbd "<tab>") 'next-buffer)
   (define-key evil-normal-state-map (kbd "<backtab>") 'previous-buffer)
+  (define-key evil-normal-state-map (kbd "<tab>") 'next-buffer)
   (define-key evil-normal-state-map (kbd "=") 'razzi/run-pytest)
   (define-key evil-normal-state-map (kbd "C") 'razzi/paredit-change)
   (define-key evil-normal-state-map (kbd "C") 'razzi/paredit-change)
@@ -618,6 +638,7 @@
   (define-key evil-normal-state-map (kbd "Q") 'razzi/replay-q-macro)
   (define-key evil-normal-state-map (kbd "Q") 'razzi/replay-q-macro)
   (define-key evil-normal-state-map (kbd "RET") 'razzi/clear)
+  (define-key evil-normal-state-map (kbd "Y") 'razzi/copy-to-end-of-line)
   (define-key evil-normal-state-map (kbd "[ SPC") 'razzi/insert-newline-before)
   (define-key evil-normal-state-map (kbd "[ c") 'git-gutter:previous-hunk)
   (define-key evil-normal-state-map (kbd "] SPC") 'razzi/insert-newline-after)
@@ -629,20 +650,22 @@
   (define-key evil-normal-state-map (kbd "gT") 'previous-buffer)
   (define-key evil-normal-state-map (kbd "gc") 'evilnc-comment-operator)
   (define-key evil-normal-state-map (kbd "gf") 'razzi/file-at-point)
+  (define-key evil-normal-state-map (kbd "go") 'evil-open-above)
   (define-key evil-normal-state-map (kbd "gs") 'magit-status)
   (define-key evil-normal-state-map (kbd "gt") 'next-buffer) ; TODO file buffers only
-  (define-key evil-normal-state-map (kbd "go") 'evil-open-above)
   (define-key evil-normal-state-map (kbd "v") 'razzi/save-kill-visual)
-  ;; (define-key evil-normal-state-map (kbd "<backtab>") 'elscreen-previous)
+
   ; todo
   ;; (define-key evil-normal-state-map (kbd "C-]") 'razzi/tag-in-split)
   ;; (define-key evil-normal-state-map (kbd "j") 'evil-next-line-first-non-blank) ; TODO only if in whitespace already
   ;; (define-key evil-normal-state-map (kbd "k") 'evil-previous-line-first-non-blank)
 
   (define-key evil-visual-state-map (kbd "!") 'sort-lines)
+  ;; (define-key evil-visual-state-map (kbd "$") 'end-of-line)
+  (define-key evil-visual-state-map (kbd ")") 'razzi/surround-with-parens)
   (define-key evil-visual-state-map (kbd "ae") 'mark-whole-buffer)
   (define-key evil-visual-state-map (kbd "il") 'razzi/mark-line-text)
-  (define-key evil-visual-state-map (kbd "V") 'evil-a-paragraph)
+  (define-key evil-visual-state-map (kbd "V") 'razzi/increase-region)
   (define-key evil-visual-state-map (kbd "p") 'razzi/paste-replace)
   (define-key evil-visual-state-map (kbd "s") 'evil-surround-region)
   ;; (define-key evil-visual-state-map (kbd "v") 'razzi/erase-kill-visual)
@@ -665,13 +688,11 @@
 
 (use-package evil-surround
   :config
-  (global-evil-surround-mode 1)
-  )
+  (global-evil-surround-mode 1))
 
 (use-package restclient
   :config
-  (add-to-list 'auto-mode-alist '("\\.http\\'" . restclient-mode))
-  )
+  (add-to-list 'auto-mode-alist '("\\.http\\'" . restclient-mode)))
 
 (use-package projectile
   :config
@@ -679,9 +700,7 @@
   (setq
     projectile-enable-caching t
     projectile-completion-system 'helm
-    projectile-switch-project-action #'projectile-commander
-    )
-  )
+    projectile-switch-project-action #'projectile-commander))
 
 (use-package change-inner)
 
@@ -701,14 +720,12 @@
   (key-chord-mode 1)
   (key-chord-define evil-insert-state-map "kj" 'evil-normal-state)
   (key-chord-define evil-normal-state-map "dp" 'change-inner-parens)
-  (setq key-chord-two-keys-delay 0.3)
-  )
+  (setq key-chord-two-keys-delay 0.3))
 
 (use-package yasnippet
   :config
   (yas-global-mode 1)
-  (define-key yas-keymap (kbd "<tab>") nil)
-  )
+  (define-key yas-keymap (kbd "<tab>") nil))
 
 (defun razzi/eshell-abbrev-and-return ()
   (interactive)
@@ -718,16 +735,14 @@
 (use-package virtualenvwrapper
   :config
   (venv-initialize-eshell)
-  (setq venv-location "~/.virtualenvs")
-  )
+  (setq venv-location "~/.virtualenvs"))
 
 (use-package s)
 
 (defun razzi/eshell-point-to-prompt ()
   (interactive)
   (goto-char (point-max))
-  (evil-append 0 0 nil)
-  )
+  (evil-append 0 0 nil))
 
 (add-hook 'html-mode-hook (lambda ()
     (modify-syntax-entry ?_ "w")
@@ -740,21 +755,10 @@
     )
   )
 
-;; (add-hook 'js-mode-hook (lambda ()
-;;     (modify-syntax-entry ?_ "w")
-;;     (setq
-;;       js-indent-level 2
-;;       evil-shift-width 2
-;;       )
-;;     )
-;;   )
 (use-package js2-mode
   :config
   (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
-    (setq
-      js-indent-level 2
-      evil-shift-width 2
-      )
+    (setq js-indent-level 2)
   )
 
 (add-hook 'nxml-mode-hook (lambda ()
@@ -934,15 +938,7 @@ length of PATH (sans directory slashes) down to MAX-LEN."
     (evil-insert-newline-above)
     (indent-for-tab-command)
     (insert (s-trim (current-kill 0)))
-    (forward-line)
-  )
-)
-
-;; asdf/a
-;; asdf/hi
-;; asdf/a
-;; sadf
-;; asdf/h
+    (forward-line)))
 
 ; TODO refactor
 (defun razzi/star-isearch ()
@@ -968,7 +964,6 @@ length of PATH (sans directory slashes) down to MAX-LEN."
       (evil-search-previous))))
 
 (defun razzi/pound-isearch ()
-   ; TODO it doesn't work in the middle of a word
   (interactive)
   (let ((inhibit-redisplay 1)
         (selection (evil-visual-state-p))
@@ -978,7 +973,7 @@ length of PATH (sans directory slashes) down to MAX-LEN."
                 (thing-at-point 'symbol))))
     (when (and (not selection)
                (not (looking-at "\\<")))
-      (backward-word))
+      (backward-sexp))
     (evil-exit-visual-state)
     (isearch-mode nil)
     (isearch-yank-string text)
@@ -990,15 +985,20 @@ length of PATH (sans directory slashes) down to MAX-LEN."
       (evil-search-previous))))
 
 ; TODO paredit-semicolon
+
+(defun current-line-empty-p ()
+  (string-match-p "^\s*$" (thing-at-point 'line)))
+
 (defun razzi/elisp-semicolon-and-space ()
   (interactive)
-  (if (and (not (bolp)) (eolp))
+  ; space preceeds if line is not empty and at end of line
+  (if (and (not (current-line-empty-p)) (eolp))
     (insert " ; ")
     (insert "; ")))
 
 (defun razzi/python-pound-and-space ()
   (interactive)
-  (if (and (not (bolp)) (eolp))
+  (if (and (not (current-line-empty-p)) (eolp))
     (insert "  # ")
     (insert "# ")))
 
@@ -1019,18 +1019,65 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 (define-key isearch-mode-map (kbd "C-j") 'isearch-done)
 (define-key isearch-mode-map (kbd "C-h") 'isearch-delete-char)
 (define-key isearch-mode-map (kbd "C-`") 'describe-key)
+(define-key isearch-mode-map (kbd "M-v") 'isearch-yank-pop)
+(define-key isearch-mode-map (kbd "C-w") 'bp/isearch-delete-word)
+
 (define-key dired-mode-map (kbd "C-j") 'dired-find-file)
 
-(global-set-key (kbd "M-v") 'nil)
 (global-set-key (kbd "M-v") 'evil-paste-after)
+
 (define-key minibuffer-local-isearch-map (kbd "M-v") 'nil)
 (define-key minibuffer-local-isearch-map (kbd "M-v") 'isearch-yank-kill)
+(define-key minibuffer-local-isearch-map (kbd "C-w") 'bp/isearch-delete-word)
+
+
+; TODO understand and refactor
+(defun isearch--remove-nonword-suffixes (str el)
+  (if (s-ends-with? el str)
+      str
+    (isearch--remove-nonword-suffixes
+     (substring str 0 (1- (string-width str)))
+     el)))
+
+(defun isearch--push-states-of-string (str len)
+  (cl-loop
+   for iter from 0 to (1- len) do
+   (let* ((i (s-left iter str))
+          (isearch-string i)
+          (isearch-message i))
+     (save-excursion
+       (setf (point) (+ isearch-other-end iter))
+       (push (isearch--get-state) isearch-cmds)))))
+
+(defun bp/isearch-delete-word ()
+  "Delete word in the `isearch-string'.
+Split strings by whitespace, dashes, underscores and camelcase.
+
+Push the current isearch-string to the `isearch-cmds' stack of
+search status elements to allow for a subsequent
+`isearch-delete-char' to further manipulate the string at hand."
+  (interactive)
+  ;; keep isearch prompt when string is empty
+  (if (equal isearch-string "")
+      (isearch-update)
+    (let* ((str isearch-string)
+           (lst (s-split-words str))
+           (el (car (last lst)))
+           (nosuf (isearch--remove-nonword-suffixes str el))
+           (res (s-chop-suffix el nosuf))
+           (len (string-width res)))
+      (setq isearch-string res
+            isearch-message res)
+      (isearch--push-states-of-string str len)
+      (isearch-search-and-update))))
+
 
 (defun minibuffer-config ()
   (interactive)
   (local-set-key (kbd "C-j") 'exit-minibuffer)
+  (define-key minibuffer-local-map (kbd "C-`") 'describe-key)
   ; todo
-  ;; (local-set-key (kbd "M-v") 'isearch-yank-pop)
+  ;; (define-key minibuffer-local-map (kbd "M-v") 'isearch-yank-pop)
   )
 
 (add-hook 'minibuffer-setup-hook 'minibuffer-config)
@@ -1052,35 +1099,23 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ;; (use-package pony-mode)
 
 ; todo
-; smarter VV when line has opening paren
-; VV ?
-; if the line ends with (starts with?) ( {, jump to it's pair
-; otherwise select paragraph
-
-; insert mode complete line non-lisp modes
-
+; insert mode c-l complete line
 ; wip elisp move stuff into own files
-
 ; eshell highlight valid commands
-
-; automatic set|var -> set(var)
 ; search c-t transpose chars
-
-; search c-w delete word, not paste...
-; visual block i to block insert
+; visual block i to block insert (may be impossible as i is a prefix)
 ; persistent marks
+; persistent undo
 ; show marks in gutter
 ; c-j xml put cursor in between tags
 ; in docstring, auto indent after first
 ; rename current file
-; persistent undo
 ; case insensitive completion eshell
 ; eshell in split
 ; ag bindings
 
 ; python tab to outdent a level?
 ; python newline when already outdented preserve outdent
-; somehow correct things like pyton_source - perhaps using syntax for word versus symbol
 ; *** razzi/extract-as-variable
 ; reassign variables when I make the same call
 ; with open(fn) as f
@@ -1090,15 +1125,10 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 
 ; make spc ; toggle between 2 buffers
 ; tab between only file buffers
-;; compile window not overwrite
 ;; compile window c-l move window
 ; compile remove line that says mode compile
 ; no scroll past end of buffer
 ; projectile c-w kill word
-
-; """ autoclose with formatted docstring!
-; (see http://stackoverflow.com/questions/19676181/electric-pair-mode-and-python-triple-quotes?rq=1)
-; newline after (setq should have a 2 space indent
 
 ; ** do the right close bracket outdent
         ;; return {
@@ -1114,18 +1144,13 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ;;     MILESTONE_IDS = { <- indent madness
 ;;         }
 ; o to indent new line if in class scope - if 2 lines open on toplevel (hard?)
-; treat _ as a word separator for abbrev / spelling
-; ending docstring indent correctly (autopep8?)
-
 ; xml auto close tag
 ; c-x c-f autocomplete file
 ; eshell smarter tab completion
 ; python: ]] isn't going to next class
 
 ; helm c-w delete word (clear?)
-; after magit, update git gutter
-
-;python if else indenting
+; python if else indenting
 
 ; yp yank inside parens
 ; S to kill within quotes for example (maybe)
@@ -1139,10 +1164,7 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 ; magit some way to pop most recent stash
 ; bind substitute - looks like
 ; (define-key evil-normal-state-map (kbd "g / r") (lambda () (evil-ex "%s/")))
-; star-isearch on whitespace should jump to last symbol
-; visual ) surround in parens
-; Y y$
-; lisp emacs ; no space before if only whitespace prior
+; star-isearch on whitespace jump to last symbol
 ; [|ret] throw the close bracket on the correct line
 ; spc q close split
 ; cs[ on a line before [ doesn't work
