@@ -40,8 +40,7 @@
 (setq-default
   abbrev-mode t
   indent-tabs-mode nil
-  tab-width 2
-  )
+  tab-width 2)
 
 ; Global vars
 (defvar razzi/pre-visual-kill)
@@ -276,8 +275,7 @@
 
 (use-package markdown-mode
   :config
-  (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
-  )
+  (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode)))
 
 (use-package avy)
 
@@ -635,6 +633,7 @@
   (define-key evil-normal-state-map (kbd "go") 'evil-open-above)
   (define-key evil-normal-state-map (kbd "gs") 'magit-status)
   (define-key evil-normal-state-map (kbd "v") 'razzi/save-kill-visual)
+  (define-key evil-normal-state-map (kbd "~") 'razzi/tilde)
 
   ; todo
   ;; (define-key evil-normal-state-map (kbd "C-]") 'razzi/tag-in-split)
@@ -990,6 +989,18 @@ length of PATH (sans directory slashes) down to MAX-LEN."
     (find-file target)
     ))
 
+(defun razzi/tilde ()
+  (interactive)
+  (if (looking-at "[A-z]")
+      (progn
+        (evil-invert-char (point) (+ (point) 1))
+        (right-char))
+    (progn
+      (right-char)
+      (razzi/tilde)
+      )
+    ))
+
 (add-hook 'emacs-lisp-mode-hook (lambda ()
     (enable-paredit-mode)
 
@@ -1085,7 +1096,6 @@ search status elements to allow for a subsequent
 ;; (use-package pony-mode)
 
 ; todo
-; ~ move to first char that can have its case switched
 ; j / k move to nonblank
 ; insert mode c-l complete line
 ; eshell highlight valid commands
