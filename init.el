@@ -47,6 +47,8 @@
 (defvar razzi/pre-visual-kill)
 (setq razzi/pre-visual-kill nil)
 
+(use-package cl-lib)
+
 (use-package monokai-theme
   :config
   (load-theme 'monokai t))
@@ -75,11 +77,8 @@
       (tab-mark ?\t [?\,A;(B ?\t]))
     )
   (setq-default
-    whitespace-style '(face space-after-tab tabs tab-mark)
-  )
-  (global-whitespace-mode)
-  )
-
+    whitespace-style '(face space-after-tab tabs tab-mark))
+  (global-whitespace-mode))
 
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 (add-hook 'focus-out-hook 'save-if-file)
@@ -144,13 +143,16 @@
 
 (defun razzi/magit-reset-one-commit ()
   (interactive)
-  (magit-reset "@^")
-  )
+  (magit-reset "@^"))
 
 (defun razzi/checkout-previous-branch ()
   (interactive)
-  (magit-checkout "-")
-  )
+  (magit-checkout "-"))
+
+(defun razzi/magit-stash ()
+  "Stash with no prompt"
+  (interactive)
+  (magit-stash-save "WIP" t t nil t))
 
 (use-package magit
   :config
@@ -158,7 +160,8 @@
   (define-key magit-status-mode-map (kbd "]") 'razzi/magit-pull)
   (define-key magit-status-mode-map (kbd "=") 'magit-diff-more-context)
   (define-key magit-status-mode-map (kbd "C-`") 'describe-key)
-  (define-key magit-status-mode-map (kbd "@") 'razzi/magit-reset-one-commit))
+  (define-key magit-status-mode-map (kbd "@") 'razzi/magit-reset-one-commit)
+  (define-key magit-status-mode-map (kbd "Z") 'razzi/magit-stash))
 
 (use-package git-gutter
   :config
@@ -174,17 +177,13 @@
 
 (use-package anzu
   :config
-  (global-anzu-mode 1)
-  )
+  (global-anzu-mode 1))
 
 (use-package evil-anzu)
 
-(use-package fzf)
-
 (use-package helm-flx
   :config
-  (helm-flx-mode 1)
-  )
+  (helm-flx-mode 1))
 
 (use-package helm
   :defines
@@ -231,8 +230,7 @@
     flycheck-disabled-checkers '(emacs-lisp-checkdoc)
     )
   :config
-  (global-flycheck-mode nil)
-  )
+  (global-flycheck-mode nil))
 
 (use-package flycheck-mypy
   :config
@@ -308,8 +306,7 @@
 
 (defun switch-to-scratch ()
   (interactive)
-  (switch-to-buffer "*scratch*")
-  )
+  (switch-to-buffer "*scratch*"))
 
 (defun edit-notes ()
   (interactive)
@@ -318,8 +315,7 @@
 
 (defun edit-init ()
   (interactive)
-  (find-file "~/.emacs.d/init.el")
-  )
+  (find-file "~/.emacs.d/init.el"))
 
 (defun razzi/copy-paragraph ()
   (interactive)
@@ -334,8 +330,7 @@
 (defun razzi/kill-buffer-and-window ()
   (interactive)
   (kill-this-buffer)
-  (delete-window)
-  )
+  (delete-window))
 
 (defun razzi/yank-file-name ()
   (interactive)
@@ -352,8 +347,7 @@
   (evil-append 0 0 nil)
   (move-end-of-line nil)
   (insert ",")
-  (evil-normal-state)
-  )
+  (evil-normal-state))
 
 (defun razzi/magit-checkout-file ()
   (interactive)
@@ -386,7 +380,7 @@
     ;; "-" 'razzi/run-test-pytest ; todo move to python mode
     "=" 'razzi/run-pytest ; todo move to python mode
     "8" 'razzi/autopep8 ; python mode
-    ";" 'previous-buffer
+    ";" 'razzi/toggle-between-buffers
     ;; "A" 'add-global-abbrev ; TODO ag current word
     "C" 'razzi/magit-checkout-file
     "E" 'eval-buffer
@@ -429,14 +423,12 @@
   (interactive)
   (split-window-below)
   (other-window 1)
-  (eshell)
-  )
+  (eshell))
 
 (defun razzi/transpose-prev-chars ()
   (interactive)
   (backward-char 1)
-  (transpose-chars nil)
-  )
+  (transpose-chars nil))
 
 (defun razzi/importmagic ()
   (interactive)
@@ -460,9 +452,7 @@
   (interactive)
   (if magit-blame-mode
     (magit-blame-quit)
-    (delete-other-windows)
-    )
-  )
+    (delete-other-windows)))
 
 (defun razzi/simple-newline ()
   "Insert a newline and indent"
@@ -481,7 +471,6 @@
   (interactive)
   ; TODO could run @q directly rather than executing those chars as a command
   (evil-execute-macro 1 "@q"))
-
 
 (defun razzi/replay-q-macro-new ()
   (interactive)
@@ -528,11 +517,7 @@
   (message razzi/pre-visual-kill)
   (if razzi/pre-visual-kill
       (insert razzi/pre-visual-kill)
-      (evil-paste-after 1)
-      ;; (insert "uyo")
-      ;; (insert razzi/pre-visual-kill)
-      ;; (evil-paste-after 1)
-      )
+      (evil-paste-after 1))
   (kill-region start end))
 
 (defun razzi/save-kill-visual ()
@@ -565,6 +550,7 @@
   ;; TODO use (evil-jump-item)
   (let* ((matching-chars (list ?\( ?\{ ?\[ ?\) ?\} ?\]))
         (opening-chars (list ?\( ?\{ ?\[))
+        (closing-chars (list ?\) ?\} ?\]))
         (visual-type (evil-visual-type))
         (char (char-before (point)))
         (line (if (eq visual-type 'line)
@@ -579,6 +565,7 @@
       ((member char matching-chars) (evil-execute-macro 1 "%"))
       ((member last-line-char opening-chars) (evil-execute-macro 1 "$%"))
       ((member first-line-char opening-chars) (evil-execute-macro 1 "^%"))
+      ((member last-line-char closing-chars) (evil-execute-macro 1 "$%"))
       (t (forward-paragraph)))
     ))
 
@@ -593,12 +580,10 @@
   (setq
     evil-regexp-search nil
     evil-cross-lines t
-    evil-ex-substitute-global t
-  )
+    evil-ex-substitute-global t)
 
   (setq-default
-    evil-shift-width 2
-   )
+    evil-shift-width 2)
 
   (define-key evil-insert-state-map (kbd "C-`") 'describe-key)
   (define-key evil-insert-state-map (kbd "C-a") nil)
@@ -635,7 +620,6 @@
   (define-key evil-normal-state-map (kbd "M-p") 'scroll-other-window)
   (define-key evil-normal-state-map (kbd "M-q") 'save-buffers-kill-terminal)
   (define-key evil-normal-state-map (kbd "Q") 'razzi/replay-q-macro)
-  (define-key evil-normal-state-map (kbd "Q") 'razzi/replay-q-macro)
   (define-key evil-normal-state-map (kbd "RET") 'razzi/clear)
   (define-key evil-normal-state-map (kbd "Y") 'razzi/copy-to-end-of-line)
   (define-key evil-normal-state-map (kbd "[ SPC") 'razzi/insert-newline-before)
@@ -646,12 +630,10 @@
   (define-key evil-normal-state-map (kbd "g'") 'goto-last-change)
   (define-key evil-normal-state-map (kbd "g-") 'razzi/checkout-previous-branch)
   (define-key evil-normal-state-map (kbd "g;") 'evilnc-comment-or-uncomment-lines)
-  (define-key evil-normal-state-map (kbd "gT") 'previous-buffer)
   (define-key evil-normal-state-map (kbd "gc") 'evilnc-comment-operator)
   (define-key evil-normal-state-map (kbd "gf") 'razzi/file-at-point)
   (define-key evil-normal-state-map (kbd "go") 'evil-open-above)
   (define-key evil-normal-state-map (kbd "gs") 'magit-status)
-  (define-key evil-normal-state-map (kbd "gt") 'next-buffer) ; TODO file buffers only
   (define-key evil-normal-state-map (kbd "v") 'razzi/save-kill-visual)
 
   ; todo
@@ -674,6 +656,7 @@
   (define-key evil-visual-state-map (kbd "v") 'razzi/erase-kill-visual)
 
   (define-key evil-operator-state-map (kbd "V") 'evil-a-paragraph)
+  (define-key evil-operator-state-map (kbd "p") 'evil-inner-paren)
 
   (add-hook 'evil-insert-state-exit-hook 'save-if-file)
   )
@@ -703,7 +686,7 @@
 
 (use-package change-inner)
 
-(defun change-inner-parens ()
+(defun razzi/kill-inside-parens ()
   (interactive)
   (let ((text (buffer-substring (point) (line-end-position))))
     (if (s-contains? "(" text)
@@ -711,14 +694,13 @@
       (progn
         (search-backward "(" (line-beginning-position) nil 1)
         (change-inner* nil "("))
-      ))
-  )
+      )))
 
 (use-package key-chord
   :config
   (key-chord-mode 1)
   (key-chord-define evil-insert-state-map "kj" 'evil-normal-state)
-  (key-chord-define evil-normal-state-map "dp" 'change-inner-parens)
+  (key-chord-define evil-normal-state-map "dp" 'razzi/kill-inside-parens)
   (setq key-chord-two-keys-delay 0.3))
 
 (use-package yasnippet
@@ -775,6 +757,7 @@
   (interactive)
   ;; (modify-syntax-entry ?_ "w" python-mode-syntax-table)
   ;; (add-to-list 'company-backends 'company-jedi)
+  (setq evil-shift-width 4)
   (evil-define-key 'insert python-mode-map
     (kbd "#") 'razzi/python-pound-and-space
     (kbd ";") 'razzi/python-pound-and-space)
@@ -1001,6 +984,12 @@ length of PATH (sans directory slashes) down to MAX-LEN."
     (insert "  # ")
     (insert "# ")))
 
+(defun razzi/toggle-between-buffers ()
+  (interactive)
+  (let ((target (cl-some 'buffer-file-name (cdr (buffer-list)))))
+    (find-file target)
+    ))
+
 (add-hook 'emacs-lisp-mode-hook (lambda ()
     (enable-paredit-mode)
 
@@ -1028,7 +1017,6 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 (define-key minibuffer-local-isearch-map (kbd "M-v") 'nil)
 (define-key minibuffer-local-isearch-map (kbd "M-v") 'isearch-yank-kill)
 (define-key minibuffer-local-isearch-map (kbd "C-w") 'bp/isearch-delete-word)
-
 
 ; TODO understand and refactor
 (defun isearch--remove-nonword-suffixes (str el)
@@ -1070,7 +1058,6 @@ search status elements to allow for a subsequent
       (isearch--push-states-of-string str len)
       (isearch-search-and-update))))
 
-
 (defun minibuffer-config ()
   (interactive)
   (local-set-key (kbd "C-j") 'exit-minibuffer)
@@ -1098,75 +1085,54 @@ search status elements to allow for a subsequent
 ;; (use-package pony-mode)
 
 ; todo
+; ~ move to first char that can have its case switched
+; j / k move to nonblank
 ; insert mode c-l complete line
-; wip elisp move stuff into own files
 ; eshell highlight valid commands
 ; search c-t transpose chars
 ; visual block i to block insert (may be impossible as i is a prefix)
-; persistent marks
 ; persistent undo
+; persistent marks
 ; show marks in gutter
 ; c-j xml put cursor in between tags
 ; in docstring, auto indent after first
 ; rename current file
 ; case insensitive completion eshell
-; eshell in split
 ; ag bindings
 
 ; python tab to outdent a level?
-; python newline when already outdented preserve outdent
+
 ; *** razzi/extract-as-variable
-; reassign variables when I make the same call
+; prompt for a var name and then extrace the current region into a var
 ; with open(fn) as f
 ;   x = f.read()
 ;   y = json.parse(f.read())
 ;                   ^ this turns into x
 
-; make spc ; toggle between 2 buffers
-; tab between only file buffers
 ;; compile window c-l move window
 ; compile remove line that says mode compile
 ; no scroll past end of buffer
 ; projectile c-w kill word
 
-; ** do the right close bracket outdent
-        ;; return {
-        ;;     issue['number'] for issue in content}
-
-; why is this happening?
-;; PIPELINE_IDS = {
-;;     'backlog': '54c19ad8f748cd180f07b4b6',
-;;     'in_development': '54c19ad8f748cd180f07b4b4',
-;;     'new_issues': '54c19ad8f748cd180f07b4b7',
-;;     'pr_outstanding': '55c2c7964e6d61ea173a1ce8'
-;; }
-;;     MILESTONE_IDS = { <- indent madness
-;;         }
 ; o to indent new line if in class scope - if 2 lines open on toplevel (hard?)
 ; xml auto close tag
 ; c-x c-f autocomplete file
 ; eshell smarter tab completion
-; python: ]] isn't going to next class
-
 ; helm c-w delete word (clear?)
-; python if else indenting
 
-; yp yank inside parens
-; S to kill within quotes for example (maybe)
+; S to kill within quotes for example
 ; use helm for find-tag
 ; smerge mode bindings: next, rebind return, keep both
 ; rebind c-h to backspace in evil-ex
 ; simpler defun yasnippet
-; ~ move to first char that can have its case switched? rather j / k move to nonblan
-; magit commit autopopulate with ref, and go straight into insert mode
-; magit Z stash no message
 ; magit some way to pop most recent stash
+; magit commit autopopulate with ref, and go straight into insert mode
+; [|ret] throw the close bracket on the correct line
+
 ; bind substitute - looks like
 ; (define-key evil-normal-state-map (kbd "g / r") (lambda () (evil-ex "%s/")))
 ; star-isearch on whitespace jump to last symbol
-; [|ret] throw the close bracket on the correct line
 ; spc q close split
+; if I already have an abbrev, make c-c a just insert it
 ; cs[ on a line before [ doesn't work
 ; no debug on error in eshell
-; if I already have an abbrev, make c-c a just insert it
-; consider turning off paredit-backslash

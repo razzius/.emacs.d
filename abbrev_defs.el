@@ -19,6 +19,8 @@
 
 (define-abbrev-table 'bookmark-edit-annotation-mode-abbrev-table '())
 
+(define-abbrev-table 'bs-mode-abbrev-table '())
+
 (define-abbrev-table 'c++-mode-abbrev-table
   '(
    ))
@@ -196,6 +198,7 @@
     ("imprtant" "important" nil 1)
     ("ina" "in a" nil 1)
     ("indiviuals" "individuals" nil 1)
+    ("inot" "into" nil 1)
     ("inser" "insert" nil 1)
     ("inserrt" "insert" nil 1)
     ("inset" "insert" nil 1)
@@ -233,6 +236,7 @@
     ("multipel" "multiple" nil 1)
     ("needef" "needed" nil 1)
     ("ngineer" "engineer" nil 1)
+    ("nonblan" "nonblank" nil 1)
     ("notimpementederror" "NotImplementedError" nil 1)
     ("nullabke" "nullable" nil 1)
     ("nwo" "now" nil 0)
@@ -259,6 +263,7 @@
     ("pipelne" "pipeline" nil 1)
     ("platofrm" "platform" nil 1)
     ("poewr" "Power" nil 1)
+    ("propmt" "prompt" nil 1)
     ("puthon" "python" nil 1)
     ("pyhton" "python" nil 2)
     ("pytho" "python" nil 1)
