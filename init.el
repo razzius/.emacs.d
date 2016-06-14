@@ -625,6 +625,8 @@
   (define-key evil-normal-state-map (kbd "] SPC") 'razzi/insert-newline-after)
   (define-key evil-normal-state-map (kbd "] c") 'git-gutter:next-hunk)
   (define-key evil-normal-state-map (kbd "_") 'razzi/transpose-previous-line)
+  ; todo
+  ;; (define-key evil-normal-state-map (kbd "e") 'forward-symbol)
   (define-key evil-normal-state-map (kbd "g'") 'goto-last-change)
   (define-key evil-normal-state-map (kbd "g-") 'razzi/checkout-previous-branch)
   (define-key evil-normal-state-map (kbd "g;") 'evilnc-comment-or-uncomment-lines)
@@ -694,6 +696,11 @@
         (search-backward "(" (line-beginning-position) nil 1)
         (change-inner* nil "("))
       )))
+
+(defun razzi/exit-insert (args)
+  (interactive)
+  (expand-abbrev)
+  (evil-normal-state))
 
 (use-package key-chord
   :config
