@@ -364,6 +364,8 @@
   (helm-projectile-on)
   (setq projectile-switch-project-action 'projectile-find-file))
 
+(use-package helm-git-grep)
+
 ;; (add-to-list 'load-path "~/.emacs.d/pytest-el")
 ;; (require 'pytest)
 
@@ -382,6 +384,7 @@
     ;; "A" 'add-global-abbrev ; TODO ag current word
     "C" 'razzi/magit-checkout-file
     "E" 'eval-buffer
+    "G" 'helm-git-grep-at-point
     "O" 'razzi/put-before
     "X" 'delete-file-and-buffer
     "DEL" 'restart-emacs
@@ -392,7 +395,7 @@
     "d" 'magit-diff-unstaged
     "e" 'eshell
     "f" 'razzi/yank-file-name
-    "g" 'magit-status
+    "g" 'helm-git-grep
     "h" 'help-command
     "i" 'edit-init
     "j" 'avy-goto-char
@@ -630,6 +633,7 @@
   (define-key evil-normal-state-map (kbd "g'") 'goto-last-change)
   (define-key evil-normal-state-map (kbd "g-") 'razzi/checkout-previous-branch)
   (define-key evil-normal-state-map (kbd "g;") 'evilnc-comment-or-uncomment-lines)
+  (define-key evil-normal-state-map (kbd "gb") 'magit-blame)
   (define-key evil-normal-state-map (kbd "gc") 'evilnc-comment-operator)
   (define-key evil-normal-state-map (kbd "gf") 'razzi/file-at-point)
   (define-key evil-normal-state-map (kbd "go") 'evil-open-above)
