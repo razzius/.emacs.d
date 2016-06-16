@@ -713,7 +713,7 @@
         (change-inner* nil "("))
       )))
 
-(defun razzi/exit-insert (args)
+(defun razzi/exit-insert ()
   (interactive)
   (expand-abbrev)
   (evil-normal-state))
@@ -721,7 +721,7 @@
 (use-package key-chord
   :config
   (key-chord-mode 1)
-  (key-chord-define evil-insert-state-map "kj" 'evil-normal-state)
+  (key-chord-define evil-insert-state-map "kj" 'razzi/exit-insert)
   (key-chord-define evil-normal-state-map "dp" 'razzi/kill-inside-parens)
   (setq key-chord-two-keys-delay 0.3))
 
@@ -1192,3 +1192,4 @@ search status elements to allow for a subsequent
 ; if I already have an abbrev, make c-c a just insert it
 ; cs[ on a line before [ doesn't work
 ; no debug on error in eshell
+; c spc -> cio
