@@ -33,6 +33,16 @@
 
 (define-abbrev-table 'change-log-mode-abbrev-table '())
 
+(define-abbrev-table 'circe-channel-mode-abbrev-table '())
+
+(define-abbrev-table 'circe-chat-mode-abbrev-table '())
+
+(define-abbrev-table 'circe-mode-abbrev-table '())
+
+(define-abbrev-table 'circe-query-mode-abbrev-table '())
+
+(define-abbrev-table 'circe-server-mode-abbrev-table '())
+
 (define-abbrev-table 'comint-mode-abbrev-table '())
 
 (define-abbrev-table 'command-history-mode-abbrev-table '())
@@ -128,6 +138,7 @@
     ("automaic" "automatic" nil 1)
     ("avalible" "available" nil 1)
     ("beefeor" "before" nil 1)
+    ("befre" "before" nil 1)
     ("beginging" "beginning" nil 1)
     ("beofre" "before" nil 1)
     ("brcked" "bracket" nil 1)
@@ -324,7 +335,7 @@
     ("superclas" "superclass" nil 1)
     ("surce" "source" nil 1)
     ("symboc" "symbol" nil 1)
-    ("symobl" "symbol" nil 1)
+    ("symobl" "symbol" nil 2)
     ("sysmte" "system" nil 1)
     ("systesm" "systems" nil 1)
     ("sytem" "system" nil 1)
@@ -338,6 +349,7 @@
     ("todo" "TODO" nil 26)
     ("tood" "TODO" nil 1)
     ("toodo" "TODO" nil 1)
+    ("toogle" "toggle" nil 1)
     ("tp" "to" nil 1)
     ("tye" "the" nil 1)
     ("udpate" "update" nil 1)
@@ -366,6 +378,8 @@
 (define-abbrev-table 'haskell-mode-abbrev-table '())
 
 (define-abbrev-table 'helm-ag-mode-abbrev-table '())
+
+(define-abbrev-table 'helm-git-grep-mode-abbrev-table '())
 
 (define-abbrev-table 'helm-grep-mode-abbrev-table '())
 
@@ -402,6 +416,8 @@
 (define-abbrev-table 'literate-haskell-mode-abbrev-table '())
 
 (define-abbrev-table 'log-edit-mode-abbrev-table '())
+
+(define-abbrev-table 'lui-mode-abbrev-table '())
 
 (define-abbrev-table 'magit-cherry-mode-abbrev-table '())
 

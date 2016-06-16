@@ -34,8 +34,7 @@
   tab-width 2
   tags-add-tables nil ; TODO is this a good default? having multiple merged tables could be cool
   vc-follow-symlinks t
-  visible-bell nil
-  )
+  visible-bell nil)
 
 (setq-default
   abbrev-mode t
@@ -101,9 +100,6 @@
 (use-package pyenv-mode)
 
 (use-package thingatpt)
-
-; TODO this doesn't work
-(use-package ag)
 
 (use-package emmet-mode
   :config
@@ -388,7 +384,6 @@
     "<left>" 'previous-buffer
     "<right>" 'previous-buffer
     ";" 'razzi/toggle-between-buffers
-    ;; "A" 'add-global-abbrev ; TODO ag current word
     "C" 'razzi/magit-checkout-file
     "E" 'eval-buffer
     "G" 'helm-git-grep-at-point
@@ -396,7 +391,6 @@
     "X" 'delete-file-and-buffer
     "DEL" 'restart-emacs
     "SPC" 'save-buffer
-    ;; "a" 'add-global-abbrev ; TODO search
     "b" 'razzi/blame
     "c" 'razzi/copy-paragraph
     "d" 'magit-diff-unstaged
@@ -552,6 +546,11 @@
   (evil-surround-region start end nil ?\))
   (goto-char (+ 1 end)))
 
+(defun razzi/surround-with-brackets (start end)
+  (interactive "r")
+  (evil-surround-region start end nil ?\])
+  (goto-char (+ 1 end)))
+
 (defun razzi/increase-region (start end)
   (interactive "r")
   ;; TODO use (evil-jump-item)
@@ -567,18 +566,25 @@
                     )
                 (thing-at-point 'line)))
         (last-line-char (car (last (string-to-list line) 2)))
-        (first-line-char (string-to-char line)))
+        (first-line-char (string-to-char (s-trim line))))
     (cond
-      ((member char matching-chars) (evil-execute-macro 1 "%"))
-      ((member last-line-char opening-chars) (evil-execute-macro 1 "$%"))
+      ((member char opening-chars) (progn (evil-backward-char) (evil-jump-item) (evil-forward-char)))
+      ((member char closing-chars) (evil-jump-item))
+      ((member last-line-char closing-chars) (progn (move-end-of-line 1) (set-mark-command nil) (evil-execute-macro 1 "%")))
       ((member first-line-char opening-chars) (evil-execute-macro 1 "^%"))
-      ((member last-line-char closing-chars) (evil-execute-macro 1 "$%"))
+      ((member last-line-char opening-chars) (progn (move-end-of-line 1) (evil-execute-macro 1 "%")))
       (t (forward-paragraph)))
     ))
 
 (defun razzi/copy-to-end-of-line ()
   (interactive)
   (evil-yank (point) (point-at-eol)))
+
+(defun razzi/almost-end-of-line ()
+  (interactive)
+  (move-end-of-line 1)
+  (backward-char)
+  (forward-char))
 
 (use-package evil
   :config
@@ -601,8 +607,7 @@
   (define-key evil-insert-state-map (kbd "C-l") 'paredit-forward-slurp-sexp)
   (define-key evil-insert-state-map (kbd "C-p") 'evil-complete-previous)
   (define-key evil-insert-state-map (kbd "C-t") 'razzi/transpose-prev-chars)
-  (define-key evil-insert-state-map (kbd "C-;") 'paredit-semicolon) ; TODO emacs only
-  (define-key evil-insert-state-map (kbd "<C-return>") 'razzi/wrap-in-parens) ; consider rebinding to c-(
+  (define-key evil-insert-state-map (kbd "<C-return>") 'razzi/wrap-in-parens)
   ;; (define-key evil-insert-state-map (kbd "<tab>") 'company-complete-selection)
 
   (define-key evil-normal-state-map (kbd "#") 'razzi/pound-isearch)
@@ -611,7 +616,7 @@
   (define-key evil-normal-state-map (kbd "<C-i>") 'evil-jump-forward)
   (define-key evil-normal-state-map (kbd "<backtab>") 'bs-cycle-previous)
   (define-key evil-normal-state-map (kbd "<tab>") 'bs-cycle-next)
-  (define-key evil-normal-state-map (kbd "=") 'razzi/run-pytest)
+  ;; (define-key evil-normal-state-map (kbd "=") 'razzi/run-pytest) ; move to python
   (define-key evil-normal-state-map (kbd "C") 'razzi/paredit-change)
   (define-key evil-normal-state-map (kbd "C-a") 'evil-numbers/inc-at-pt)
   (define-key evil-normal-state-map (kbd "C-h") 'windmove-left)
@@ -620,6 +625,7 @@
   (define-key evil-normal-state-map (kbd "C-l") 'windmove-right)
   (define-key evil-normal-state-map (kbd "C-x") 'evil-numbers/dec-at-pt)
   (define-key evil-normal-state-map (kbd "D") 'razzi/kill-line-and-whitespace)
+  (define-key evil-normal-state-map (kbd "E") 'forward-symbol)
   (define-key evil-normal-state-map (kbd "M-RET") 'delete-window)
   (define-key evil-normal-state-map (kbd "M-[") 'my-toggle-frame-left)
   (define-key evil-normal-state-map (kbd "M-]") 'my-toggle-frame-right)
@@ -634,8 +640,6 @@
   (define-key evil-normal-state-map (kbd "] SPC") 'razzi/insert-newline-after)
   (define-key evil-normal-state-map (kbd "] c") 'git-gutter:next-hunk)
   (define-key evil-normal-state-map (kbd "_") 'razzi/transpose-previous-line)
-  ; todo
-  ;; (define-key evil-normal-state-map (kbd "e") 'forward-symbol)
   (define-key evil-normal-state-map (kbd "g'") 'goto-last-change)
   (define-key evil-normal-state-map (kbd "g-") 'razzi/checkout-previous-branch)
   (define-key evil-normal-state-map (kbd "g;") 'evilnc-comment-or-uncomment-lines)
@@ -644,20 +648,21 @@
   (define-key evil-normal-state-map (kbd "gf") 'razzi/file-at-point)
   (define-key evil-normal-state-map (kbd "go") 'evil-open-above)
   (define-key evil-normal-state-map (kbd "gs") 'magit-status)
+  (define-key evil-normal-state-map (kbd "g SPC") 'magit-commit)
   (define-key evil-normal-state-map (kbd "v") 'razzi/save-kill-visual)
   (define-key evil-normal-state-map (kbd "~") 'razzi/tilde)
 
   ; todo
   ;; (define-key evil-normal-state-map (kbd "C-]") 'razzi/tag-in-split)
-  ;; (define-key evil-normal-state-map (kbd "j") 'evil-next-line-first-non-blank) ; TODO only if in whitespace already
-  ;; (define-key evil-normal-state-map (kbd "k") 'evil-previous-line-first-non-blank)
-
   (define-key evil-visual-state-map (kbd "!") 'sort-lines)
+  ;; (define-key evil-visual-state-map (kbd "~") ') ; toggle region
   (define-key evil-visual-state-map (kbd "#") 'razzi/pound-isearch)
-  ;; (define-key evil-visual-state-map (kbd "$") 'end-of-line)
+  (define-key evil-visual-state-map (kbd "$") 'razzi/almost-end-of-line)
   (define-key evil-visual-state-map (kbd "'") 'razzi/surround-with-single-quotes)
   (define-key evil-visual-state-map (kbd ")") 'razzi/surround-with-parens)
+  (define-key evil-visual-state-map (kbd "]") 'razzi/surround-with-brackets)
   (define-key evil-visual-state-map (kbd "*") 'razzi/star-isearch)
+  (define-key evil-visual-state-map (kbd "E") 'forward-symbol)
   (define-key evil-visual-state-map (kbd "V") 'razzi/increase-region)
   (define-key evil-visual-state-map (kbd "\"") 'razzi/surround-with-double-quotes)
   (define-key evil-visual-state-map (kbd "ae") 'mark-whole-buffer)
@@ -667,6 +672,7 @@
   (define-key evil-visual-state-map (kbd "v") 'razzi/erase-kill-visual)
 
   (define-key evil-operator-state-map (kbd "V") 'evil-a-paragraph)
+  (define-key evil-operator-state-map (kbd "E") 'forward-symbol)
   (define-key evil-operator-state-map (kbd "p") 'evil-inner-paren)
 
   (add-hook 'evil-insert-state-exit-hook 'save-if-file)
@@ -786,7 +792,8 @@
   (evil-define-key 'insert python-mode-map
     (kbd "#") 'razzi/python-pound-and-space
     (kbd ";") 'razzi/python-pound-and-space
-    (kbd "C-h") 'py-electric-backspace))
+    ;(kbd "C-h") 'py-electric-backspace)
+    ))
 
 (add-hook 'python-mode-hook 'razzi/python-mode)
 
@@ -947,9 +954,19 @@ length of PATH (sans directory slashes) down to MAX-LEN."
     (insert (s-trim (current-kill 0)))
     (forward-line)))
 
+(defun test ()
+  (interactive)
+  (if (looking-at "\\_<")
+      (message "yes")
+    (message "no")
+    ))
+
 ; TODO refactor
 (defun razzi/star-isearch ()
   (interactive)
+  (while (not (looking-at "[A-z]"))
+      (forward-char))
+
   (let ((inhibit-redisplay 1)
         (selection (evil-visual-state-p))
         (visual-type (evil-visual-type))
@@ -958,7 +975,7 @@ length of PATH (sans directory slashes) down to MAX-LEN."
                 (thing-at-point 'symbol))))
     ; Go to the start of the word if not in visual and not already at the start
     (when (and (not selection)
-               (not (looking-at "\\<")))
+               (not (looking-at "\\_<")))
       (backward-sexp))
     (evil-exit-visual-state)
     (isearch-mode t)
@@ -972,6 +989,8 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 
 (defun razzi/pound-isearch ()
   (interactive)
+  (while (not (looking-at "[A-z]"))
+      (backward-char))
   (let ((inhibit-redisplay 1)
         (selection (evil-visual-state-p))
         (visual-type (evil-visual-type))
@@ -979,8 +998,11 @@ length of PATH (sans directory slashes) down to MAX-LEN."
                 (buffer-substring-no-properties (region-beginning) (region-end))
                 (thing-at-point 'symbol))))
     (when (and (not selection)
-               (not (looking-at "\\<")))
-      (backward-sexp))
+               (not (looking-at "\\_<")))
+      (progn
+        (backward-sexp)
+        (if (eq ?' (char-before (point)))
+            (forward-char))))
     (evil-exit-visual-state)
     (isearch-mode nil)
     (isearch-yank-string text)
@@ -991,17 +1013,17 @@ length of PATH (sans directory slashes) down to MAX-LEN."
             (not (eq visual-type 'line)))
       (evil-search-previous))))
 
-; TODO paredit-semicolon
-
 (defun current-line-empty-p ()
-  (string-match-p "^\s*$" (thing-at-point 'line)))
+   (string-match-p "^\s*$" (thing-at-point 'line)))
 
 (defun razzi/elisp-semicolon-and-space ()
   (interactive)
   ; space preceeds if line is not empty and at end of line
   (if (and (not (current-line-empty-p)) (eolp))
     (insert " ; ")
-    (insert "; ")))
+    (progn
+      (paredit-semicolon)
+      (insert " "))))
 
 (defun razzi/python-pound-and-space ()
   (interactive)
@@ -1127,7 +1149,8 @@ search status elements to allow for a subsequent
 ;; (use-package pony-mode)
 
 ; todo
-; insert mode c-l complete line
+; magit gZ pop most recent stash
+; insert mode c-tab complete line
 ; eshell highlight valid commands
 ; search c-t transpose chars
 ; visual block i to block insert (may be impossible as i is a prefix)
@@ -1138,8 +1161,6 @@ search status elements to allow for a subsequent
 ; in docstring, auto indent after first
 ; rename current file
 ; case insensitive completion eshell
-; ag bindings
-
 ; python tab to outdent a level?
 
 ; *** razzi/extract-as-variable
@@ -1149,8 +1170,6 @@ search status elements to allow for a subsequent
 ;   y = json.parse(f.read())
 ;                   ^ this turns into x
 
-;; compile window c-l move window
-; compile remove line that says mode compile
 ; no scroll past end of buffer
 ; projectile c-w kill word
 
@@ -1165,13 +1184,11 @@ search status elements to allow for a subsequent
 ; smerge mode bindings: next, rebind return, keep both
 ; rebind c-h to backspace in evil-ex
 ; simpler defun yasnippet
-; magit some way to pop most recent stash
 ; magit commit autopopulate with ref, and go straight into insert mode
 ; [|ret] throw the close bracket on the correct line
 
 ; bind substitute - looks like
 ; (define-key evil-normal-state-map (kbd "g / r") (lambda () (evil-ex "%s/")))
-; star-isearch on whitespace jump to last symbol
 ; if I already have an abbrev, make c-c a just insert it
 ; cs[ on a line before [ doesn't work
 ; no debug on error in eshell
