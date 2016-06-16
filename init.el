@@ -46,6 +46,13 @@
 (defvar razzi/pre-visual-kill)
 (setq razzi/pre-visual-kill nil)
 
+(use-package circe
+  :config
+  ; TODO authenticate n sheit
+  ;; https://github.com/jorgenschaefer/circe/wiki/Configuration#hiding-other-messages
+  (circe-set-display-handler "Join:" (lambda (&rest ignored) nil))
+  )
+
 (use-package cl-lib)
 
 (use-package monokai-theme
@@ -328,7 +335,8 @@
 (defun razzi/kill-buffer-and-window ()
   (interactive)
   (kill-this-buffer)
-  (delete-window))
+  (when (> (length (window-list)) 1)
+    (delete-window)))
 
 (defun razzi/yank-file-name ()
   (interactive)
@@ -377,9 +385,8 @@
   (evil-leader/set-leader "<SPC>")
   (evil-leader/set-key
     "," 'razzi/append-comma
-    ;; "-" 'razzi/run-test-pytest ; todo move to python mode
-    "=" 'razzi/run-pytest ; todo move to python mode
-    "8" 'razzi/autopep8 ; python mode
+    "<left>" 'previous-buffer
+    "<right>" 'previous-buffer
     ";" 'razzi/toggle-between-buffers
     ;; "A" 'add-global-abbrev ; TODO ag current word
     "C" 'razzi/magit-checkout-file
@@ -405,8 +412,7 @@
     "o" 'razzi/put-after
     ; "p" 'razzi/edit-eshell-profile
     "p" 'razzi/importmagic
-    ;; "q" 'razzi/kill-buffer-and-window
-    "q" 'kill-this-buffer
+    "q" 'razzi/kill-buffer-and-window
     "r" 'helm-recentf
     "s" 'switch-to-scratch
     "t" 'helm-projectile-find-file
@@ -765,13 +771,22 @@
 
 (defun razzi/python-mode ()
   (interactive)
+  ; TODO add operator to move to end of word
   ;; (modify-syntax-entry ?_ "w" python-mode-syntax-table)
+
   ;; (add-to-list 'company-backends 'company-jedi)
+
   (setq evil-shift-width 4)
+
+  (evil-leader/set-key-for-mode 'python-mode
+    "-" 'razzi/run-test-pytest
+    "=" 'razzi/run-pytest
+    "8" 'razzi/autopep8)
+
   (evil-define-key 'insert python-mode-map
     (kbd "#") 'razzi/python-pound-and-space
-    (kbd ";") 'razzi/python-pound-and-space)
-  (evil-define-key 'insert python-mode-map (kbd "C-h") 'py-electric-backspace))
+    (kbd ";") 'razzi/python-pound-and-space
+    (kbd "C-h") 'py-electric-backspace))
 
 (add-hook 'python-mode-hook 'razzi/python-mode)
 
@@ -1000,17 +1015,22 @@ length of PATH (sans directory slashes) down to MAX-LEN."
     (find-file target)
     ))
 
-(defun razzi/tilde ()
-  (interactive)
-  (if (looking-at "[A-z]")
-      (progn
-        (evil-invert-char (point) (+ (point) 1))
-        (right-char))
-    (progn
-      (right-char)
-      (razzi/tilde)
-      )
-    ))
+(defun razzi/tilde (count)
+  (interactive "P")
+  (let ((repeat (if count count 1)))
+    (if (> repeat 0)
+        (if (looking-at "[A-z]")
+            (progn
+              (evil-invert-char (point) (+ (point) 1))
+              (right-char)
+              (razzi/tilde (- repeat 1))
+              )
+          (progn
+            (right-char)
+            (razzi/tilde count)
+            )
+          )))
+  )
 
 (add-hook 'emacs-lisp-mode-hook (lambda ()
     (enable-paredit-mode)
@@ -1107,7 +1127,6 @@ search status elements to allow for a subsequent
 ;; (use-package pony-mode)
 
 ; todo
-; j / k move to nonblank
 ; insert mode c-l complete line
 ; eshell highlight valid commands
 ; search c-t transpose chars
@@ -1153,7 +1172,6 @@ search status elements to allow for a subsequent
 ; bind substitute - looks like
 ; (define-key evil-normal-state-map (kbd "g / r") (lambda () (evil-ex "%s/")))
 ; star-isearch on whitespace jump to last symbol
-; spc q close split
 ; if I already have an abbrev, make c-c a just insert it
 ; cs[ on a line before [ doesn't work
 ; no debug on error in eshell
