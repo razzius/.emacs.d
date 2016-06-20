@@ -43,7 +43,7 @@
 (defvar razzi/pre-visual-kill)
 (setq razzi/pre-visual-kill nil)
 
-(use-package cl-lib)
+
 
 (use-package monokai-theme
   :config
@@ -311,8 +311,7 @@
 
 (defun edit-notes ()
   (interactive)
-  (find-file "~/notes.org")
-  )
+  (find-file "~/notes.org"))
 
 (defun edit-init ()
   (interactive)
@@ -381,17 +380,18 @@
   (evil-leader/set-leader "<SPC>")
   (evil-leader/set-key
     "," 'razzi/append-comma
+    ";" 'razzi/toggle-between-buffers
     "<left>" 'previous-buffer
     "<right>" 'previous-buffer
-    ";" 'razzi/toggle-between-buffers
     "C" 'razzi/magit-checkout-file
+    "DEL" 'restart-emacs
     "E" 'eval-buffer
     "G" 'helm-git-grep-at-point
     "R" 'razzi/rename-current-file
     "O" 'razzi/put-before
-    "X" 'delete-file-and-buffer
-    "DEL" 'restart-emacs
     "SPC" 'save-buffer
+    "X" 'delete-file-and-buffer
+    "]" 'find-tag
     "b" 'razzi/blame
     "c" 'razzi/copy-paragraph
     "d" 'magit-diff-unstaged
@@ -401,21 +401,19 @@
     "h" 'help-command
     "i" 'edit-init
     "j" 'avy-goto-char
-    ;; "k" 'edit-private-xml
     "m" 'razzi/show-messages
     "n" 'edit-notes
     "o" 'razzi/put-after
-    ; "p" 'razzi/edit-eshell-profile
-    "p" 'razzi/importmagic
     "q" 'razzi/kill-buffer-and-window
     "r" 'helm-recentf
     "s" 'switch-to-scratch
     "t" 'helm-projectile-find-file
     "v" 'eval-last-sexp ; TODO move to lisp mode
     "x" 'compile
-    ; TODO recompile
     "z" 'razzi/eshell-in-split
-    ;; "b" 'eval-buffer
+    ; "p" 'razzi/edit-eshell-profile
+    ; TODO recompile
+    ;; "k" 'edit-private-xml
     )
   )
 
@@ -624,6 +622,7 @@
   (define-key evil-insert-state-map (kbd "C-l") 'paredit-forward-slurp-sexp)
   (define-key evil-insert-state-map (kbd "C-p") 'evil-complete-previous)
   (define-key evil-insert-state-map (kbd "C-t") 'razzi/transpose-prev-chars)
+  (define-key evil-insert-state-map (kbd "M-v") 'evil-paste-before)
   (define-key evil-insert-state-map (kbd "<C-return>") 'razzi/wrap-in-parens)
   ;; (define-key evil-insert-state-map (kbd "<tab>") 'company-complete-selection)
 
@@ -633,7 +632,6 @@
   (define-key evil-normal-state-map (kbd "<C-i>") 'evil-jump-forward)
   (define-key evil-normal-state-map (kbd "<backtab>") 'bs-cycle-previous)
   (define-key evil-normal-state-map (kbd "<tab>") 'bs-cycle-next)
-  ;; (define-key evil-normal-state-map (kbd "=") 'razzi/run-pytest) ; move to python
   (define-key evil-normal-state-map (kbd "C") 'razzi/paredit-change)
   (define-key evil-normal-state-map (kbd "C-a") 'evil-numbers/inc-at-pt)
   (define-key evil-normal-state-map (kbd "C-h") 'windmove-left)
@@ -669,7 +667,7 @@
   (define-key evil-normal-state-map (kbd "go") 'evil-open-above)
   ;; (define-key evil-normal-state-map (kbd "gp") 'magit-push); todo
   (define-key evil-normal-state-map (kbd "gs") 'magit-status)
-  (define-key evil-normal-state-map (kbd "g SPC") 'magit-commit)
+  (define-key evil-normal-state-map (kbd "g SPC") 'razzi/magit-commit)
   (define-key evil-normal-state-map (kbd "v") 'razzi/save-kill-visual)
   (define-key evil-normal-state-map (kbd "~") 'razzi/tilde)
 
@@ -818,8 +816,9 @@
 
   (evil-leader/set-key-for-mode 'python-mode
     "-" 'razzi/run-test-pytest
+    "8" 'razzi/autopep8
     "=" 'razzi/run-pytest
-    "8" 'razzi/autopep8)
+    "p" 'razzi/importmagic)
 
   (evil-define-key 'insert python-mode-map
     (kbd "#") 'razzi/python-pound-and-space
@@ -914,6 +913,7 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   (kbd "C-c") 'eshell-interrupt-process
   (kbd "C-d") 'razzi/eshell-eof-or-delete
   (kbd "C-e") 'end-of-line
+  (kbd "C-j") 'nil
   (kbd "C-j") 'razzi/eshell-abbrev-and-return
   (kbd "C-k") 'razzi/eshell-up-window-or-kill-line
   (kbd "C-n") 'eshell-next-input
@@ -977,6 +977,13 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 (defun razzi/file-at-point ()
   (interactive)
   (find-file-at-point (thing-at-point 'symbol)))
+
+(defun razzi/magit-commit ()
+  (interactive)
+  (when (not (magit-anything-staged-p))
+    (magit-run-git "add" "-u" "."))
+  (let ((same-window-regexps nil))
+    (magit-commit)))
 
 (defun razzi/put-before ()
   (interactive)
@@ -1200,3 +1207,4 @@ search status elements to allow for a subsequent
 ; (define-key evil-normal-state-map (kbd "g / r") (lambda () (evil-ex "%s/")))
 ; cs[ on a line before [ doesn't work
 ; no debug on error in eshell
+; eshell make - word syntax

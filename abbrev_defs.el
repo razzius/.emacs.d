@@ -102,6 +102,7 @@
     ("p" "python" nil 2)
     ("pi" "pip install" nil 2)
     ("t" "py.test" nil 1)
+    ("w" "cd ~/code/clint" nil 1)
    ))
 
 (define-abbrev-table 'evil-command-window-mode-abbrev-table '())
@@ -161,9 +162,11 @@
     ("comand" "command" nil 1)
     ("comapny" "company" nil 1)
     ("contat" "contact" nil 1)
+    ("coomit" "commit" nil 1)
     ("coud" "could" nil 1)
     ("craeted" "created" nil 1)
     ("createsa" "creates a" nil 1)
+    ("creidt" "credit" nil 1)
     ("cty" "City" nil 1)
     ("curosr" "cursor" nil 1)
     ("currentl" "currently" nil 1)
@@ -179,6 +182,7 @@
     ("disalbe" "disable" nil 0)
     ("dlete" "delete" nil 1)
     ("docsting" "docstring" nil 1)
+    ("eco" "echo" nil 1)
     ("ecoh" "echo" nil 1)
     ("eixt" "exit" nil 1)
     ("emtpy" "empty" nil 1)
@@ -225,6 +229,7 @@
     ("instantaited" "instantiated" nil 1)
     ("intermeidate" "intermediate" nil 1)
     ("interpeter" "interpreter" nil 1)
+    ("iself" "itself" nil 1)
     ("isnt" "isn't" nil 1)
     ("isthis" "is this" nil 1)
     ("itsef" "itself" nil 1)
@@ -361,6 +366,7 @@
     ("tp" "to" nil 1)
     ("tye" "the" nil 1)
     ("udpate" "update" nil 1)
+    ("utilit" "utility" nil 1)
     ("utilitiies" "utilities" nil 1)
     ("vales" "values" nil 1)
     ("vauels" "values" nil 1)
@@ -369,6 +375,7 @@
     ("whcih" "which" nil 2)
     ("whitepace" "whitespace" nil 1)
     ("wiht" "with" nil 1)
+    ("withoout" "without" nil 2)
     ("wor" "work" nil 1)
     ("woudl" "would" nil 1)
     ("wthout" "without" nil 1)
@@ -519,6 +526,8 @@
 (define-abbrev-table 'select-tags-table-mode-abbrev-table '())
 
 (define-abbrev-table 'sgml-mode-abbrev-table '())
+
+(define-abbrev-table 'sh-mode-abbrev-table '())
 
 (define-abbrev-table 'shell-mode-abbrev-table '())
 
