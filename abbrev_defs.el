@@ -67,6 +67,8 @@
 
 (define-abbrev-table 'diff-mode-abbrev-table '())
 
+(define-abbrev-table 'dig-mode-abbrev-table '())
+
 (define-abbrev-table 'display-time-world-mode-abbrev-table '())
 
 (define-abbrev-table 'edebug-eval-mode-abbrev-table '())
@@ -77,7 +79,7 @@
 
 (define-abbrev-table 'emacs-lisp-mode-abbrev-table
   '(
-    ("kdb" "kbd" nil 1)
+    ("kdb" "kbd" nil 2)
    ))
 
 (define-abbrev-table 'epa-info-mode-abbrev-table '())
@@ -251,12 +253,12 @@
     ("merics" "metrics" nil 1)
     ("mertric" "Metric" nil 1)
     ("mkaing" "making" nil 0)
-    ("msg" "message" nil 2)
     ("mst" "must" nil 1)
     ("mulit" "Multi" nil 1)
     ("multipel" "multiple" nil 1)
     ("needef" "needed" nil 1)
     ("ngineer" "engineer" nil 1)
+    ("nme" "name" nil 1)
     ("notimpementederror" "NotImplementedError" nil 1)
     ("nullabke" "nullable" nil 1)
     ("nwo" "now" nil 0)
@@ -297,6 +299,7 @@
     ("quoes" "quotes" nil 1)
     ("qutes" "quotes" nil 1)
     ("qutoe" "quote" nil 1)
+    ("quti" "quit" nil 1)
     ("rateh" "rate" nil 1)
     ("razi" "razzi" nil 1)
     ("reeturn" "return" nil 1)
@@ -374,6 +377,20 @@
     ("yeild" "yield" nil 1)
     ("youy" "you" nil 1)
    ))
+
+(define-abbrev-table 'gnus-article-edit-mode-abbrev-table '())
+
+(define-abbrev-table 'gnus-article-mode-abbrev-table '())
+
+(define-abbrev-table 'gnus-browse-mode-abbrev-table '())
+
+(define-abbrev-table 'gnus-category-mode-abbrev-table '())
+
+(define-abbrev-table 'gnus-group-mode-abbrev-table '())
+
+(define-abbrev-table 'gnus-score-mode-abbrev-table '())
+
+(define-abbrev-table 'gnus-sticky-article-mode-abbrev-table '())
 
 (define-abbrev-table 'grep-mode-abbrev-table '())
 
@@ -505,6 +522,8 @@
 
 (define-abbrev-table 'shell-mode-abbrev-table '())
 
+(define-abbrev-table 'smime-mode-abbrev-table '())
+
 (define-abbrev-table 'snippet-mode-abbrev-table '())
 
 (define-abbrev-table 'special-mode-abbrev-table '())
@@ -528,4 +547,3 @@
 (define-abbrev-table 'vc-svn-log-view-mode-abbrev-table '())
 
 (define-abbrev-table 'ycmd-view-mode-abbrev-table '())
-

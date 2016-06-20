@@ -19,7 +19,7 @@
   eshell-banner-message ""
   eshell-rc-script "~/.emacs.d/eshell/profile.el"
   frame-title-format "%f"
-  gc-cons-threshold 20000000
+  gc-cons-threshold 100000000
   indent-tabs-mode nil
   inhibit-splash-screen t
   inhibit-startup-message t
@@ -49,7 +49,9 @@
   :config
   ; TODO authenticate n sheit
   ;; https://github.com/jorgenschaefer/circe/wiki/Configuration#hiding-other-messages
-  (circe-set-display-handler "Join:" (lambda (&rest ignored) nil))
+  (circe-set-display-handler "JOIN" (lambda (&rest ignored) nil))
+  (circe-set-display-handler "QUIT" (lambda (&rest ignored) nil))
+  (evil-set-initial-state 'circe-mode 'emacs)
   )
 
 (use-package cl-lib)
@@ -86,7 +88,14 @@
   (global-whitespace-mode))
 
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
-(add-hook 'focus-out-hook 'save-if-file)
+(add-hook 'focus-out-hook 'garbage-collect)
+
+(use-package diminish)
+
+(use-package focus-autosave-mode
+  :diminish focus-autosave-mode
+  :config
+  (focus-autosave-mode))
 
 (use-package evil-numbers)
 
@@ -111,10 +120,18 @@
 (use-package hippie-exp
   :config
   (setq hippie-expand-try-functions-list '(
-      yas-hippie-try-expand
+      try-expand-line
+      try-expand-line-all-buffers
+      ;; yas-hippie-try-expand
       ;; emmet-expand-line
+
       )
     )
+
+  (defadvice he-substitute-string (after he-paredit-fix)
+    "Remove extra paren when expanding line in paredit"
+    (if (and paredit-mode (equal (substring str -1) ")"))
+      (progn (backward-delete-char 1) (forward-char))))
   )
 
 (use-package highlight-numbers
@@ -159,6 +176,7 @@
 (use-package magit
   :config
   (setq same-window-regexps (append same-window-regexps '("\*magit: .*\*" "\*magit-diff: .*\*")))
+  (evil-set-initial-state 'text-mode 'insert)
   (define-key magit-status-mode-map (kbd "]") 'razzi/magit-pull)
   (define-key magit-status-mode-map (kbd "=") 'magit-diff-more-context)
   (define-key magit-status-mode-map (kbd "C-`") 'describe-key)
@@ -240,26 +258,22 @@
 
 (require 'company-simple-complete "~/.emacs.d/company-complete-cycle.el")
 
-(defun my-company-hook ()
-  (interactive)
+(use-package company
+  :config
+  (global-company-mode)
+  (define-key company-active-map (kbd "C-w") 'nil)
+  (define-key company-active-map (kbd "C-h") 'nil)
   ;; (define-key company-active-map [return] 'nil)
   ;; (define-key company-active-map (kbd "<tab>") 'company-complete-selection)
-  ; TODO turn off c-h
+  (setq
+    company-minimum-prefix-length 2
+    ;; company-backends '(company-ycmd)
+    )
   )
 
-;; (use-package company
-;;   :config
-;;   (global-company-mode)
-;;   ;; (add-hook 'company-mode-hook 'my-company-hook)
-;;   (setq
-;;     company-minimum-prefix-length 2
-;;     ;; company-backends '(company-ycmd)
-;;     )
-;;   )
-
-;; (use-package company-flx
-;;   :config
-;;   (company-flx-mode 1))
+(use-package company-flx
+  :config
+  (company-flx-mode 1))
 
 ;; (use-package ycmd
 ;;   :config
@@ -425,6 +439,12 @@
   (split-window-below)
   (other-window 1)
   (eshell))
+
+(defun razzi/rename-current-file (name)
+  (interactive "MRename to:")
+  (rename-file old-name name)
+  (kill-this-buffer)
+  (find-file name))
 
 (defun razzi/transpose-prev-chars ()
   (interactive)
@@ -601,6 +621,8 @@
   (define-key evil-insert-state-map (kbd "C-`") 'describe-key)
   (define-key evil-insert-state-map (kbd "C-a") nil)
   (define-key evil-insert-state-map (kbd "C-c a") 'inverse-add-global-abbrev)
+  (define-key evil-insert-state-map (kbd "<C-i>") 'hippie-expand)
+  (define-key evil-insert-state-map (kbd "C-f") 'company-files)
   (define-key evil-insert-state-map (kbd "C-h") 'delete-backward-char)
   (define-key evil-insert-state-map (kbd "C-j") 'razzi/simple-newline)
   (define-key evil-insert-state-map (kbd "C-k") 'paredit-kill)
@@ -630,7 +652,8 @@
   (define-key evil-normal-state-map (kbd "M-[") 'my-toggle-frame-left)
   (define-key evil-normal-state-map (kbd "M-]") 'my-toggle-frame-right)
   (define-key evil-normal-state-map (kbd "M-a") 'mark-whole-buffer) ; TODO make this keep point where it is
-  (define-key evil-normal-state-map (kbd "M-p") 'scroll-other-window)
+  (define-key evil-normal-state-map (kbd "M-n") 'scroll-other-window)
+  (define-key evil-normal-state-map (kbd "M-p") 'scroll-other-window-down)
   (define-key evil-normal-state-map (kbd "M-q") 'save-buffers-kill-terminal)
   (define-key evil-normal-state-map (kbd "Q") 'razzi/replay-q-macro)
   (define-key evil-normal-state-map (kbd "RET") 'razzi/clear)
@@ -647,6 +670,7 @@
   (define-key evil-normal-state-map (kbd "gc") 'evilnc-comment-operator)
   (define-key evil-normal-state-map (kbd "gf") 'razzi/file-at-point)
   (define-key evil-normal-state-map (kbd "go") 'evil-open-above)
+  ;; (define-key evil-normal-state-map (kbd "gp") 'magit-push); todo
   (define-key evil-normal-state-map (kbd "gs") 'magit-status)
   (define-key evil-normal-state-map (kbd "g SPC") 'magit-commit)
   (define-key evil-normal-state-map (kbd "v") 'razzi/save-kill-visual)
@@ -1018,6 +1042,7 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 
 (defun razzi/elisp-semicolon-and-space ()
   (interactive)
+  ; TODO broken
   ; space preceeds if line is not empty and at end of line
   (if (and (not (current-line-empty-p)) (eolp))
     (insert " ; ")
@@ -1125,6 +1150,7 @@ search status elements to allow for a subsequent
 (defun minibuffer-config ()
   (interactive)
   (local-set-key (kbd "C-j") 'exit-minibuffer)
+  (local-set-key (kbd "C-h") 'delete-backward-char)
   (define-key minibuffer-local-map (kbd "C-`") 'describe-key)
   ; todo
   ;; (define-key minibuffer-local-map (kbd "M-v") 'isearch-yank-pop)
@@ -1149,10 +1175,9 @@ search status elements to allow for a subsequent
 ;; (use-package pony-mode)
 
 ; todo
-; magit gZ pop most recent stash
-; insert mode c-tab complete line
-; eshell highlight valid commands
+; magit/gZ pop most recent stash
 ; search c-t transpose chars
+; eshell highlight valid commands
 ; visual block i to block insert (may be impossible as i is a prefix)
 ; persistent undo
 ; persistent marks
@@ -1175,7 +1200,6 @@ search status elements to allow for a subsequent
 
 ; o to indent new line if in class scope - if 2 lines open on toplevel (hard?)
 ; xml auto close tag
-; c-x c-f autocomplete file
 ; eshell smarter tab completion
 ; helm c-w delete word (clear?)
 
