@@ -20,7 +20,6 @@
   eshell-rc-script "~/.emacs.d/eshell/profile.el"
   frame-title-format "%f"
   gc-cons-threshold 100000000
-  indent-tabs-mode nil
   inhibit-splash-screen t
   inhibit-startup-message t
   initial-scratch-message nil
@@ -31,7 +30,6 @@
   python-python-command "/Users/razzi/.pyenv/shims/python"
   ring-bell-function 'ignore
   save-abbrevs 'silently
-  tab-width 2
   tags-add-tables nil ; TODO is this a good default? having multiple merged tables could be cool
   vc-follow-symlinks t
   visible-bell nil)
@@ -44,15 +42,6 @@
 ; Global vars
 (defvar razzi/pre-visual-kill)
 (setq razzi/pre-visual-kill nil)
-
-(use-package circe
-  :config
-  ; TODO authenticate n sheit
-  ;; https://github.com/jorgenschaefer/circe/wiki/Configuration#hiding-other-messages
-  (circe-set-display-handler "JOIN" (lambda (&rest ignored) nil))
-  (circe-set-display-handler "QUIT" (lambda (&rest ignored) nil))
-  (evil-set-initial-state 'circe-mode 'emacs)
-  )
 
 (use-package cl-lib)
 
@@ -128,11 +117,10 @@
       )
     )
 
-  (defadvice he-substitute-string (after he-paredit-fix)
+  (defadvice hippie-expand-substitute-string (after he-paredit-fix)
     "Remove extra paren when expanding line in paredit"
     (if (and paredit-mode (equal (substring str -1) ")"))
-      (progn (backward-delete-char 1) (forward-char))))
-  )
+      (progn (backward-delete-char 1) (forward-char)))))
 
 (use-package highlight-numbers
   :config
@@ -176,8 +164,6 @@
 (use-package magit
   :config
   (setq same-window-regexps (append same-window-regexps '("\*magit: .*\*" "\*magit-diff: .*\*")))
-  (evil-set-initial-state 'text-mode 'insert)
-  (define-key magit-status-mode-map (kbd "]") 'razzi/magit-pull)
   (define-key magit-status-mode-map (kbd "=") 'magit-diff-more-context)
   (define-key magit-status-mode-map (kbd "C-`") 'describe-key)
   (define-key magit-status-mode-map (kbd "@") 'razzi/magit-reset-one-commit)
@@ -401,6 +387,7 @@
     "C" 'razzi/magit-checkout-file
     "E" 'eval-buffer
     "G" 'helm-git-grep-at-point
+    "R" 'razzi/rename-current-file
     "O" 'razzi/put-before
     "X" 'delete-file-and-buffer
     "DEL" 'restart-emacs
@@ -442,7 +429,7 @@
 
 (defun razzi/rename-current-file (name)
   (interactive "MRename to:")
-  (rename-file old-name name)
+  (rename-file buffer-file-name name)
   (kill-this-buffer)
   (find-file name))
 
@@ -606,6 +593,12 @@
   (backward-char)
   (forward-char))
 
+(defun razzi/abbrev-or-add-global-abbrev ()
+  (interactive)
+  (if (abbrev-expansion (thing-at-point 'word))
+    (expand-abbrev)
+    (inverse-add-global-abbrev nil)))
+
 (use-package evil
   :config
   (evil-mode 1)
@@ -618,9 +611,11 @@
   (setq-default
     evil-shift-width 2)
 
+  (evil-set-initial-state 'text-mode 'insert)
+
   (define-key evil-insert-state-map (kbd "C-`") 'describe-key)
   (define-key evil-insert-state-map (kbd "C-a") nil)
-  (define-key evil-insert-state-map (kbd "C-c a") 'inverse-add-global-abbrev)
+  (define-key evil-insert-state-map (kbd "C-c a") 'razzi/abbrev-or-add-global-abbrev)
   (define-key evil-insert-state-map (kbd "<C-i>") 'hippie-expand)
   (define-key evil-insert-state-map (kbd "C-f") 'company-files)
   (define-key evil-insert-state-map (kbd "C-h") 'delete-backward-char)
@@ -668,7 +663,9 @@
   (define-key evil-normal-state-map (kbd "g;") 'evilnc-comment-or-uncomment-lines)
   (define-key evil-normal-state-map (kbd "gb") 'magit-blame)
   (define-key evil-normal-state-map (kbd "gc") 'evilnc-comment-operator)
+  (define-key evil-normal-state-map (kbd "gd") 'magit-diff)
   (define-key evil-normal-state-map (kbd "gf") 'razzi/file-at-point)
+  (define-key evil-normal-state-map (kbd "gl") 'razzi/magit-pull)
   (define-key evil-normal-state-map (kbd "go") 'evil-open-above)
   ;; (define-key evil-normal-state-map (kbd "gp") 'magit-push); todo
   (define-key evil-normal-state-map (kbd "gs") 'magit-status)
@@ -698,6 +695,7 @@
   (define-key evil-operator-state-map (kbd "V") 'evil-a-paragraph)
   (define-key evil-operator-state-map (kbd "E") 'forward-symbol)
   (define-key evil-operator-state-map (kbd "p") 'evil-inner-paren)
+  (define-key evil-operator-state-map (kbd "SPC") 'evil-inner-symbol)
 
   (add-hook 'evil-insert-state-exit-hook 'save-if-file)
   )
@@ -706,6 +704,16 @@
 ;; (use-package evil-visualstar
 ;;   :config
 ;;   (global-evil-visualstar-mode t))
+
+(use-package circe
+  :config
+  ; TODO authenticate n sheit
+  ;; https://github.com/jorgenschaefer/circe/wiki/Configuration#hiding-other-messages
+  (circe-set-display-handler "JOIN" (lambda (&rest ignored) nil))
+  (circe-set-display-handler "QUIT" (lambda (&rest ignored) nil))
+  (evil-set-initial-state 'circe-mode 'emacs)
+  )
+
 
 (use-package evil-nerd-commenter)
 
@@ -1064,28 +1072,23 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 
 (defun razzi/tilde (count)
   (interactive "P")
-  (let ((repeat (if count count 1)))
+  (let ((repeat (or count 1)))
     (if (> repeat 0)
         (if (looking-at "[A-z]")
             (progn
               (evil-invert-char (point) (+ (point) 1))
               (right-char)
-              (razzi/tilde (- repeat 1))
-              )
+              (razzi/tilde (- repeat 1)))
           (progn
             (right-char)
-            (razzi/tilde count)
-            )
-          )))
-  )
+            (razzi/tilde count))))))
 
 (add-hook 'emacs-lisp-mode-hook (lambda ()
     (enable-paredit-mode)
 
     (setq
       evil-shift-width 2
-      tab-width 2
-      indent-tabs-mode nil)
+      tab-width 2)
 
     (evil-define-key 'insert emacs-lisp-mode-map
       (kbd ";") 'razzi/elisp-semicolon-and-space)
@@ -1151,25 +1154,9 @@ search status elements to allow for a subsequent
   (interactive)
   (local-set-key (kbd "C-j") 'exit-minibuffer)
   (local-set-key (kbd "C-h") 'delete-backward-char)
-  (define-key minibuffer-local-map (kbd "C-`") 'describe-key)
-  ; todo
-  ;; (define-key minibuffer-local-map (kbd "M-v") 'isearch-yank-pop)
-  )
+  (define-key minibuffer-local-map (kbd "C-`") 'describe-key))
 
 (add-hook 'minibuffer-setup-hook 'minibuffer-config)
-
-; TODO no confirm
-(defun delete-file-and-buffer ()
-  "Kill the current buffer and deletes the file it is visiting."
-  (interactive)
-  (let ((filename (buffer-file-name)))
-    (when filename
-      (if (vc-backend filename)
-          (vc-delete-file filename)
-        (progn
-          (delete-file filename)
-          (message "Deleted file %s" filename)
-          (kill-buffer))))))
 
 ; (this is a django mode for emacs)
 ;; (use-package pony-mode)
@@ -1177,17 +1164,17 @@ search status elements to allow for a subsequent
 ; todo
 ; magit/gZ pop most recent stash
 ; search c-t transpose chars
-; eshell highlight valid commands
-; visual block i to block insert (may be impossible as i is a prefix)
+; S to kill within quotes for example
 ; persistent undo
 ; persistent marks
 ; show marks in gutter
 ; c-j xml put cursor in between tags
 ; in docstring, auto indent after first
-; rename current file
 ; case insensitive completion eshell
 ; python tab to outdent a level?
 
+; visual block i to block insert (may be impossible as i is a prefix)
+; eshell highlight valid commands
 ; *** razzi/extract-as-variable
 ; prompt for a var name and then extrace the current region into a var
 ; with open(fn) as f
@@ -1203,17 +1190,13 @@ search status elements to allow for a subsequent
 ; eshell smarter tab completion
 ; helm c-w delete word (clear?)
 
-; S to kill within quotes for example
 ; use helm for find-tag
 ; smerge mode bindings: next, rebind return, keep both
-; rebind c-h to backspace in evil-ex
 ; simpler defun yasnippet
-; magit commit autopopulate with ref, and go straight into insert mode
+; magit commit autopopulate with ref
 ; [|ret] throw the close bracket on the correct line
 
 ; bind substitute - looks like
 ; (define-key evil-normal-state-map (kbd "g / r") (lambda () (evil-ex "%s/")))
-; if I already have an abbrev, make c-c a just insert it
 ; cs[ on a line before [ doesn't work
 ; no debug on error in eshell
-; c spc -> cio
