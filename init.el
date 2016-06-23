@@ -234,7 +234,7 @@
     flycheck-display-errors-delay .4
     flycheck-highlighting-mode 'lines
     flycheck-disabled-checkers '(emacs-lisp-checkdoc)
-    )
+    flycheck-temp-prefix "/tmp/flycheck")
   :config
   (global-flycheck-mode nil))
 
@@ -529,7 +529,7 @@
 (defun razzi/save-kill-visual ()
   "Before entering visual mode, save the last kill"
   (interactive)
-  (setq razzi/pre-visual-kill (ns-get-pasteboard))
+  (setq razzi/pre-visual-kill (shell-command-to-string "pbpaste"))
   (evil-visual-char))
 
 (defun razzi/erase-kill-visual ()
@@ -597,6 +597,15 @@
     (expand-abbrev)
     (inverse-add-global-abbrev nil)))
 
+(defun razzi/paredit-change-line ()
+  (interactive)
+  (while (and (>= (current-column) (current-indentation))
+              (not (looking-at "\s(")))
+    (backward-char))
+  (forward-char)
+  (paredit-kill)
+  (evil-insert 0))
+
 (use-package evil
   :config
   (evil-mode 1)
@@ -641,6 +650,7 @@
   (define-key evil-normal-state-map (kbd "C-x") 'evil-numbers/dec-at-pt)
   (define-key evil-normal-state-map (kbd "D") 'razzi/kill-line-and-whitespace)
   (define-key evil-normal-state-map (kbd "E") 'forward-symbol)
+  (define-key evil-normal-state-map (kbd "S") 'razzi/paredit-change-line)
   (define-key evil-normal-state-map (kbd "M-RET") 'delete-window)
   (define-key evil-normal-state-map (kbd "M-[") 'my-toggle-frame-left)
   (define-key evil-normal-state-map (kbd "M-]") 'my-toggle-frame-right)
@@ -665,7 +675,7 @@
   (define-key evil-normal-state-map (kbd "gf") 'razzi/file-at-point)
   (define-key evil-normal-state-map (kbd "gl") 'razzi/magit-pull)
   (define-key evil-normal-state-map (kbd "go") 'evil-open-above)
-  ;; (define-key evil-normal-state-map (kbd "gp") 'magit-push); todo
+  (define-key evil-normal-state-map (kbd "gp") 'razzi/magit-push)
   (define-key evil-normal-state-map (kbd "gs") 'magit-status)
   (define-key evil-normal-state-map (kbd "g SPC") 'razzi/magit-commit)
   (define-key evil-normal-state-map (kbd "v") 'razzi/save-kill-visual)
@@ -758,6 +768,7 @@
 (use-package yasnippet
   :config
   (yas-global-mode 1)
+  (setq yas-snippet-dirs '("~/.emacs.d/snippets/"))
   (define-key yas-keymap (kbd "<tab>") nil))
 
 (use-package virtualenvwrapper
@@ -985,6 +996,10 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   (let ((same-window-regexps nil))
     (magit-commit)))
 
+(defun razzi/magit-push ()
+  (interactive)
+  (magit-run-git "push"))
+
 (defun razzi/put-before ()
   (interactive)
   (evil-with-single-undo
@@ -1171,7 +1186,6 @@ search status elements to allow for a subsequent
 ; todo
 ; magit/gZ pop most recent stash
 ; search c-t transpose chars
-; S to kill within quotes for example
 ; persistent undo
 ; persistent marks
 ; show marks in gutter
@@ -1183,7 +1197,7 @@ search status elements to allow for a subsequent
 ; visual block i to block insert (may be impossible as i is a prefix)
 ; eshell highlight valid commands
 ; *** razzi/extract-as-variable
-; prompt for a var name and then extrace the current region into a var
+; prompt for a var name and then extract the current region into a var
 ; with open(fn) as f
 ;   x = f.read()
 ;   y = json.parse(f.read())
