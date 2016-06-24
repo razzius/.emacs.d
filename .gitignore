@@ -12,3 +12,4 @@ projectile-bookmarks.eld
 .emacs.desktop.lock
 ac-comphist.dat
 .python-environments/
+.mc-lists.el

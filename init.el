@@ -81,6 +81,7 @@
 
 (use-package diminish)
 
+; TODO don't need this
 (use-package focus-autosave-mode
   :diminish focus-autosave-mode
   :config
@@ -591,6 +592,10 @@
   (backward-char)
   (forward-char))
 
+(defun razzi/magit-stage-file ()
+  (interactive)
+  (magit-stage-file buffer-file-name))
+
 (defun razzi/abbrev-or-add-global-abbrev ()
   (interactive)
   (if (abbrev-expansion (thing-at-point 'word))
@@ -609,6 +614,8 @@
   (forward-char)
   (paredit-kill)
   (evil-insert 0))
+
+(use-package multiple-cursors)
 
 (use-package evil
   :config
@@ -656,9 +663,8 @@
   (define-key evil-normal-state-map (kbd "E") 'forward-symbol)
   (define-key evil-normal-state-map (kbd "S") 'razzi/paredit-change-line)
   (define-key evil-normal-state-map (kbd "M-RET") 'delete-window)
-  (define-key evil-normal-state-map (kbd "M-[") 'my-toggle-frame-left)
-  (define-key evil-normal-state-map (kbd "M-]") 'my-toggle-frame-right)
   (define-key evil-normal-state-map (kbd "M-a") 'mark-whole-buffer) ; TODO make this keep point where it is
+  (define-key evil-normal-state-map (kbd "M-d") 'mc/mark-next-symbol-like-this)
   (define-key evil-normal-state-map (kbd "M-n") 'scroll-other-window)
   (define-key evil-normal-state-map (kbd "M-p") 'scroll-other-window-down)
   (define-key evil-normal-state-map (kbd "M-q") 'save-buffers-kill-terminal)
@@ -673,6 +679,7 @@
   (define-key evil-normal-state-map (kbd "g'") 'goto-last-change)
   (define-key evil-normal-state-map (kbd "g-") 'razzi/checkout-previous-branch)
   (define-key evil-normal-state-map (kbd "g;") 'evilnc-comment-or-uncomment-lines)
+  (define-key evil-normal-state-map (kbd "ga") 'razzi/magit-stage-file)
   (define-key evil-normal-state-map (kbd "gb") 'magit-blame)
   (define-key evil-normal-state-map (kbd "gc") 'evilnc-comment-operator)
   (define-key evil-normal-state-map (kbd "gd") 'magit-diff-unstaged)
@@ -1251,3 +1258,7 @@ search status elements to allow for a subsequent
 ; cs[ on a line before [ doesn't work
 ; no debug on error in eshell
 ; eshell make - word syntax
+; yp copy line - see
+;; http://permalink.gmane.org/gmane.emacs.vim-emulation/2000
+; fix paste in insert mode
+;; spc ' surround symbol with quotes
