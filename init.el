@@ -595,7 +595,7 @@
   (interactive)
   (if (abbrev-expansion (thing-at-point 'word))
     (expand-abbrev)
-    (inverse-add-global-abbrev nil)))
+    (inverse-add-global-abbrev 1)))
 
 (defun razzi/magit-stash-wip ()
   (interactive)
@@ -692,6 +692,7 @@
   (define-key evil-visual-state-map (kbd "!") 'sort-lines)
   ;; (define-key evil-visual-state-map (kbd "~") 'razzi/switch-case-based-on-first-char)
   (define-key evil-visual-state-map (kbd "#") 'razzi/pound-isearch)
+  (define-key evil-visual-state-map (kbd "C-`") 'describe-key)
   (define-key evil-visual-state-map (kbd "$") 'razzi/almost-end-of-line)
   (define-key evil-visual-state-map (kbd "'") 'razzi/surround-with-single-quotes)
   (define-key evil-visual-state-map (kbd ")") 'razzi/surround-with-parens)
@@ -705,6 +706,7 @@
   (define-key evil-visual-state-map (kbd "p") 'razzi/paste-replace)
   (define-key evil-visual-state-map (kbd "s") 'evil-surround-region)
   (define-key evil-visual-state-map (kbd "v") 'razzi/erase-kill-visual)
+  (define-key evil-visual-state-map (kbd "SPC") 'evil-inner-symbol)
 
   (define-key evil-operator-state-map (kbd "V") 'evil-a-paragraph)
   (define-key evil-operator-state-map (kbd "E") 'forward-symbol)
@@ -1124,8 +1126,31 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 
 (define-key input-decode-map "\C-i" [C-i])
 
+(defun razzi/transpose-last-2-chars (string)
+  "If string is less than 2 chars, return it."
+  (if (< (length string) 2)
+      (string)
+    (let ((prefix (substring string 0 -2))
+          (second-to-last-char (aref string (- (length string) 2)))
+          (last-char (aref string (- (length string) 1))))
+      (format "%s%c%c" prefix last-char second-to-last-char))))
+
+(defun razzi/isearch-transpose-char ()
+  (interactive)
+  (let* ((string isearch-string)
+         (len (length isearch-string))
+         (second-to-last-char (aref string (- len 2)))
+         (last-char (aref string (- len 1))))
+    (isearch-pop-state)
+    (isearch-pop-state)
+    (isearch-process-search-char last-char)
+    (isearch-process-search-char second-to-last-char)
+    )
+  )
+
 (define-key isearch-mode-map (kbd "C-j") 'isearch-done)
 (define-key isearch-mode-map (kbd "C-h") 'isearch-delete-char)
+(define-key isearch-mode-map (kbd "C-t") 'razzi/isearch-transpose-char)
 (define-key isearch-mode-map (kbd "C-`") 'describe-key)
 (define-key isearch-mode-map (kbd "M-v") 'isearch-yank-pop)
 (define-key isearch-mode-map (kbd "C-w") 'bp/isearch-delete-word)
@@ -1190,8 +1215,6 @@ search status elements to allow for a subsequent
 ;; (use-package pony-mode)
 
 ; todo
-; magit/gZ pop most recent stash
-; search c-t transpose chars
 ; persistent undo
 ; persistent marks
 ; show marks in gutter

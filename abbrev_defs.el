@@ -257,6 +257,7 @@
     ("memebers" "members" nil 1)
     ("merics" "metrics" nil 1)
     ("mertric" "Metric" nil 1)
+    ("mesage" "message" nil 1)
     ("mkaing" "making" nil 0)
     ("mst" "must" nil 1)
     ("mulit" "Multi" nil 1)
@@ -303,8 +304,8 @@
     ("qulification" "qualification" nil 1)
     ("quoes" "quotes" nil 1)
     ("qutes" "quotes" nil 1)
-    ("qutoe" "quote" nil 1)
     ("quti" "quit" nil 1)
+    ("qutoe" "quote" nil 1)
     ("rateh" "rate" nil 1)
     ("razi" "razzi" nil 1)
     ("reeturn" "return" nil 1)
@@ -334,6 +335,7 @@
     ("soem" "some" nil 1)
     ("solarste" "solarsite" nil 1)
     ("solarstei" "solarsite" nil 1)
+    ("sring" "string" nil 2)
     ("sslef" "self" nil 1)
     ("ssytem" "system" nil 1)
     ("staet" "state" nil 1)
@@ -556,3 +558,4 @@
 (define-abbrev-table 'vc-svn-log-view-mode-abbrev-table '())
 
 (define-abbrev-table 'ycmd-view-mode-abbrev-table '())
+
