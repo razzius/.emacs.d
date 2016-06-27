@@ -597,6 +597,10 @@
     (expand-abbrev)
     (inverse-add-global-abbrev nil)))
 
+(defun razzi/magit-stash-wip ()
+  (interactive)
+  (magit-stash "WIP"))
+
 (defun razzi/paredit-change-line ()
   (interactive)
   (while (and (>= (current-column) (current-indentation))
@@ -671,12 +675,14 @@
   (define-key evil-normal-state-map (kbd "g;") 'evilnc-comment-or-uncomment-lines)
   (define-key evil-normal-state-map (kbd "gb") 'magit-blame)
   (define-key evil-normal-state-map (kbd "gc") 'evilnc-comment-operator)
-  (define-key evil-normal-state-map (kbd "gd") 'magit-diff)
+  (define-key evil-normal-state-map (kbd "gd") 'magit-diff-unstaged)
   (define-key evil-normal-state-map (kbd "gf") 'razzi/file-at-point)
   (define-key evil-normal-state-map (kbd "gl") 'razzi/magit-pull)
   (define-key evil-normal-state-map (kbd "go") 'evil-open-above)
   (define-key evil-normal-state-map (kbd "gp") 'razzi/magit-push)
   (define-key evil-normal-state-map (kbd "gs") 'magit-status)
+  (define-key evil-normal-state-map (kbd "gz") 'razzi/magit-stash-wip)
+  (define-key evil-normal-state-map (kbd "gZ") 'magit-stash-pop)
   (define-key evil-normal-state-map (kbd "g SPC") 'razzi/magit-commit)
   (define-key evil-normal-state-map (kbd "v") 'razzi/save-kill-visual)
   (define-key evil-normal-state-map (kbd "~") 'razzi/tilde)
@@ -684,7 +690,7 @@
   ; todo
   ;; (define-key evil-normal-state-map (kbd "C-]") 'razzi/tag-in-split)
   (define-key evil-visual-state-map (kbd "!") 'sort-lines)
-  ;; (define-key evil-visual-state-map (kbd "~") ') ; toggle region
+  ;; (define-key evil-visual-state-map (kbd "~") 'razzi/switch-case-based-on-first-char)
   (define-key evil-visual-state-map (kbd "#") 'razzi/pound-isearch)
   (define-key evil-visual-state-map (kbd "$") 'razzi/almost-end-of-line)
   (define-key evil-visual-state-map (kbd "'") 'razzi/surround-with-single-quotes)
