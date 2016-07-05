@@ -246,6 +246,7 @@
 (require 'company-simple-complete "~/.emacs.d/company-complete-cycle.el")
 
 (use-package company
+  :disabled t
   :config
   (global-company-mode)
   (define-key company-active-map (kbd "C-w") 'nil)
@@ -259,6 +260,7 @@
   )
 
 (use-package company-flx
+  :disabled t
   :config
   (company-flx-mode 1))
 
@@ -1262,3 +1264,6 @@ search status elements to allow for a subsequent
 ;; http://permalink.gmane.org/gmane.emacs.vim-emulation/2000
 ; fix paste in insert mode
 ;; spc ' surround symbol with quotes
+
+; pep8 expand
+;; from .metrics import EventIDMetric, EventStartTimeMetric, EventReviewIDMetric, EventReviewContentMetric
