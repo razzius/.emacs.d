@@ -213,6 +213,7 @@
     ;; helm-always-two-windows nil
     )
   (define-key helm-map (kbd "C-v") 'find-file-other-window)
+  (define-key helm-map (kbd "C-w") 'evil-delete-backward-word)
   )
 
 (use-package helm-ag)
@@ -784,8 +785,8 @@
 
 (use-package yasnippet
   :config
-  (yas-global-mode 1)
   (setq yas-snippet-dirs '("~/.emacs.d/snippets/"))
+  (yas-global-mode 1)
   (define-key yas-keymap (kbd "<tab>") nil))
 
 (use-package virtualenvwrapper
@@ -1220,20 +1221,15 @@ search status elements to allow for a subsequent
 
 (add-hook 'minibuffer-setup-hook 'minibuffer-config)
 
-; (this is a django mode for emacs)
-;; (use-package pony-mode)
-
 ; todo
 ; persistent undo
 ; persistent marks
 ; show marks in gutter
 ; c-j xml put cursor in between tags
 ; in docstring, auto indent after first
-; case insensitive completion eshell
 ; python tab to outdent a level?
 
 ; visual block i to block insert (may be impossible as i is a prefix)
-; eshell highlight valid commands
 ; *** razzi/extract-as-variable
 ; prompt for a var name and then extract the current region into a var
 ; with open(fn) as f
@@ -1241,27 +1237,17 @@ search status elements to allow for a subsequent
 ;   y = json.parse(f.read())
 ;                   ^ this turns into x
 
-; no scroll past end of buffer
-; projectile c-w kill word
-
 ; o to indent new line if in class scope - if 2 lines open on toplevel (hard?)
 ; xml auto close tag
-; eshell smarter tab completion
-; helm c-w delete word (clear?)
 
 ; use helm for find-tag
 ; smerge mode bindings: next, rebind return, keep both
 ; simpler defun yasnippet
 ; magit commit autopopulate with ref
-; [|ret] throw the close bracket on the correct line
 
 ; bind substitute - looks like
 ; (define-key evil-normal-state-map (kbd "g / r") (lambda () (evil-ex "%s/")))
 ; cs[ on a line before [ doesn't work
-; no debug on error in eshell
-; eshell make - word syntax
-; yp copy line - see
-;; http://permalink.gmane.org/gmane.emacs.vim-emulation/2000
 ; fix paste in insert mode
 ;; spc ' surround symbol with quotes
 
