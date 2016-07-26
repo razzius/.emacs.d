@@ -371,7 +371,7 @@
   (helm-projectile-on)
   (setq projectile-switch-project-action 'projectile-find-file))
 
-(use-package helm-git-grep)
+;; (use-package helm-git-grep)
 
 ;; (add-to-list 'load-path "~/.emacs.d/pytest-el")
 ;; (require 'pytest)
@@ -401,7 +401,7 @@
     "d" 'magit-diff-unstaged
     "e" 'eshell
     "f" 'razzi/yank-file-name
-    "g" 'helm-git-grep
+    "g" 'helm-projectile-ag
     "h" 'help-command
     "i" 'edit-init
     "j" 'avy-goto-char
@@ -1253,3 +1253,7 @@ search status elements to allow for a subsequent
 
 ; pep8 expand
 ;; from .metrics import EventIDMetric, EventStartTimeMetric, EventReviewIDMetric, EventReviewContentMetric
+;; quit buffer w/ proc no confirm
+; don't switch to tags buffer
+
+; spc o d for debugger
