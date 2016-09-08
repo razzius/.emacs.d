@@ -16,6 +16,8 @@
   desktop-save t
   dired-recursive-deletes 'always
   ediff-window-setup-function 'ediff-setup-windows-plain
+  ;; exec-path (append exec-path '("/Users/razzi/.pyenv/shims/"))
+  exec-path (append exec-path '("/usr/local/bin"))
   eshell-banner-message ""
   eshell-rc-script "~/.emacs.d/eshell/profile.el"
   frame-title-format "%f"
@@ -401,7 +403,7 @@
     "d" 'magit-diff-unstaged
     "e" 'eshell
     "f" 'razzi/yank-file-name
-    "g" 'helm-projectile-ag
+    "g" 'helm-git-grep
     "h" 'help-command
     "i" 'edit-init
     "j" 'avy-goto-char
@@ -653,8 +655,8 @@
   (define-key evil-normal-state-map (kbd "*") 'razzi/star-isearch)
   (define-key evil-normal-state-map (kbd "-") 'razzi/transpose-next-line)
   (define-key evil-normal-state-map (kbd "<C-i>") 'evil-jump-forward)
-  (define-key evil-normal-state-map (kbd "<backtab>") 'bs-cycle-previous)
-  (define-key evil-normal-state-map (kbd "<tab>") 'bs-cycle-next)
+  (define-key evil-normal-state-map (kbd "<backtab>") 'bs-cycle-next)
+  (define-key evil-normal-state-map (kbd "<tab>") 'bs-cycle-previous)
   (define-key evil-normal-state-map (kbd "C") 'razzi/paredit-change)
   (define-key evil-normal-state-map (kbd "C-a") 'evil-numbers/inc-at-pt)
   (define-key evil-normal-state-map (kbd "C-h") 'windmove-left)
