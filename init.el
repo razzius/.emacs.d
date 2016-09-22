@@ -374,6 +374,11 @@
 
 (use-package paredit)
 
+(defun razzi/save-and-restart ()
+  (interactive)
+  (save-if-file)
+  (restart-emacs))
+
 (use-package evil-leader
   :config
   (global-evil-leader-mode)
@@ -384,7 +389,7 @@
     "<left>" 'previous-buffer
     "<right>" 'previous-buffer
     "C" 'razzi/magit-checkout-file
-    "DEL" 'restart-emacs
+    "DEL" 'razzi/save-and-restart
     "E" 'eval-buffer
     "G" 'helm-git-grep-at-point
     "R" 'razzi/rename-current-file
@@ -826,8 +831,6 @@
 
 (defun razzi/python-mode ()
   (interactive)
-  ; TODO add operator to move to end of word
-  ;; (modify-syntax-entry ?_ "w" python-mode-syntax-table)
 
   ;; (add-to-list 'company-backends 'company-jedi)
 
@@ -1066,9 +1069,11 @@ length of PATH (sans directory slashes) down to MAX-LEN."
         (if (eq ?' (char-before (point)))
             (forward-char))))
     (evil-exit-visual-state)
-    (isearch-mode nil)
-    (isearch-yank-string text)
-    (isearch-done)
+    (save-excursion
+      (isearch-mode nil)
+      (message text)
+      (isearch-yank-string text)
+      (isearch-done))
     (evil-search-next)
     (when (and
             selection
