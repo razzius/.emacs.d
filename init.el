@@ -22,14 +22,19 @@
 (straight-use-package 'flow-minor-mode)
 (straight-use-package 'flycheck)
 (straight-use-package 'flycheck-package)
+(straight-use-package 'flycheck-package)
 (straight-use-package 'general)
 (straight-use-package 'ivy)
 (straight-use-package 'js2-mode)
 (straight-use-package 'markdown-mode)
 (straight-use-package 'magit)
+(straight-use-package 'projectile)
 (straight-use-package 'restart-emacs)
+(straight-use-package 'ripgrep)
 (straight-use-package 'rjsx-mode)
 (straight-use-package 'smartparens)
+(straight-use-package 'swiper)
+(straight-use-package 'string-inflection)
 (straight-use-package 'use-package)
 
 (straight-use-package
@@ -42,10 +47,12 @@
 
 (use-package eval-sexp-fu)
 
+(use-package counsel
+  :straight t
+  :config
+  (counsel-mode +1))
+
 (use-package smartparens)
-;; (use-package counsel
-;;   :config
-;;   (counsel-mode +1))
 
 (ivy-mode)
 (eldoc-mode)
@@ -95,6 +102,8 @@
 (razzi-associate-extension-mode "js" 'rjsx-mode)
 
 (setq
+ evil-shift-width 2
+ vc-follow-symlinks t
  frame-title-format "%f"
  inhibit-startup-screen t
  ns-pop-up-frames nil)
@@ -103,11 +112,15 @@
  evil-symbol-word-search t)
 
 (general-define-key "C-`" 'describe-key)
+
 (general-auto-unbind-keys)
 (general-define-key :states 'normal
 		    :prefix "SPC"
 		    "bb" 'ivy-switch-buffer
+		    "bn" 'next-buffer
+		    "bp" 'razzi-previous-useful-buffer
 		    "bd" 'kill-buffer
+		    "el" 'flycheck-list-errors
 		    "en" 'flycheck-next-error
 		    "ep" 'flycheck-previous-error
 		    "hdf" 'describe-function
@@ -116,6 +129,7 @@
 		    "qr" 'restart-emacs
 		    "qq" 'save-buffers-kill-terminal
 		    "wk" 'evil-window-up
+		    "w2" 'evil-window-vsplit
 		    "wj" 'evil-window-down
 		    "wm" 'delete-other-windows
 		    "fi" 'crux-find-user-init-file
@@ -129,21 +143,29 @@
 		    "TAB" 'razzi-previous-useful-buffer)
 
 (general-define-key :states 'insert
+		    "C-i" 'razzi-expand-line
 		    "C-t" 'razzi-transpose-previous-chars
 		    "C-c a" 'razzi-abbrev-or-add-global-abbrev
+		    "s-<backspace>" 'evil-delete-backward-word
 		    "M-s" 'razzi-exit-insert-and-save
+		    "M-t" 'transpose-words
 		    "M-RET" 'eval-defun)
 
 (general-define-key :states 'normal
 		    "[ SPC" 'razzi-insert-newline-before
 		    "] SPC" 'razzi-insert-newline-after
+		    "C" 'razzi-change-line
 		    "D" 'razzi-kill-line-and-whitespace
 		    "g]" 'dumb-jump-go
 		    "gs" 'magit-status
 		    "M-s" 'save-buffer
+		    "M-u" 'razzi-update-current-package
 		    "M-r" 'raise-sexp
 		    "M-RET" 'eval-defun
 		    "<backtab>" 'crux-switch-to-previous-buffer)
+
+(evil-define-text-object whole-buffer (count &optional beginning end type)
+  (evil-range 0 (point-max)))
 
 (general-define-key :states 'operator
   "E" 'forward-symbol
@@ -151,7 +173,9 @@
   "SPC" 'evil-inner-symbol)
 
 (general-define-key :states 'visual
-		    "s" 'evil-surround-region)
+		    "s" 'evil-surround-region
+		    "'" 'razzi-surround-with-single-quotes
+		    "\"" 'razzi-surround-with-double-quotes)
 
 (setq js2-mode-show-parse-errors nil)
 (setq js2-mode-show-strict-warnings nil)
