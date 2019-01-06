@@ -1,9 +1,3 @@
-; (add-to-list 'load-path "~/.emacs.d/site-lisp/")
-
-; (load "js2-mode/js2-mode.el")
-; (load "flow-minor-mode/flow-minor-mode.el")
-; (load "flow-js2-mode/flow-js2-mode.el")
-
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
