@@ -4,12 +4,29 @@
       (bootstrap-version 5))
   (unless (file-exists-p bootstrap-file)
     (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
+	(url-retrieve-synchronously
+	 "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+	 'silent 'inhibit-cookies)
       (goto-char (point-max))
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
+
+(setq
+ shell-file-name "/bin/bash"
+ evil-cross-lines t
+ evil-ex-substitute-global t
+ evil-regexp-search nil
+ save-abbrevs 'silently
+ ivy-initial-inputs-alist nil
+ evil-shift-width 2
+ straight-use-package-by-default t
+ vc-follow-symlinks t
+ frame-title-format "%f"
+ inhibit-startup-screen t
+ make-backup-files nil
+ auto-save-default nil
+ create-lockfiles nil
+ ns-pop-up-frames nil)
 
 (straight-use-package '(flow-js2-mode :type git :host github :repo "Fuco1/flow-js2-mode"))
 (straight-use-package 'crux)
@@ -20,10 +37,12 @@
 (straight-use-package 'evil-magit)
 (straight-use-package 'evil-surround)
 (straight-use-package 'flow-minor-mode)
+(straight-use-package 'flycheck-flow)
 (straight-use-package 'flycheck)
 (straight-use-package 'flycheck-package)
 (straight-use-package 'flycheck-package)
 (straight-use-package 'general)
+(straight-use-package 'golden-ratio)
 (straight-use-package 'ivy)
 (straight-use-package 'js2-mode)
 (straight-use-package 'markdown-mode)
@@ -43,7 +62,11 @@
 (straight-use-package
  '(razzi :host github :repo "razzius/razzi.el"))
 
-(use-package zerodark-theme)
+(use-package flycheck-flow)
+
+(use-package golden-ratio
+  :config
+  (golden-ratio-mode))
 
 (use-package eval-sexp-fu)
 
@@ -52,10 +75,15 @@
   :config
   (counsel-mode +1))
 
-(use-package smartparens)
+(use-package smartparens
+  :config
+  (smartparens-global-mode)
+  (sp-with-modes sp--lisp-modes
+    ;; disable ', it's the quote character!
+    (sp-local-pair "'" nil :actions nil)))
 
 (ivy-mode)
-(eldoc-mode)
+(eldoc-mode -1)
 (evil-mode 1)
 (evil-magit-init)
 (evil-commentary-mode)
@@ -63,9 +91,11 @@
 (dumb-jump-mode)
 (recentf-mode)
 (tool-bar-mode -1)
+(global-auto-revert-mode 1)
+(global-hl-line-mode 1)
 
-(use-package evil-surround)
-(global-evil-surround-mode)
+(use-package evil-surround :config
+  (global-evil-surround-mode))
 
 (use-package magit
   :config
@@ -74,39 +104,35 @@
   (add-hook 'git-commit-mode-hook 'evil-insert-state)
 
   (setq
-    magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1
-    magit-push-current-set-remote-if-missing nil
-    magit-commit-show-diff nil
-    magit-status-sections-hook
-    '(magit-insert-merge-log
-      magit-insert-rebase-sequence
-      magit-insert-am-sequence
-      magit-insert-sequencer-sequence
-      magit-insert-bisect-output
-      magit-insert-bisect-rest
-      magit-insert-bisect-log
-      magit-insert-unstaged-changes
-      magit-insert-untracked-files
-      magit-insert-staged-changes
-      magit-insert-status-headers
-      magit-insert-stashes
-      magit-insert-unpulled-from-upstream
-      magit-insert-unpulled-from-pushremote
-      magit-insert-unpushed-to-upstream
-      magit-insert-unpushed-to-pushremote)))
+   magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1
+   magit-push-current-set-remote-if-missing nil
+   magit-commit-show-diff nil
+   magit-status-sections-hook
+   '(magit-insert-merge-log
+     magit-insert-rebase-sequence
+     magit-insert-am-sequence
+     magit-insert-sequencer-sequence
+     magit-insert-bisect-output
+     magit-insert-bisect-rest
+     magit-insert-bisect-log
+     magit-insert-unstaged-changes
+     magit-insert-untracked-files
+     magit-insert-staged-changes
+     magit-insert-status-headers
+     magit-insert-stashes
+     magit-insert-unpulled-from-upstream
+     magit-insert-unpulled-from-pushremote
+     magit-insert-unpushed-to-upstream
+     magit-insert-unpushed-to-pushremote)))
 
-; this should load automatically
 (use-package flow-js2-mode)
+
+(use-package super-save
+  :config
+  (super-save-mode))
 
 (add-hook 'js2-mode-hook 'flycheck-mode)
 (razzi-associate-extension-mode "js" 'rjsx-mode)
-
-(setq
- evil-shift-width 2
- vc-follow-symlinks t
- frame-title-format "%f"
- inhibit-startup-screen t
- ns-pop-up-frames nil)
 
 (setq-default
  evil-symbol-word-search t)
@@ -124,10 +150,14 @@
 		    "en" 'flycheck-next-error
 		    "ep" 'flycheck-previous-error
 		    "hdf" 'describe-function
+		    "hdv" 'describe-variable
 		    "wd" 'delete-window
 		    "wo" 'other-window
+		    "/" 'counsel-rg
+		    "," 'razzi-append-comma
 		    "qr" 'restart-emacs
 		    "qq" 'save-buffers-kill-terminal
+		    "sl" 'ivy-resume
 		    "wk" 'evil-window-up
 		    "w2" 'evil-window-vsplit
 		    "wj" 'evil-window-down
@@ -137,50 +167,109 @@
 		    "fr" 'crux-recentf-find-file
 		    "f SPC" 'razzi-copy-file-name-to-clipboard
 		    "o" 'razzi-put-after
+		    "tg" 'golden-ratio-mode
 		    "O" 'razzi-put-before
 		    "ESC" 'kill-this-buffer
 		    "SPC" 'execute-extended-command
-		    "TAB" 'razzi-previous-useful-buffer)
+		    "TAB" 'crux-switch-to-previous-buffer)
 
 (general-define-key :states 'insert
 		    "C-i" 'razzi-expand-line
+		    "C-l" 'sp-forward-slurp-sexp
 		    "C-t" 'razzi-transpose-previous-chars
 		    "C-c a" 'razzi-abbrev-or-add-global-abbrev
 		    "s-<backspace>" 'evil-delete-backward-word
+		    "M-/" 'evil-commentary-line
+		    "M-l" 'evil-visual-line
 		    "M-s" 'razzi-exit-insert-and-save
+		    "M-v" 'razzi-paste
 		    "M-t" 'transpose-words
 		    "M-RET" 'eval-defun)
 
 (general-define-key :states 'normal
+		    "-" 'razzi-transpose-next-line
+		    "_" 'razzi-transpose-previous-line
 		    "[ SPC" 'razzi-insert-newline-before
 		    "] SPC" 'razzi-insert-newline-after
+		    "C-c r" 'rjsx-rename-tag-at-point
+		    "c" (general-key-dispatch 'evil-change
+			  "ru" 'string-inflection-upcase
+			  "rs" 'string-inflection-underscore
+			  "rt" 'string-inflection-camelcase
+			  "rc" 'string-inflection-lower-camelcase
+			  "rd" 'string-inflection-kebab-case
+			  "c" 'magit-commit)
 		    "C" 'razzi-change-line
 		    "D" 'razzi-kill-line-and-whitespace
 		    "g]" 'dumb-jump-go
 		    "gs" 'magit-status
-		    "M-s" 'save-buffer
+		    "M-l" 'evil-visual-line
+		    "M-[" 'evil-backward-paragraph
+		    "M-]" 'evil-forward-paragraph
+		    "M-s" 'razzi-flycheck-and-save-buffer
+		    "M-/" 'evil-commentary-line
 		    "M-u" 'razzi-update-current-package
 		    "M-r" 'raise-sexp
 		    "M-RET" 'eval-defun
-		    "<backtab>" 'crux-switch-to-previous-buffer)
+		    "o" 'razzi-open-with-comma
+		    "<backtab>" 'razzi-previous-useful-buffer)
 
 (evil-define-text-object whole-buffer (count &optional beginning end type)
   (evil-range 0 (point-max)))
 
 (general-define-key :states 'operator
-  "E" 'forward-symbol
-  "ae" 'whole-buffer
-  "SPC" 'evil-inner-symbol)
+		    "E" 'forward-symbol
+		    "ae" 'whole-buffer
+		    "SPC" 'evil-inner-symbol)
 
 (general-define-key :states 'visual
+		    "c" 'evil-change
 		    "s" 'evil-surround-region
+		    "il" 'razzi-mark-line-text
+		    "SPC SPC" 'execute-extended-command
 		    "'" 'razzi-surround-with-single-quotes
+		    ")" 'razzi-surround-with-parens
+		    "]" 'razzi-surround-with-brackets
+		    "}" 'razzi-surround-with-curly-braces
+		    "M-l" 'evil-next-line
+		    "M-RET" 'eval-region
 		    "\"" 'razzi-surround-with-double-quotes)
+
+(general-define-key :modes ivy-mode
+		    "C-h" 'ivy-backward-delete-char)
 
 (setq js2-mode-show-parse-errors nil)
 (setq js2-mode-show-strict-warnings nil)
 (setq js2-strict-missing-semi-warning nil)
+(setq js-indent-level 2)
 
 (when (equal system-type 'darwin)
   (setq mac-option-modifier 'super)
   (setq mac-command-modifier 'meta))
+
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+(add-hook 'focus-out-hook 'garbage-collect)
+
+(use-package hippie-exp
+  :config
+  (setq hippie-expand-try-functions-list
+	'(try-expand-line try-expand-line-all-buffers))
+
+  (defun hippie-expand-substitute-string ()
+    "Remove extra paren when expanding line in smartparens"
+    (if (and smartparens-mode
+	     (memq (razzi-char-at-point) '(?} ?\))))
+	(delete-char 1)))
+
+  (advice-add 'razzi-expand-line :after 'hippie-expand-substitute-string))
+
+(use-package prettier-js :config
+  (add-hook 'js2-mode-hook 'prettier-js-mode))
+
+(add-hook 'focus-out-hook 'garbage-collect)
+(mapc 'evil-declare-not-repeat '(flycheck-next-error flycheck-previous-error razzi-flycheck-and-save-buffer))
+(add-hook 'python-mode-hook (lambda ()
+                              (setq evil-shift-width 4)))
+
+(use-package zerodark-theme
+  :demand t)
