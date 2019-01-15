@@ -12,6 +12,7 @@
   (load bootstrap-file nil 'nomessage))
 
 (setq
+ ring-bell-function 'ignore
  shell-file-name "/bin/bash"
  evil-cross-lines t
  evil-ex-substitute-global t
@@ -26,6 +27,7 @@
  make-backup-files nil
  auto-save-default nil
  create-lockfiles nil
+ recentf-max-saved-items 100
  ns-pop-up-frames nil)
 
 (straight-use-package '(flow-js2-mode :type git :host github :repo "Fuco1/flow-js2-mode"))
@@ -70,6 +72,12 @@
 
 (use-package eval-sexp-fu)
 
+;; (use-package evil-mc
+;;   :config
+;;   (global-evil-mc-mode 1))
+
+(use-package iedit)
+
 (use-package counsel
   :straight t
   :config
@@ -79,7 +87,7 @@
   :config
   (smartparens-global-mode)
   (sp-with-modes sp--lisp-modes
-    ;; disable ', it's the quote character!
+    ;; Disable ' as it's the quote character.
     (sp-local-pair "'" nil :actions nil)))
 
 (ivy-mode)
@@ -131,6 +139,10 @@
   :config
   (super-save-mode))
 
+(use-package yasnippet
+  :config
+  (yas-minor-mode))
+
 (add-hook 'js2-mode-hook 'flycheck-mode)
 (razzi-associate-extension-mode "js" 'rjsx-mode)
 
@@ -140,6 +152,13 @@
 (general-define-key "C-`" 'describe-key)
 
 (general-auto-unbind-keys)
+
+(defun razzi-evil-mc-quit-and-quit ()
+  (interactive)
+  (when (and (boundp 'iedit-mode) iedit-mode) (iedit-mode))
+  (evil-mc-undo-all-cursors)
+  (keyboard-quit))
+
 (general-define-key :states 'normal
 		    :prefix "SPC"
 		    "bb" 'ivy-switch-buffer
@@ -173,6 +192,39 @@
 		    "SPC" 'execute-extended-command
 		    "TAB" 'crux-switch-to-previous-buffer)
 
+(general-define-key :states 'normal
+		    "-" 'razzi-transpose-next-line
+		    "_" 'razzi-transpose-previous-line
+		    "[ SPC" 'razzi-insert-newline-before
+		    "] SPC" 'razzi-insert-newline-after
+		    "C-c r" 'rjsx-rename-tag-at-point
+		    "C-g" 'razzi-evil-mc-quit-and-quit
+		    "c" (general-key-dispatch 'evil-change
+			  "ru" 'string-inflection-upcase
+			  "rs" 'string-inflection-underscore
+			  "rt" 'string-inflection-camelcase
+			  "rc" 'string-inflection-lower-camelcase
+			  "rd" 'string-inflection-kebab-case
+			  "c" 'magit-commit)
+		    "C" 'razzi-change-line
+		    "D" 'razzi-kill-line-and-whitespace
+		    "Q" 'razzi-replay-last-macro
+		    "g]" 'dumb-jump-go
+		    "gb" 'magit-blame-addition
+		    "gs" 'magit-status
+		    "M-l" 'evil-visual-line
+		    "M-f" 'evil-search-forward
+		    "M-[" 'evil-backward-paragraph
+		    "M-]" 'evil-forward-paragraph
+		    "M-d" 'iedit-mode
+		    "M-s" 'razzi-flycheck-and-save-buffer
+		    "M-/" 'evil-commentary-line
+		    "M-u" 'razzi-update-current-package
+		    "M-r" 'raise-sexp
+		    "M-RET" 'eval-defun
+		    "o" 'razzi-open-with-comma
+		    "<backtab>" 'razzi-previous-useful-buffer)
+
 (general-define-key :states 'insert
 		    "C-i" 'razzi-expand-line
 		    "C-l" 'sp-forward-slurp-sexp
@@ -185,34 +237,6 @@
 		    "M-v" 'razzi-paste
 		    "M-t" 'transpose-words
 		    "M-RET" 'eval-defun)
-
-(general-define-key :states 'normal
-		    "-" 'razzi-transpose-next-line
-		    "_" 'razzi-transpose-previous-line
-		    "[ SPC" 'razzi-insert-newline-before
-		    "] SPC" 'razzi-insert-newline-after
-		    "C-c r" 'rjsx-rename-tag-at-point
-		    "c" (general-key-dispatch 'evil-change
-			  "ru" 'string-inflection-upcase
-			  "rs" 'string-inflection-underscore
-			  "rt" 'string-inflection-camelcase
-			  "rc" 'string-inflection-lower-camelcase
-			  "rd" 'string-inflection-kebab-case
-			  "c" 'magit-commit)
-		    "C" 'razzi-change-line
-		    "D" 'razzi-kill-line-and-whitespace
-		    "g]" 'dumb-jump-go
-		    "gs" 'magit-status
-		    "M-l" 'evil-visual-line
-		    "M-[" 'evil-backward-paragraph
-		    "M-]" 'evil-forward-paragraph
-		    "M-s" 'razzi-flycheck-and-save-buffer
-		    "M-/" 'evil-commentary-line
-		    "M-u" 'razzi-update-current-package
-		    "M-r" 'raise-sexp
-		    "M-RET" 'eval-defun
-		    "o" 'razzi-open-with-comma
-		    "<backtab>" 'razzi-previous-useful-buffer)
 
 (evil-define-text-object whole-buffer (count &optional beginning end type)
   (evil-range 0 (point-max)))
@@ -230,10 +254,10 @@
 		    "'" 'razzi-surround-with-single-quotes
 		    ")" 'razzi-surround-with-parens
 		    "]" 'razzi-surround-with-brackets
-		    "}" 'razzi-surround-with-curly-braces
 		    "M-l" 'evil-next-line
 		    "M-RET" 'eval-region
 		    "\"" 'razzi-surround-with-double-quotes)
+
 
 (general-define-key :modes ivy-mode
 		    "C-h" 'ivy-backward-delete-char)
@@ -269,7 +293,18 @@
 (add-hook 'focus-out-hook 'garbage-collect)
 (mapc 'evil-declare-not-repeat '(flycheck-next-error flycheck-previous-error razzi-flycheck-and-save-buffer))
 (add-hook 'python-mode-hook (lambda ()
-                              (setq evil-shift-width 4)))
+			      (setq evil-shift-width 4)))
+
+
+(defun razzi-make-parent-directories (filename)
+  "Create parent directory if not exists while visiting file."
+  (unless (file-exists-p filename)
+    (let ((dir (file-name-directory filename)))
+      (unless (file-exists-p dir)
+	(make-directory dir)))))
+
+(advice-add 'find-file :before 'razzi-make-parent-directories)
+
 
 (use-package zerodark-theme
   :demand t)
