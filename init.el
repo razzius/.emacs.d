@@ -64,6 +64,10 @@
 (straight-use-package
  '(razzi :host github :repo "razzius/razzi.el"))
 
+(use-package evil-matchit
+  :config
+  (global-evil-matchit-mode 1))
+
 (use-package flycheck-flow)
 
 (use-package golden-ratio
@@ -217,6 +221,7 @@
 		    "M-[" 'evil-backward-paragraph
 		    "M-]" 'evil-forward-paragraph
 		    "M-d" 'iedit-mode
+		    "M-w" 'kill-current-buffer
 		    "M-s" 'razzi-flycheck-and-save-buffer
 		    "M-/" 'evil-commentary-line
 		    "M-u" 'razzi-update-current-package
