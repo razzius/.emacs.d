@@ -212,14 +212,17 @@
 			  "c" 'magit-commit)
 		    "C" 'razzi-change-line
 		    "D" 'razzi-kill-line-and-whitespace
-		    "Q" 'razzi-replay-last-macro
+		    "Q" 'razzi-replay-q-macro
 		    "g]" 'dumb-jump-go
 		    "gb" 'magit-blame-addition
 		    "gs" 'magit-status
+		    "g/" 'razzi-ivy-search-at-point
 		    "M-l" 'evil-visual-line
 		    "M-f" 'evil-search-forward
 		    "M-[" 'evil-backward-paragraph
 		    "M-]" 'evil-forward-paragraph
+		    "M-n" 'flycheck-next-error
+		    "M-p" 'flycheck-previous-error
 		    "M-d" 'iedit-mode
 		    "M-w" 'kill-current-buffer
 		    "M-s" 'razzi-flycheck-and-save-buffer
