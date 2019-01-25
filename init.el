@@ -160,7 +160,6 @@
 (defun razzi-evil-mc-quit-and-quit ()
   (interactive)
   (when (and (boundp 'iedit-mode) iedit-mode) (iedit-mode))
-  (evil-mc-undo-all-cursors)
   (keyboard-quit))
 
 (general-define-key :states 'normal
@@ -234,7 +233,7 @@
 		    "<backtab>" 'razzi-previous-useful-buffer)
 
 (general-define-key :states 'insert
-		    "C-i" 'razzi-expand-line
+		    "C-i" 'hippie-expand
 		    "C-l" 'sp-forward-slurp-sexp
 		    "C-t" 'razzi-transpose-previous-chars
 		    "C-c a" 'razzi-abbrev-or-add-global-abbrev
@@ -287,13 +286,13 @@
   (setq hippie-expand-try-functions-list
 	'(try-expand-line try-expand-line-all-buffers))
 
-  (defun hippie-expand-substitute-string ()
+  (defun hippie-expand-substitute-string (arg)
     "Remove extra paren when expanding line in smartparens"
     (if (and smartparens-mode
-	     (memq (razzi-char-at-point) '(?} ?\))))
-	(delete-char 1)))
+  	     (memq (razzi-char-at-point) '(?} ?\))))
+  	(delete-char 1)))
 
-  (advice-add 'razzi-expand-line :after 'hippie-expand-substitute-string))
+  (advice-add 'hippie-expand :after 'hippie-expand-substitute-string))
 
 (use-package prettier-js :config
   (add-hook 'js2-mode-hook 'prettier-js-mode))
