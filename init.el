@@ -203,6 +203,7 @@
 		    "qr" 'restart-emacs
 		    "qq" 'save-buffers-kill-terminal
 		    "sl" 'ivy-resume
+		    "pf" 'projectile-find-file
 		    "ss" 'swiper
 		    "td" 'toggle-debug-on-error
 		    "wk" 'evil-window-up
@@ -213,7 +214,8 @@
 		    "wk" 'evil-window-up
 		    "wm" 'delete-other-windows
 		    "fi" 'crux-find-user-init-file
-		    "ff" 'find-file
+		    "ff" 'razzi-find-relative-to-current
+		    "f/" 'find-file ; / because this works from room. eh might not need it
 		    "ft" (lambda () (interactive) (find-file (replace-regexp-in-string "index.js" "test.js" (buffer-file-name))))
 		    "fe" (lambda () (interactive) (find-file (replace-regexp-in-string "test.js" "index.js" (buffer-file-name))))
 		    "fp" 'razzi-copy-project-file-path
@@ -247,6 +249,7 @@
 		    "D" 'razzi-kill-line-and-whitespace
 		    "M-/" 'evil-commentary-line
 		    "M-RET" 'eval-defun
+		    "SPC RET" 'eval-defun ; experiment
 		    "M-[" 'evil-backward-paragraph
 		    "M-]" 'evil-forward-paragraph
 		    "M-d" 'iedit-mode
@@ -301,6 +304,7 @@
 		    "]" 'razzi-surround-with-brackets
 		    "M-l" 'evil-next-line
 		    "M-RET" 'eval-region
+		    "SPC RET" 'eval-region
 		    "\"" 'razzi-surround-with-double-quotes)
 
 
@@ -402,3 +406,8 @@
 ; git push current with progress or async - editor hangs at the moment
 ; gc uncomment removes end-of-line //
 ; partial keybinding show options
+; show app folder in title bar
+; emacs without basic title bar
+; D moves ; comments to the right (try it here)
+; spc i c insert copy
+; spc ret eval
