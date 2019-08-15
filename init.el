@@ -12,8 +12,8 @@
   (load bootstrap-file nil 'nomessage))
 
 (setq
+ enable-local-variables :safe
  ring-bell-function 'ignore
- shell-file-name "/bin/bash"
  evil-cross-lines t
  evil-ex-substitute-global t
  evil-regexp-search nil
@@ -29,6 +29,7 @@
  auto-save-default nil
  create-lockfiles nil
  recentf-max-saved-items 100
+ vterm-shell "fish"
  ns-pop-up-frames nil)
 
 (straight-use-package '(flow-js2-mode :type git :host github :repo "Fuco1/flow-js2-mode"))
@@ -63,6 +64,9 @@
 (straight-use-package
  '(razzi :host github :repo "razzius/razzi.el"))
 
+(straight-use-package
+ '(vterm :local-repo "~/forks/emacs-libvterm"))
+
 (use-package evil-matchit
   :config
   (global-evil-matchit-mode 1))
@@ -82,6 +86,10 @@
 (use-package web-mode)
 
 (use-package iedit)
+
+;; (use-package exec-path-from-shell
+;;   :config
+;;   (exec-path-from-shell-copy-env "SHELL"))
 
 (use-package counsel
   :straight t
@@ -163,6 +171,8 @@
 
 (general-define-key "C-`" 'describe-key)
 
+;; (general-define-key "<s-right>" nil)
+
 (general-auto-unbind-keys)
 
 (defun razzi-evil-mc-quit-and-quit ()
@@ -185,10 +195,15 @@
 		    "d" 'razzi-put-debugger
 		    "wd" 'delete-window
 		    "wo" 'other-window
+		    "ww" 'other-window
+		    "wh" 'windmove-left
+		    "wl" 'windmove-right
 		    "/" 'counsel-rg
+                    "'" 'vterm
 		    "," 'razzi-append-comma
-		    "qr" 'restart-emacs
+		    "qr" 'razzi-restart-emacs
 		    "qq" 'save-buffers-kill-terminal
+                    "qb" 'razzi-close-all-buffers
 		    "sl" 'ivy-resume
 		    "wk" 'evil-window-up
 		    "w2" 'evil-window-vsplit
@@ -196,16 +211,14 @@
 		    "wm" 'delete-other-windows
 		    "fc" 'write-file
 		    "fR" 'spacemacs/rename-current-buffer-file
-		    "fi" 'crux-find-user-init-file
+		    "fi" '(lambda () (interactive) (find-file user-init-file))
 		    "fn" 'razzi-copy-file-name
 		    "fd" 'razzi-copy-file-dir
 		    "fD" 'crux-delete-buffer-and-file
 		    "fo" 'crux-open-with
-					; redundant v_v
 		    "fp" 'razzi-copy-project-file-path
 		    "f RET" 'razzi-copy-project-file-path
-
-		    "ff" 'find-file
+		    "ff" 'counsel-find-file
 		    "ft" '(lambda () (interactive) (find-file ()))
 		    "fr" 'crux-recentf-find-file
 		    "f SPC" 'razzi-copy-file-name-to-clipboard
@@ -224,7 +237,7 @@
 		    "_" 'razzi-transpose-previous-line
 		    "[ SPC" 'razzi-insert-newline-before
 		    "] SPC" 'razzi-insert-newline-after
-		    "C-c r" 'rjsx-rename-tag-at-point
+		    ;; "C-c r" 'rjsx-rename-tag-at-point
 		    "C-g" 'razzi-evil-mc-quit-and-quit
 		    "c" (general-key-dispatch 'evil-change
 			  "ru" 'string-inflection-upcase
@@ -240,6 +253,7 @@
 		    "gb" 'magit-blame-addition
 		    "gs" 'magit-status
 		    "g/" 'razzi-ivy-search-at-point
+		    "M-e" 'eval-buffer
 		    "M-l" 'evil-visual-line
 		    "M-f" 'evil-search-forward
 		    "M-`" '(lambda () (interactive)) ; todo something useful
@@ -262,7 +276,7 @@
 		    "C-SPC" 'yas-expand
 		    "C-l" 'sp-forward-slurp-sexp
 		    "C-t" 'razzi-transpose-previous-chars
-		    "C-c a" 'razzi-abbrev-or-add-global-abbrev
+		    ;; "C-c a" 'razzi-abbrev-or-add-global-abbrev
 		    "s-<backspace>" 'evil-delete-backward-word
 		    "M-/" 'evil-commentary-line
 		    "M-l" 'evil-visual-line
@@ -300,6 +314,7 @@
 (setq js2-mode-show-strict-warnings nil)
 (setq js2-strict-missing-semi-warning nil)
 (setq js-indent-level 2)
+(setq split-window-preferred-function 'split-window-horizontally)
 
 (when (equal system-type 'darwin)
   (setq mac-option-modifier 'super)
@@ -345,6 +360,51 @@
 	(make-directory dir)))))
 
 (advice-add 'find-file :before 'razzi-make-parent-directories)
+
+(setq ivy-recursive-restore nil)
+
+
+;; (ivy-set-actions
+;;  'ivy-switch-buffer
+;;  '(("f"
+;;     ivy--find-file-action
+;;     "find file")
+;;    ("j"
+;;     ivy--switch-buffer-other-window-action
+;;     "other window")
+;;    ("k"
+;;     ivy--kill-buffer-action
+;;     "kill")
+;;    ("r"
+;;     ivy--rename-buffer-action
+;;     "rename")))
+
+(defun razzi/open-file-in-split-from-minibuffer (f)
+  (other-window 1)
+  (split-window-horizontally)
+  (find-file f))
+
+(defun razzi/counsel-find-file-other-window ()
+  (interactive)
+  (let ((current-symbol (ivy-state-current ivy-last)))
+    (ivy-exit-with-action #'razzi/open-file-in-split-from-minibuffer)))
+
+(define-key counsel-find-file-map (kbd "M-s") 'razzi/counsel-find-file-other-window)
+;; (define-key counsel-find-file-map (kbd "M-a") 'razzi/counsel-find-file-other-window)
+
+(defun counsel-describe-function-or-variable ()
+  "Display help about the currently selected ivy result.
+Assumes the symbol is a function and tries with a variable describe-function fails."
+  (interactive)
+  (let ((inhibit-message t)
+        (current-symbol (intern (ivy-state-current ivy-last))))
+    (condition-case nil
+        (describe-function current-symbol)
+      ('error
+       (describe-variable current-symbol)))))
+
+(define-key counsel-describe-map (kbd "TAB") 'counsel-describe-function-or-variable)
+
 
 ;; from magnars
 (defun spacemacs/rename-current-buffer-file ()
@@ -398,6 +458,44 @@
 
 (global-hl-line-mode -1)
 
-;; (provide 'razzi)
+(use-package which-key
+  :config (which-key-mode))
+
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
 (load-theme `tron t)
+
+(setq ivy-extra-directories ())
+
+(add-to-list 'load-path "~/forks/emacs-libvterm")
+(require 'vterm)
+(evil-set-initial-state 'vterm-mode 'insert)
+(add-hook 'vterm-mode-hook (lambda ()
+                            (yas-minor-mode -1)
+                            (linum-mode -1)))
+
+(define-key vterm-mode-map (kbd "<s-right>") '(lambda () (interactive) (term-send-raw-string "\e[1;5C")))
+;;
+(define-key vterm-mode-map (kbd "<s-left>") '(lambda () (interactive) (term-send-raw-string "\e[1;5D")))
+(define-key vterm-mode-map (kbd "C-c") #'vterm-send-ctrl-c)
+;; (define-key evil-insert-state-map (kbd "C-SPC") nil)
+;; (define-key evil-insert-state-map (kbd "C-d") nil)
+
+
+(evil-define-key 'insert vterm-mode-map (kbd "C-a")      #'vterm--self-insert)
+(evil-define-key 'insert vterm-mode-map (kbd "C-b")      #'vterm--self-insert)
+(evil-define-key 'insert vterm-mode-map (kbd "C-c")      #'vterm--self-insert)
+(evil-define-key 'insert vterm-mode-map (kbd "C-d")      #'vterm--self-insert)
+(evil-define-key 'insert vterm-mode-map (kbd "C-e")      #'vterm--self-insert)
+(evil-define-key 'insert vterm-mode-map (kbd "C-f")      #'vterm--self-insert)
+(evil-define-key 'insert vterm-mode-map (kbd "C-g")      #'vterm--self-insert)
+(evil-define-key 'insert vterm-mode-map (kbd "C-j")      #'vterm--self-insert)
+(evil-define-key 'insert vterm-mode-map (kbd "C-k")      #'vterm--self-insert)
+(evil-define-key 'insert vterm-mode-map (kbd "C-m")      #'vterm--self-insert)
+(evil-define-key 'insert vterm-mode-map (kbd "C-n")      #'vterm--self-insert)
+(evil-define-key 'insert vterm-mode-map (kbd "C-p")      #'vterm--self-insert)
+(evil-define-key 'insert vterm-mode-map (kbd "C-r")      #'vterm--self-insert)
+(evil-define-key 'insert vterm-mode-map (kbd "C-t")      #'vterm--self-insert)
+(evil-define-key 'insert vterm-mode-map (kbd "C-u")      #'vterm--self-insert)
+(evil-define-key 'insert vterm-mode-map (kbd "C-v")      #'vterm--self-insert)
+(evil-define-key 'insert vterm-mode-map (kbd "C-w")      #'vterm--self-insert)
+(evil-define-key 'insert vterm-mode-map (kbd "C-SPC")    #'vterm--self-insert)
