@@ -31,6 +31,7 @@
  recentf-max-saved-items 100
  ns-pop-up-frames nil)
 
+(straight-use-package '(razzi :type git :host github :repo "razzius/razzi.el"))
 (straight-use-package '(flow-js2-mode :type git :host github :repo "Fuco1/flow-js2-mode"))
 (straight-use-package 'crux)
 (straight-use-package 'dumb-jump)
@@ -40,6 +41,7 @@
 (straight-use-package 'evil-magit)
 (straight-use-package 'evil-surround)
 (straight-use-package 'flow-minor-mode)
+(straight-use-package 'vterm)
 
 (straight-use-package 'flycheck)
 (straight-use-package 'flycheck-package)
@@ -213,9 +215,11 @@
 		    "wj" 'evil-window-down
 		    "wk" 'evil-window-up
 		    "wm" 'delete-other-windows
-		    "fi" 'crux-find-user-init-file
-		    "ff" 'razzi-find-relative-to-current
-		    "f/" 'find-file ; / because this works from room. eh might not need it
+		    "fi" (lambda () (interactive)
+			   (find-file (expand-file-name
+				       (concat (cdadr (assoc chemacs-current-emacs-profile chemacs-emacs-profiles))
+					       "/init.el"))))
+		    "ff" 'find-file
 		    "ft" (lambda () (interactive) (find-file (replace-regexp-in-string "index.js" "test.js" (buffer-file-name))))
 		    "fe" (lambda () (interactive) (find-file (replace-regexp-in-string "test.js" "index.js" (buffer-file-name))))
 		    "fp" 'razzi-copy-project-file-path
@@ -228,6 +232,8 @@
 		    "SPC" 'execute-extended-command
 		    "TAB" 'crux-switch-to-previous-buffer)
 
+(alist-get chemacs-current-emacs-profile chemacs-emacs-profiles)
+(expand-file-name (concat (cdadr (assoc chemacs-current-emacs-profile chemacs-emacs-profiles)) "/init.el"))
 (general-define-key :states 'normal
 		    "<up>" 'evil-scroll-line-up
 		    "<down>" 'evil-scroll-line-down
@@ -249,7 +255,6 @@
 		    "D" 'razzi-kill-line-and-whitespace
 		    "M-/" 'evil-commentary-line
 		    "M-RET" 'eval-defun
-		    "SPC RET" 'eval-defun ; experiment
 		    "M-[" 'evil-backward-paragraph
 		    "M-]" 'evil-forward-paragraph
 		    "M-d" 'iedit-mode
