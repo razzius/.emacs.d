@@ -148,7 +148,6 @@
 (straight-use-package 'ripgrep)
 (straight-use-package 'rjsx-mode)
 (straight-use-package 'smartparens)
-;; (straight-use-package 'swiper)
 (straight-use-package 'string-inflection)
 
 (use-package undo-tree
@@ -168,6 +167,17 @@
 (straight-use-package
  '(razzi :host github :repo "razzius/razzi.el"))
 
+(straight-use-package
+ '(selectrum :host github :repo "raxod502/selectrum"))
+
+(selectrum-mode +1)
+
+(straight-use-package
+ '(selectrum-prescient :host github :repo "raxod502/prescient.el"
+		       :files ("selectrum-prescient.el")))
+(selectrum-prescient-mode +1)
+(prescient-persist-mode +1)
+
 (use-package evil-matchit
   :config
   (global-evil-matchit-mode 1))
@@ -183,16 +193,17 @@
 
 (use-package eval-sexp-fu)
 
-;; (use-package evil-mc
-;;   :config
-;;   (global-evil-mc-mode 1))
-
-(use-package iedit)
-
-(use-package counsel
-  :straight t
+(use-package iedit
   :config
-  (counsel-mode +1))
+  (defun razzi-iedit-quit-and-quit ()
+    (interactive)
+    (when (and (boundp 'iedit-mode) iedit-mode) (iedit-mode))
+    (keyboard-quit))
+
+  (general-define-key "C-g" 'razzi-iedit-quit-and-quit)
+
+  (general-define-key :states 'normal
+		      "ie" 'iedit-mode))
 
 (use-package smartparens
   :config
@@ -201,25 +212,28 @@
     ;; Disable ' as it's the quote character.
     (sp-local-pair "'" nil :actions nil)))
 
+;; ?? doesn't work
 (eldoc-mode -1)
+
 (global-linum-mode)
-(evil-mode 1)
-; (evil-magit-init)
-(evil-commentary-mode)
 (set-face-attribute 'default nil :height 180)
-(dumb-jump-mode)
+
 (recentf-mode)
 (tool-bar-mode -1)
 (column-number-mode)
 (global-auto-revert-mode 1)
 (global-hl-line-mode 1)
 (global-subword-mode)
+(server-start)
 
 (use-package evil-surround :config
   (global-evil-surround-mode))
 
 (setq exec-path (append exec-path '("/usr/local/bin")))
 (setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
+
+(setq exec-path (append exec-path (list (expand-file-name "~/.local/bin"))))
+(setenv "PATH" (concat (getenv "PATH") ":" (expand-file-name "~/.local/bin")))
 
 (use-package magit
   :config
@@ -249,8 +263,6 @@
      magit-insert-unpushed-to-upstream
      magit-insert-unpushed-to-pushremote)))
 
-(use-package flow-js2-mode)
-
 (use-package super-save
   :config
   (super-save-mode))
@@ -267,15 +279,9 @@
 
 (general-define-key "C-`" 'describe-key
 		    "M-w" 'kill-current-buffer
-		    "M-`" 'vterm-toggle
 		    "M-q" 'save-buffers-kill-terminal)
 
 (general-auto-unbind-keys)
-
-(defun razzi-evil-mc-quit-and-quit ()
-  (interactive)
-  (when (and (boundp 'iedit-mode) iedit-mode) (iedit-mode))
-  (keyboard-quit))
 
 (general-define-key :states 'normal
 		    :prefix ","
@@ -285,8 +291,8 @@
 (general-define-key :states 'normal
 		    :prefix "SPC"
 		    "," 'razzi-append-comma
-		    "/" 'counsel-rg
-		    "bb" 'ivy-switch-buffer
+		    ;; "/" 'counsel-rg
+		    "bb" 'switch-to-buffer
 		    "bd" 'kill-buffer
 		    "bn" 'next-buffer
 		    "bp" 'razzi-previous-useful-buffer
@@ -300,8 +306,8 @@
 		    "hdv" 'describe-variable
 		    "pf" 'projectile-find-file
 		    "qq" 'save-buffers-kill-terminal
-		    "qr" 'restart-emacs
-		    "sl" 'ivy-resume
+		    "qr" 'razzi-restart-emacs
+		    ;; "sl" 'ivy-resume
 		    "td" 'toggle-debug-on-error
 		    "w-" 'evil-window-split
 		    "w2" 'evil-window-vsplit
@@ -320,11 +326,12 @@
 		    "ft" (lambda () (interactive) (find-file (replace-regexp-in-string "index.js" "test.js" (buffer-file-name))))
 		    "fe" (lambda () (interactive) (find-file (replace-regexp-in-string "test.js" "index.js" (buffer-file-name))))
 		    "fp" 'razzi-copy-project-file-path
-		    "fr" 'counsel-recentf
+		    "fr" 'recentf-open-files
 		    "f SPC" 'razzi-copy-file-name-to-clipboard
 		    "o" 'razzi-put-after
 		    "tg" 'golden-ratio-mode
 		    "O" 'razzi-put-before
+		    "u" 'universal-argument
 		    "ESC" 'kill-this-buffer
 		    "SPC" 'execute-extended-command
 		    "TAB" 'crux-switch-to-previous-buffer)
@@ -335,7 +342,6 @@
 		    "-" 'razzi-transpose-next-line
 		    "0" 'evil-first-non-blank
 		    "C-c r" 'rjsx-rename-tag-at-point
-		    "C-g" 'razzi-evil-mc-quit-and-quit
 		    "[ SPC" 'razzi-insert-newline-before
 		    "] SPC" 'razzi-insert-newline-after
 		    "_" 'razzi-transpose-previous-line
@@ -349,10 +355,8 @@
 		    "C" 'razzi-change-line
 		    "D" 'razzi-kill-line-and-whitespace
 		    "M-/" 'evil-commentary-line
-		    "M-RET" 'eval-defun
 		    "M-[" 'evil-backward-paragraph
 		    "M-]" 'evil-forward-paragraph
-		    "M-d" 'iedit-mode
 		    "M-f" 'evil-ex-search-forward
 		    "M-l" 'evil-visual-line
 		    "M-n" 'flycheck-next-error
@@ -362,7 +366,7 @@
 		    "M-u" 'razzi-update-current-package
 		    "M-w" 'kill-current-buffer
 		    "Q" 'razzi-replay-q-macro
-		    "g/" 'razzi-ivy-search-at-point
+		    ;; "g/" 'razzi-ivy-search-at-point
 		    "g]" 'dumb-jump-go
 		    "gb" 'magit-blame-addition
 		    "gs" 'magit-status
@@ -413,16 +417,16 @@
 
 
 
-(general-define-key :modes ivy-mode
-		    "C-h" 'ivy-backward-delete-char)
+;; (general-define-key :modes ivy-mode
+;; 		    "C-h" 'ivy-backward-delete-char)
 
 (setq js2-mode-show-parse-errors nil)
 (setq js2-mode-show-strict-warnings nil)
 (setq js2-strict-missing-semi-warning nil)
 (setq js-indent-level 2)
 
-(setq ivy-re-builders-alist
-      '((t . ivy--regex-fuzzy)))
+;; (setq ivy-re-builders-alist
+;;       '((t . ivy--regex-fuzzy)))
 
 (when (equal system-type 'darwin)
   (setq mac-option-modifier 'super)
@@ -439,8 +443,8 @@
   (defun hippie-expand-substitute-string (arg)
     "Remove extra paren when expanding line in smartparens"
     (if (and smartparens-mode
-  	     (memq (razzi-char-at-point) '(?} ?\))))
-  	(delete-char 1)))
+	     (memq (razzi-char-at-point) '(?} ?\))))
+	(delete-char 1)))
 
   (advice-add 'hippie-expand :after 'hippie-expand-substitute-string))
 
@@ -450,10 +454,11 @@
 (add-hook 'focus-out-hook 'garbage-collect)
 (mapc 'evil-declare-not-repeat '(flycheck-next-error flycheck-previous-error razzi-flycheck-and-save-buffer))
 (add-hook 'python-mode-hook (lambda ()
+			      (flycheck-mode)
 			      (setq evil-shift-width 4)))
 
 
-(defun razzi-make-parent-directories (filename)
+(defun razzi-make-parent-directories (filename &optional wildcards)
   "Create parent directory if not exists while visiting file."
   (unless (file-exists-p filename)
     (let ((dir (file-name-directory filename)))
@@ -461,7 +466,8 @@
 	(make-directory dir)))))
 
 (defun cd-project-root ()
-  (cd (projectile-project-root)))
+  (let ((root (projectile-project-root)))
+    (when root (cd root))))
 
 (add-hook 'find-file-hook 'cd-project-root)
 
@@ -472,15 +478,8 @@
 (define-key minibuffer-local-map (kbd "M-v") 'yank)
 ;; (define-key evil-ex-completion-map "\C-r" #'evil-paste-from-register)
 (define-key evil-ex-completion-map (kbd "M-v") 'yank)
-; does this need to refer to evil-vars?
+					; does this need to refer to evil-vars?
 (eval-after-load 'evil-vars '(define-key evil-ex-completion-map (kbd "M-v") 'isearch-yank-kill))
-
-
-;; (defun razzi/magit-push ()
-;;   (interactive)
-;;   (magit-run-git "push"))
-
-;; (transient-append-suffix 'magit-pull "p" '("d" "current" razzi/magit-pull))
 
 (use-package zerodark-theme
   :demand t)
@@ -498,33 +497,34 @@
   (evil-define-key 'normal dired-mode-map (kbd "gs") 'magit-status)
 
   (add-hook 'dired-mode-hook 'dired-hide-details-mode))
-; isearch c-t not work
-; visual u makes lowercase - not good
-; ui for number of errors
-; visual V to select the current paragraph or eol other brace: $%
-; goto-last-change: Invalid function: undo-tree-node-p
-; spc-based keybindings in * buffers: spc esc does not close
-; search then n does not work...? seems to use a different buffer
-; normal c-a increase number
-; ripgrep file names take up whole screen
-; visual eval flash region
-; git push current with progress or async - editor hangs at the moment
-; gc uncomment removes end-of-line //
-; partial keybinding show options
-; show app folder in title bar
-; emacs without basic title bar
-; D moves ; comments to the right (try it here)
-; spc i c insert copy
-; spc ret eval
+
+;; isearch c-t not work
+;; visual u makes lowercase - not good
+;; ui for number of errors
+;; visual V to select the current paragraph or eol other brace: $%
+;; goto-last-change: Invalid function: undo-tree-node-p
+;; spc-based keybindings in * buffers: spc esc does not close
+;; search then n does not work...? seems to use a different buffer
+;; normal c-a increase number
+;; ripgrep file names take up whole screen
+;; visual eval flash region
+;; git push current with progress or async - editor hangs at the moment
+;; gc uncomment removes end-of-line //
+;; partial keybinding show options
+;; show app folder in title bar
+;; emacs without basic title bar
+;; D moves ; comments to the right (try it here)
+;; spc i c insert copy
+;; spc ret eval
 
 
-(defun razzi-mouse-open-file-or-url-on-click ()
+(defun razzi-mouse-open-url ()
   (interactive)
   (let ((url (thing-at-point 'url)))
     (if (string-prefix-p "http" url)
 	(browse-url url)
       (message "Not a url"))))
 
-; for some reason m-mouse-1 does not work
-(global-set-key (kbd "<M-mouse-1>") 'razzi-mouse-open-file-or-url-on-click)
-;; (global-set-key (kbd "<mouse-1>") 'browse-url-at-mouse)
+;; for some reason m-mouse-1 does not work
+;; (global-set-key (kbd "<M-mouse-1>") 'razzi-mouse-open-file-or-url-on-click)
+(global-set-key (kbd "<mouse-1>") 'razzi-mouse-open-url)
