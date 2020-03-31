@@ -1,4 +1,6 @@
+custom.el
 eshell
 recentf
 straight
 auto-save-list/
+projectile-bookmarks.eld

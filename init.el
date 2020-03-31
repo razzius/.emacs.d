@@ -57,7 +57,7 @@
 (straight-use-package 'ripgrep)
 (straight-use-package 'rjsx-mode)
 (straight-use-package 'smartparens)
-(straight-use-package 'swiper)
+;; (straight-use-package 'swiper)
 (straight-use-package 'string-inflection)
 (straight-use-package 'use-package)
 
@@ -88,8 +88,8 @@
 
 (use-package flycheck-flow)
 
-(use-package tern
-  :init (add-hook 'js2-mode-hook 'tern-mode))
+;; (use-package tern
+;;   :init (add-hook 'js2-mode-hook 'tern-mode))
 
 (use-package golden-ratio
   :config
@@ -132,6 +132,9 @@
 
 (use-package evil-surround :config
   (global-evil-surround-mode))
+
+(add-to-list 'exec-path "/usr/local/bin/")
+exec-path
 
 (use-package magit
   :config
@@ -187,6 +190,11 @@
   (keyboard-quit))
 
 (general-define-key :states 'normal
+		    :prefix ","
+		    "ee" 'eval-last-sexp
+		    "ec" 'eval-defun)
+
+(general-define-key :states 'normal
 		    :prefix "SPC"
 		    "bb" 'ivy-switch-buffer
 		    "bs" 'razzi-switch-to-scratch-buffer
@@ -196,6 +204,7 @@
 		    "el" 'flycheck-list-errors
 		    "en" 'flycheck-next-error
 		    "ep" 'flycheck-previous-error
+		    "ev" 'flycheck-verify-setup
 		    "hdf" 'describe-function
 		    "hdv" 'describe-variable
 		    "wd" 'delete-window
@@ -206,7 +215,7 @@
 		    "qq" 'save-buffers-kill-terminal
 		    "sl" 'ivy-resume
 		    "pf" 'projectile-find-file
-		    "ss" 'swiper
+		    ;; "ss" 'swiper
 		    "td" 'toggle-debug-on-error
 		    "wk" 'evil-window-up
 		    "w2" 'evil-window-vsplit
@@ -232,8 +241,6 @@
 		    "SPC" 'execute-extended-command
 		    "TAB" 'crux-switch-to-previous-buffer)
 
-(alist-get chemacs-current-emacs-profile chemacs-emacs-profiles)
-(expand-file-name (concat (cdadr (assoc chemacs-current-emacs-profile chemacs-emacs-profiles)) "/init.el"))
 (general-define-key :states 'normal
 		    "<up>" 'evil-scroll-line-up
 		    "<down>" 'evil-scroll-line-down
@@ -254,6 +261,7 @@
 		    "C" 'razzi-change-line
 		    "D" 'razzi-kill-line-and-whitespace
 		    "M-/" 'evil-commentary-line
+		    "M-`" 'vterm
 		    "M-RET" 'eval-defun
 		    "M-[" 'evil-backward-paragraph
 		    "M-]" 'evil-forward-paragraph
