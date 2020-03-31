@@ -12,41 +12,61 @@
   (load bootstrap-file nil 'nomessage))
 
 (setq
- fill-column 100
- ring-bell-function 'ignore
- shell-file-name "/bin/bash"
+ auto-save-default nil
+ create-lockfiles nil
  evil-cross-lines t
  evil-ex-substitute-global t
  evil-regexp-search nil
- save-abbrevs 'silently
- ivy-initial-inputs-alist nil
  evil-shift-width 2
- straight-use-package-by-default t
- vc-follow-symlinks t
+ fill-column 100
  frame-title-format "%f"
  inhibit-startup-screen t
+ ivy-initial-inputs-alist nil
+ kill-buffer-query-functions nil
  make-backup-files nil
- auto-save-default nil
- create-lockfiles nil
  recentf-max-saved-items 100
+ ring-bell-function 'ignore
+ save-abbrevs 'silently
+ shell-file-name "fish"
+ vc-follow-symlinks t
  ns-pop-up-frames nil)
 
-(straight-use-package '(razzi :type git :host github :repo "razzius/razzi.el"))
-(straight-use-package '(flow-js2-mode :type git :host github :repo "Fuco1/flow-js2-mode"))
+(straight-use-package 'use-package)
+
+(setq straight-use-package-by-default t)
+
+
+(global-unset-key (kbd "C-SPC"))
+
+(use-package general)
+(use-package flow-js2-mode)
+
+(use-package vterm
+  :config
+  (add-hook 'vterm-mode-hook 'evil-insert-state)
+  (general-define-key :keymaps 'vterm-mode-map
+		      "C-SPC c" 'vterm
+		      "C-h" 'vterm--self-insert
+		      "M-w" 'kill-this-buffer)
+
+  ; (define-key vterm-mode-map (kbd "C-SPC") nil)
+  :general
+  ("C-SPC" nil)
+  ("C-SPC c" 'vterm))
+
 (straight-use-package 'crux)
 (straight-use-package 'dumb-jump)
 (straight-use-package 'eval-sexp-fu)
 (straight-use-package 'evil)
 (straight-use-package 'evil-commentary)
-(straight-use-package 'evil-magit)
+; (straight-use-package 'evil-magit)
 (straight-use-package 'evil-surround)
 (straight-use-package 'flow-minor-mode)
 (straight-use-package 'vterm)
+(straight-use-package 'vterm-toggle)
 
 (straight-use-package 'flycheck)
 (straight-use-package 'flycheck-package)
-(straight-use-package 'flycheck-package)
-(straight-use-package 'general)
 (straight-use-package 'golden-ratio)
 (straight-use-package 'ivy)
 (straight-use-package 'js2-mode)
@@ -59,7 +79,6 @@
 (straight-use-package 'smartparens)
 ;; (straight-use-package 'swiper)
 (straight-use-package 'string-inflection)
-(straight-use-package 'use-package)
 
 (use-package undo-tree
   :config
@@ -77,10 +96,6 @@
 
 (straight-use-package
  '(razzi :host github :repo "razzius/razzi.el"))
-
-(use-package js-comint
-  :config
-  (setq js-comint-program-command "/Users/razzi/apps/pick-api/node_modules/.bin/babel-node"))
 
 (use-package evil-matchit
   :config
@@ -115,11 +130,10 @@
     ;; Disable ' as it's the quote character.
     (sp-local-pair "'" nil :actions nil)))
 
-(ivy-mode)
 (eldoc-mode -1)
 (global-linum-mode)
 (evil-mode 1)
-(evil-magit-init)
+; (evil-magit-init)
 (evil-commentary-mode)
 (set-face-attribute 'default nil :height 180)
 (dumb-jump-mode)
@@ -133,8 +147,8 @@
 (use-package evil-surround :config
   (global-evil-surround-mode))
 
-(add-to-list 'exec-path "/usr/local/bin/")
-exec-path
+(setq exec-path (append exec-path '("/usr/local/bin")))
+(setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
 
 (use-package magit
   :config
@@ -180,7 +194,10 @@ exec-path
 (setq-default
  evil-symbol-word-search t)
 
-(general-define-key "C-`" 'describe-key)
+(general-define-key "C-`" 'describe-key
+		    "M-w" 'kill-current-buffer
+		    "M-`" 'vterm-toggle
+		    "M-q" 'save-buffers-kill-terminal)
 
 (general-auto-unbind-keys)
 
@@ -196,34 +213,34 @@ exec-path
 
 (general-define-key :states 'normal
 		    :prefix "SPC"
+		    "," 'razzi-append-comma
+		    "/" 'counsel-rg
 		    "bb" 'ivy-switch-buffer
-		    "bs" 'razzi-switch-to-scratch-buffer
+		    "bd" 'kill-buffer
 		    "bn" 'next-buffer
 		    "bp" 'razzi-previous-useful-buffer
-		    "bd" 'kill-buffer
+		    "bs" 'razzi-switch-to-scratch-buffer
 		    "el" 'flycheck-list-errors
 		    "en" 'flycheck-next-error
 		    "ep" 'flycheck-previous-error
 		    "ev" 'flycheck-verify-setup
+		    "f RET" 'razzi-copy-project-file-path
 		    "hdf" 'describe-function
 		    "hdv" 'describe-variable
-		    "wd" 'delete-window
-		    "wo" 'other-window
-		    "/" 'counsel-rg
-		    "," 'razzi-append-comma
-		    "qr" 'restart-emacs
-		    "qq" 'save-buffers-kill-terminal
-		    "sl" 'ivy-resume
 		    "pf" 'projectile-find-file
-		    ;; "ss" 'swiper
+		    "qq" 'save-buffers-kill-terminal
+		    "qr" 'restart-emacs
+		    "sl" 'ivy-resume
 		    "td" 'toggle-debug-on-error
-		    "wk" 'evil-window-up
-		    "w2" 'evil-window-vsplit
 		    "w-" 'evil-window-split
-		    "wl" 'evil-window-right
+		    "w2" 'evil-window-vsplit
+		    "wd" 'delete-window
 		    "wj" 'evil-window-down
 		    "wk" 'evil-window-up
+		    "wk" 'evil-window-up
+		    "wl" 'evil-window-right
 		    "wm" 'delete-other-windows
+		    "wo" 'other-window
 		    "fi" (lambda () (interactive)
 			   (find-file (expand-file-name
 				       (concat (cdadr (assoc chemacs-current-emacs-profile chemacs-emacs-profiles))
@@ -261,7 +278,6 @@ exec-path
 		    "C" 'razzi-change-line
 		    "D" 'razzi-kill-line-and-whitespace
 		    "M-/" 'evil-commentary-line
-		    "M-`" 'vterm
 		    "M-RET" 'eval-defun
 		    "M-[" 'evil-backward-paragraph
 		    "M-]" 'evil-forward-paragraph
@@ -308,17 +324,22 @@ exec-path
 		    "SPC" 'evil-inner-symbol)
 
 (general-define-key :states 'visual
-		    "c" 'evil-change
-		    "s" 'evil-surround-region
-		    "il" 'razzi-mark-line-text
-		    "SPC SPC" 'execute-extended-command
+		    "$" 'evil-last-non-blank
 		    "'" 'razzi-surround-with-single-quotes
 		    ")" 'razzi-surround-with-parens
-		    "]" 'razzi-surround-with-brackets
-		    "M-l" 'evil-next-line
+		    "0" 'evil-first-non-blank
+		    "K" 'evil-previous-line  ; Protect against typo
 		    "M-RET" 'eval-region
+		    "M-l" 'evil-next-line
 		    "SPC RET" 'eval-region
-		    "\"" 'razzi-surround-with-double-quotes)
+		    "SPC SPC" 'execute-extended-command
+		    "\"" 'razzi-surround-with-double-quotes
+		    "]" 'razzi-surround-with-brackets
+		    "c" 'evil-change
+		    "il" 'razzi-mark-line-text
+		    "s" 'evil-surround-region
+		    "v" 'evil-normal-state)
+
 
 
 (general-define-key :modes ivy-mode
@@ -384,11 +405,11 @@ exec-path
 (eval-after-load 'evil-vars '(define-key evil-ex-completion-map (kbd "M-v") 'isearch-yank-kill))
 
 
-(defun razzi/magit-push ()
-  (interactive)
-  (magit-run-git "push"))
+;; (defun razzi/magit-push ()
+;;   (interactive)
+;;   (magit-run-git "push"))
 
-(magit-define-popup-action 'magit-push-popup ?p "Push current :D" 'razzi/magit-push)
+;; (transient-append-suffix 'magit-pull "p" '("d" "current" razzi/magit-pull))
 
 (use-package zerodark-theme
   :demand t)
@@ -424,3 +445,15 @@ exec-path
 ; D moves ; comments to the right (try it here)
 ; spc i c insert copy
 ; spc ret eval
+
+
+(defun razzi-mouse-open-file-or-url-on-click ()
+  (interactive)
+  (let ((url (thing-at-point 'url)))
+    (if (string-prefix-p "http" url)
+	(browse-url url)
+      (message "Not a url"))))
+
+; for some reason m-mouse-1 does not work
+(global-set-key (kbd "<M-mouse-1>") 'razzi-mouse-open-file-or-url-on-click)
+;; (global-set-key (kbd "<mouse-1>") 'browse-url-at-mouse)
