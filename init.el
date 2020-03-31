@@ -11,13 +11,12 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
+(straight-use-package 'use-package)
+(setq straight-use-package-by-default t)
+
 (setq
  auto-save-default nil
  create-lockfiles nil
- evil-cross-lines t
- evil-ex-substitute-global t
- evil-regexp-search nil
- evil-shift-width 2
  fill-column 100
  frame-title-format "%f"
  inhibit-startup-screen t
@@ -31,44 +30,116 @@
  vc-follow-symlinks t
  ns-pop-up-frames nil)
 
-(straight-use-package 'use-package)
-
-(setq straight-use-package-by-default t)
-
-
-(global-unset-key (kbd "C-SPC"))
-
 (use-package general)
+
 (use-package flow-js2-mode)
+
+(use-package evil
+  :config
+  (setq evil-cross-lines t
+	evil-ex-substitute-global t
+	evil-regexp-search nil
+	evil-shift-width 2)
+  (evil-mode 1))
+
+(use-package evil-magit
+  :config (evil-magit-init))
+
+(use-package eshell
+  :config
+  (evil-set-initial-state 'eshell-mode 'emacs))
 
 (use-package vterm
   :config
-  (add-hook 'vterm-mode-hook 'evil-insert-state)
-  (general-define-key :keymaps 'vterm-mode-map
-		      "C-SPC c" 'vterm
-		      "C-h" 'vterm--self-insert
-		      "M-w" 'kill-this-buffer)
+  (evil-set-initial-state 'vterm-mode 'emacs)
 
-  ; (define-key vterm-mode-map (kbd "C-SPC") nil)
-  :general
-  ("C-SPC" nil)
-  ("C-SPC c" 'vterm))
+  (defun razzi-vterm-send-c-w ()
+    (interactive)
+    (vterm-send-key "w" nil nil t))
+
+  (defun razzi-vterm-send-m-b ()
+    (interactive)
+    (vterm-send-key "b" nil t nil))
+
+  (defun razzi-vterm-send-m-f ()
+    (interactive)
+    (vterm-send-key "f" nil t nil))
+
+  ;; These next 2 require fish integration
+  (defun razzi-vterm-send-s-up ()
+    (interactive)
+    (vterm-send-key "<up>" t nil nil))
+
+  (defun razzi-vterm-send-s-down ()
+    (interactive)
+    (vterm-send-key "<down>" t nil nil))
+
+  (general-define-key :keymaps 'vterm-mode-map
+		      "<tab>" #'vterm--self-insert
+		      "C-a" #'vterm--self-insert
+		      "C-c" #'vterm--self-insert
+		      "C-e" #'vterm--self-insert
+		      "C-h" #'vterm--self-insert
+		      "C-n" #'vterm--self-insert
+		      "C-p" #'vterm--self-insert
+		      "C-u" #'vterm--self-insert
+
+		      "M-v" #'vterm-yank
+		      "M-w" #'kill-this-buffer
+
+		      "<s-backspace>" #'razzi-vterm-send-c-w
+
+		      ;; todo bind other than arrow keys to stay on home row
+		      "<s-up>" #'razzi-vterm-send-s-up
+		      "<s-down>" #'razzi-vterm-send-s-down
+
+		      ;; These are remapped to c-q andn c-v system-wide
+		      "<s-left>" #'razzi-vterm-send-m-b
+		      "<s-right>" #'razzi-vterm-send-m-f)
+
+  (general-define-key :keymaps 'vterm-mode-map
+		      :prefix "C-SPC"
+		      "" nil
+		      "c" 'vterm))
 
 (straight-use-package 'crux)
-(straight-use-package 'dumb-jump)
-(straight-use-package 'eval-sexp-fu)
-(straight-use-package 'evil)
-(straight-use-package 'evil-commentary)
-; (straight-use-package 'evil-magit)
-(straight-use-package 'evil-surround)
-(straight-use-package 'flow-minor-mode)
-(straight-use-package 'vterm)
-(straight-use-package 'vterm-toggle)
 
-(straight-use-package 'flycheck)
+(use-package dumb-jump :config (dumb-jump-mode))
+
+(use-package evil-commentary :config (evil-commentary-mode))
+
+(straight-use-package 'flow-minor-mode)
+
+(use-package vterm-toggle
+  :config
+  (general-define-key "M-`" 'vterm-toggle))
+
+(defun eval-sexp-fu-flash-paren-only (bounds face eface buf)
+  nil)
+
+(use-package eval-sexp-fu
+  :config
+  ;; The default duration disappears for some forms that take a while
+  ;; to evaluate, like use-package
+  (setq eval-sexp-fu-flash-duration .2)
+
+  (defun razzi-flash-eval-defun ()
+    "Hack to make the thing flash even when on an opening parenthesis."
+    (interactive)
+    (save-excursion
+      (when (string= (thing-at-point 'char) "(")
+	(forward-char))
+      (call-interactively 'eval-defun)))
+
+  (general-define-key "M-RET" 'razzi-flash-eval-defun))
+
+(use-package flycheck
+  :config (setq flycheck-flake8rc "~/.config/flake8"
+		flycheck-python-flake8-executable "flake8"))
+
 (straight-use-package 'flycheck-package)
 (straight-use-package 'golden-ratio)
-(straight-use-package 'ivy)
+;; (straight-use-package 'ivy)
 (straight-use-package 'js2-mode)
 (straight-use-package 'markdown-mode)
 (straight-use-package 'magit)
