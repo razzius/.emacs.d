@@ -316,9 +316,11 @@
     ("requier" "require" nil 1)
     ("requierd" "Required" nil 1)
     ("restoer" "restore" nil 1)
+    ("restrat" "restart" nil 1)
     ("reveiew" "review" nil 1)
     ("riase" "raise" nil 1)
     ("rwap" "wrap" nil 1)
+    ("saev" "save" nil 1)
     ("saluation" "salutation" nil 1)
     ("saluattion" "salutation" nil 1)
     ("sav" "save" nil 1)
@@ -442,6 +444,8 @@
 (define-abbrev-table 'js2-jsx-mode-abbrev-table '())
 
 (define-abbrev-table 'js2-mode-abbrev-table '())
+
+(define-abbrev-table 'json-mode-abbrev-table '())
 
 (define-abbrev-table 'lisp-mode-abbrev-table '())
 

@@ -1,5 +1,5 @@
 ; TODO make init.el a series of load-file / require and split things out nicely
-(load-file "~/.emacs.d/lisp/init_use_package.el")
+(load-file "~/personal/razzi_emacs/lisp/init_use_package.el")
 
 (setq
   ;; (setq mouse-wheel-progressive-speed nil)
@@ -26,7 +26,7 @@
   isearch-regexp nil
   mouse-wheel-scroll-amount '(1 ((shift) . 1))
   next-line-add-newlines nil
-  ns-pop-up-frames nil
+  ;; ns-pop-up-frames nil
   python-python-command "/Users/razzi/.pyenv/shims/python"
   ring-bell-function 'ignore
   save-abbrevs 'silently
@@ -99,6 +99,8 @@
 
 (use-package thingatpt)
 
+(use-package json-mode)
+
 (use-package emmet-mode
   :config
   (add-hook 'nxml-mode-hook (lambda () (emmet-mode)))
@@ -163,7 +165,11 @@
 
 (use-package magit
   :config
-  (setq same-window-regexps (append same-window-regexps '("\*magit: .*\*" "\*magit-diff: .*\*")))
+  (setq
+   same-window-regexps (append same-window-regexps '("\*magit: .*\*" "\*magit-diff: .*\*"))
+   with-editor-emacsclient-executable "/usr/local/Cellar/emacs-mac/emacs-24.5-z-mac-5.11/bin/emacsclient"
+   )
+
   (define-key magit-status-mode-map (kbd "=") 'magit-diff-more-context)
   (define-key magit-status-mode-map (kbd "C-`") 'describe-key)
   (define-key magit-status-mode-map (kbd "@") 'razzi/magit-reset-one-commit)
@@ -234,6 +240,7 @@
     flycheck-display-errors-delay .4
     flycheck-highlighting-mode 'lines
     flycheck-disabled-checkers '(emacs-lisp-checkdoc)
+    ;; flycheck-eslint-rulesdir "~/hack/eslintrc"
     flycheck-temp-prefix "/tmp/flycheck")
   :config
   (global-flycheck-mode nil))
@@ -362,6 +369,14 @@
   ;; (evil-scroll-line-to-top nil)
   (magit-blame "HEAD" buffer-file-name))
 
+(defun razzi/show-messages ()
+  (interactive)
+  (split-window-below)
+  (other-window 1)
+  (switch-to-buffer "*Messages*")
+  (end-of-buffer)
+  (other-window 1))
+
 (use-package helm-projectile
   :config
   (helm-projectile-on)
@@ -399,7 +414,6 @@
     "]" 'find-tag
     "b" 'razzi/blame
     "c" 'razzi/copy-paragraph
-    "d" 'magit-diff-unstaged
     "e" 'eshell
     "f" 'razzi/yank-file-name
     "g" 'helm-git-grep
@@ -815,7 +829,12 @@
 (use-package js2-mode
   :config
   (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
-    (setq js-indent-level 2)
+  (setq
+   js-indent-level 2
+   js2-mode-show-strict-warnings nil
+   js2-strict-missing-semi-warning nil
+   js2-global-externs '("module")
+   )
   )
 
 (add-hook 'nxml-mode-hook (lambda ()
