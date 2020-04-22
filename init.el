@@ -20,7 +20,6 @@
  fill-column 100
  frame-title-format "%f"
  inhibit-startup-screen t
- ivy-initial-inputs-alist nil
  kill-buffer-query-functions nil
  make-backup-files nil
  recentf-max-saved-items 100
@@ -29,6 +28,23 @@
  shell-file-name "fish"
  vc-follow-symlinks t
  ns-pop-up-frames nil)
+
+(define-key input-decode-map "\C-i" [C-i])
+
+(when (equal system-type 'darwin)
+  (setq mac-option-modifier 'super
+	mac-command-modifier 'meta))
+
+(defun razzi-add-directory-to-path (directory)
+  (setq exec-path (append exec-path (list directory)))
+  (setenv "PATH" (concat (getenv "PATH") ":" directory)))
+
+(razzi-add-directory-to-path "/usr/local/bin")
+(razzi-add-directory-to-path (expand-file-name "~/.local/bin"))
+
+(use-package zerodark-theme
+  :straight (:host github :repo "NicolasPetton/zerodark-theme")
+  :config (load-theme 'zerodark 'noconfirm))
 
 (use-package general)
 
@@ -40,7 +56,28 @@
 	evil-ex-substitute-global t
 	evil-regexp-search nil
 	evil-shift-width 2)
-  (evil-mode 1))
+  (setq-default evil-symbol-word-search t)
+
+  (evil-mode 1)
+
+  (mapc 'evil-declare-not-repeat
+	'(flycheck-next-error
+	  flycheck-previous-error
+	  razzi-flycheck-and-save-buffer))
+
+  (evil-define-text-object whole-buffer (count &optional beginning end type)
+    (evil-range 0 (point-max)))
+
+  (use-package evil-surround
+    :config
+    (global-evil-surround-mode))
+
+  (use-package evil-matchit
+    :config
+    (global-evil-matchit-mode 1))
+
+  (use-package evil-numbers
+    :general (:states 'normal "C-a" 'evil-numbers/inc-at-pt)))
 
 (use-package evil-magit
   :config (evil-magit-init))
@@ -102,17 +139,21 @@
 		      "" nil
 		      "c" 'vterm))
 
-(straight-use-package 'crux)
+(use-package crux
+  :general (:states 'normal
+		    :prefix "SPC"
+		    "TAB" 'crux-switch-to-previous-buffer))
 
-(use-package dumb-jump :config (dumb-jump-mode))
+(use-package dumb-jump
+  :config (dumb-jump-mode))
 
-(use-package evil-commentary :config (evil-commentary-mode))
+(use-package evil-commentary
+  :config (evil-commentary-mode))
 
-(straight-use-package 'flow-minor-mode)
+(use-package flow-minor-mode)
 
 (use-package vterm-toggle
-  :config
-  (general-define-key "M-`" 'vterm-toggle))
+  :general ("M-`" 'vterm-toggle))
 
 (defun eval-sexp-fu-flash-paren-only (bounds face eface buf)
   nil)
@@ -121,7 +162,7 @@
   :config
   ;; The default duration disappears for some forms that take a while
   ;; to evaluate, like use-package
-  (setq eval-sexp-fu-flash-duration .2)
+  (setq eval-sexp-fu-flash-duration .3)
 
   (defun razzi-flash-eval-defun ()
     "Hack to make the thing flash even when on an opening parenthesis."
@@ -134,12 +175,24 @@
   (general-define-key "M-RET" 'razzi-flash-eval-defun))
 
 (use-package flycheck
-  :config (setq flycheck-flake8rc "~/.config/flake8"
-		flycheck-python-flake8-executable "flake8"))
+  :config
+  (setq flycheck-flake8rc "~/.config/flake8"
+	flycheck-python-flake8-executable "flake8"))
 
-(straight-use-package 'flycheck-package)
-(straight-use-package 'golden-ratio)
-;; (straight-use-package 'ivy)
+(use-package flycheck-package)
+
+;; (use-package ivy
+;;   :general
+;;   (:modes ivy-mode
+;; 	  "C-h" 'ivy-backward-delete-char
+;; 	  "C-g" 'keyboard-quit)
+;;   (:states 'normal :prefix "SPC"
+;; 	   "sl" 'ivy-resume)
+;;   :config
+;;   (setq
+;;    ivy-initial-inputs-alist nil
+;;    ivy-re-builders-alist '((t . ivy--regex-fuzzy))))
+
 (straight-use-package 'js2-mode)
 (straight-use-package 'markdown-mode)
 (straight-use-package 'magit)
@@ -161,26 +214,18 @@
   :config
   (add-hook 'javascript-mode-hook 'flycheck-mode))
 
-(straight-use-package
- '(zerodark-theme :host github :repo "NicolasPetton/zerodark-theme"))
+(use-package razzi
+  :straight (:host github :repo "razzius/razzi.el"))
 
-(straight-use-package
- '(razzi :host github :repo "razzius/razzi.el"))
+(use-package selectrum
+  :straight (:host github :repo "raxod502/selectrum")
+  :config (selectrum-mode +1))
 
-(straight-use-package
- '(selectrum :host github :repo "raxod502/selectrum"))
-
-(selectrum-mode +1)
-
-(straight-use-package
- '(selectrum-prescient :host github :repo "raxod502/prescient.el"
-		       :files ("selectrum-prescient.el")))
-(selectrum-prescient-mode +1)
-(prescient-persist-mode +1)
-
-(use-package evil-matchit
+(use-package selectrum-prescient
+  :straight (:host github :repo "raxod502/prescient.el" :files ("selectrum-prescient.el"))
   :config
-  (global-evil-matchit-mode 1))
+  (selectrum-prescient-mode +1)
+  (prescient-persist-mode +1))
 
 (use-package flycheck-flow)
 
@@ -200,9 +245,10 @@
     (when (and (boundp 'iedit-mode) iedit-mode) (iedit-mode))
     (keyboard-quit))
 
-  (general-define-key "C-g" 'razzi-iedit-quit-and-quit)
+  (general-define-key :states 'normal "C-g" 'razzi-iedit-quit-and-quit)
 
   (general-define-key :states 'normal
+		      :prefix "SPC"
 		      "ie" 'iedit-mode))
 
 (use-package smartparens
@@ -212,8 +258,7 @@
     ;; Disable ' as it's the quote character.
     (sp-local-pair "'" nil :actions nil)))
 
-;; ?? doesn't work
-(eldoc-mode -1)
+(eldoc-mode nil)
 
 (global-linum-mode)
 (set-face-attribute 'default nil :height 180)
@@ -225,15 +270,6 @@
 (global-hl-line-mode 1)
 (global-subword-mode)
 (server-start)
-
-(use-package evil-surround :config
-  (global-evil-surround-mode))
-
-(setq exec-path (append exec-path '("/usr/local/bin")))
-(setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
-
-(setq exec-path (append exec-path (list (expand-file-name "~/.local/bin"))))
-(setenv "PATH" (concat (getenv "PATH") ":" (expand-file-name "~/.local/bin")))
 
 (use-package magit
   :config
@@ -274,9 +310,6 @@
 (add-hook 'js2-mode-hook 'flycheck-mode)
 (razzi-associate-extension-mode "js" 'rjsx-mode)
 
-(setq-default
- evil-symbol-word-search t)
-
 (general-define-key "C-`" 'describe-key
 		    "M-w" 'kill-current-buffer
 		    "M-q" 'save-buffers-kill-terminal)
@@ -307,13 +340,11 @@
 		    "pf" 'projectile-find-file
 		    "qq" 'save-buffers-kill-terminal
 		    "qr" 'razzi-restart-emacs
-		    ;; "sl" 'ivy-resume
 		    "td" 'toggle-debug-on-error
 		    "w-" 'evil-window-split
 		    "w2" 'evil-window-vsplit
 		    "wd" 'delete-window
 		    "wj" 'evil-window-down
-		    "wk" 'evil-window-up
 		    "wk" 'evil-window-up
 		    "wl" 'evil-window-right
 		    "wm" 'delete-other-windows
@@ -334,7 +365,7 @@
 		    "u" 'universal-argument
 		    "ESC" 'kill-this-buffer
 		    "SPC" 'execute-extended-command
-		    "TAB" 'crux-switch-to-previous-buffer)
+		    )
 
 (general-define-key :states 'normal
 		    "<up>" 'evil-scroll-line-up
@@ -388,11 +419,6 @@
 		    "M-t" 'transpose-words
 		    "M-RET" 'eval-defun)
 
-(define-key input-decode-map "\C-i" [C-i]) ; does this work?
-
-(evil-define-text-object whole-buffer (count &optional beginning end type)
-  (evil-range 0 (point-max)))
-
 (general-define-key :states 'operator
 		    "E" 'forward-symbol
 		    "ae" 'whole-buffer
@@ -415,22 +441,10 @@
 		    "s" 'evil-surround-region
 		    "v" 'evil-normal-state)
 
-
-
-;; (general-define-key :modes ivy-mode
-;; 		    "C-h" 'ivy-backward-delete-char)
-
 (setq js2-mode-show-parse-errors nil)
 (setq js2-mode-show-strict-warnings nil)
 (setq js2-strict-missing-semi-warning nil)
 (setq js-indent-level 2)
-
-;; (setq ivy-re-builders-alist
-;;       '((t . ivy--regex-fuzzy)))
-
-(when (equal system-type 'darwin)
-  (setq mac-option-modifier 'super)
-  (setq mac-command-modifier 'meta))
 
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 (add-hook 'focus-out-hook 'garbage-collect)
@@ -452,7 +466,6 @@
   (add-hook 'js2-mode-hook 'prettier-js-mode))
 
 (add-hook 'focus-out-hook 'garbage-collect)
-(mapc 'evil-declare-not-repeat '(flycheck-next-error flycheck-previous-error razzi-flycheck-and-save-buffer))
 (add-hook 'python-mode-hook (lambda ()
 			      (flycheck-mode)
 			      (setq evil-shift-width 4)))
@@ -481,9 +494,6 @@
 					; does this need to refer to evil-vars?
 (eval-after-load 'evil-vars '(define-key evil-ex-completion-map (kbd "M-v") 'isearch-yank-kill))
 
-(use-package zerodark-theme
-  :demand t)
-
 (use-package dired+
   :config
   (setq
@@ -502,28 +512,19 @@
 ;; visual u makes lowercase - not good
 ;; ui for number of errors
 ;; visual V to select the current paragraph or eol other brace: $%
-;; goto-last-change: Invalid function: undo-tree-node-p
 ;; spc-based keybindings in * buffers: spc esc does not close
 ;; search then n does not work...? seems to use a different buffer
-;; normal c-a increase number
 ;; ripgrep file names take up whole screen
 ;; visual eval flash region
 ;; git push current with progress or async - editor hangs at the moment
-;; gc uncomment removes end-of-line //
+;; gc uncomment removes end-of-line // if multiple // in line
 ;; partial keybinding show options
 ;; show app folder in title bar
 ;; emacs without basic title bar
-;; D moves ; comments to the right (try it here)
+;; D moves ; comments to the right (try it below)
+; hihi x
 ;; spc i c insert copy
 ;; spc ret eval
-
-
-(defun razzi-mouse-open-url ()
-  (interactive)
-  (let ((url (thing-at-point 'url)))
-    (if (string-prefix-p "http" url)
-	(browse-url url)
-      (message "Not a url"))))
 
 ;; for some reason m-mouse-1 does not work
 ;; (global-set-key (kbd "<M-mouse-1>") 'razzi-mouse-open-file-or-url-on-click)
