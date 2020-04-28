@@ -65,6 +65,8 @@
 	  flycheck-previous-error
 	  razzi-flycheck-and-save-buffer))
 
+  (evil-set-initial-state 'help-mode 'emacs)
+
   (evil-define-text-object whole-buffer (count &optional beginning end type)
     (evil-range 0 (point-max)))
 
@@ -219,7 +221,24 @@
 
 (use-package selectrum
   :straight (:host github :repo "raxod502/selectrum")
-  :config (selectrum-mode +1))
+  :config
+  (selectrum-mode +1)
+
+  (defun razzi-delete-backward-to-slash ()
+    (interactive)
+    (zap-up-to-char -1 ?/))
+
+  (defun razzi-go-home ()
+    (interactive)
+    (beginning-of-line)
+    (kill-line)
+    (insert "~/"))
+
+  (defun razzi-minibuffer-bindings ()
+    (local-set-key (kbd "~") 'razzi-go-home)
+    (local-set-key (kbd "C-h") 'razzi-delete-backward-to-slash))
+
+  (add-hook 'minibuffer-setup-hook 'razzi-minibuffer-bindings))
 
 (use-package selectrum-prescient
   :straight (:host github :repo "raxod502/prescient.el" :files ("selectrum-prescient.el"))
@@ -408,6 +427,7 @@
 (general-define-key :states 'insert
 		    "<tab>" 'yas-expand
 		    "<C-i>" 'hippie-expand
+		    "C-h" 'delete-backward-char
 		    "C-l" 'sp-forward-slurp-sexp
 		    "C-t" 'razzi-transpose-previous-chars
 		    "C-c a" 'razzi-abbrev-or-add-global-abbrev
