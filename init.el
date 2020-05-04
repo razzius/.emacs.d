@@ -17,6 +17,7 @@
 (setq
  auto-save-default nil
  create-lockfiles nil
+ default-directory (expand-file-name "~")
  fill-column 100
  frame-title-format "%f"
  inhibit-startup-screen t
