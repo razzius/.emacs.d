@@ -68,7 +68,7 @@
 
 (use-package flow-js2-mode)
 
-(general-define-key :modes 'help-mode "<tab>" 'forward-button)
+(general-define-key :keymaps 'help-mode-map "<tab>" 'forward-button)
 
 (use-package evil
   :config
@@ -199,17 +199,21 @@
 	flycheck-python-flake8-executable "flake8")
   (setq-default flycheck-disabled-checkers '(python-pycompile python-pylint)))
 
+(use-package flycheck-mypy
+  :config
+  (setq flycheck-python-mypy-args '("--ignore-missing-imports" "--follow-imports=silent")))
+
 (use-package pipenv)
 
 (use-package flycheck-package)
 
 (straight-use-package 'js2-mode)
-(straight-use-package 'markdown-mode)
-
 (straight-use-package 'restart-emacs)
 (straight-use-package 'ripgrep)
 (straight-use-package 'rjsx-mode)
 (straight-use-package 'string-inflection)
+
+(use-package markdown-mode)
 
 (use-package undo-tree
   :config
@@ -274,8 +278,8 @@
     (local-set-key (kbd "M-v") 'yank)
     (local-set-key (kbd "C-h") 'razzi-delete-backward-to-slash))
 
-
   (add-hook 'minibuffer-setup-hook 'razzi-minibuffer-bindings))
+
 (use-package selectrum-prescient
   :straight (:host github :repo "raxod502/prescient.el" :files ("selectrum-prescient.el"))
   :config
@@ -405,6 +409,8 @@
 		    "f RET" 'razzi-copy-project-file-path
 		    "hdf" 'describe-function
 		    "hdv" 'describe-variable
+		    "ff" 'find-file
+		    "fi" 'razzi-find-init
 		    "pf" 'projectile-find-file
 		    "qq" 'save-buffers-kill-terminal
 		    "qr" 'razzi-restart-emacs
@@ -412,13 +418,12 @@
 		    "w-" 'evil-window-split
 		    "w2" 'evil-window-vsplit
 		    "wd" 'delete-window
+		    "wh" 'evil-window-left
 		    "wj" 'evil-window-down
 		    "wk" 'evil-window-up
 		    "wl" 'evil-window-right
 		    "wm" 'delete-other-windows
 		    "wo" 'other-window
-		    "fi" 'razzi-find-init
-		    "ff" 'find-file
 		    "fp" 'razzi-copy-project-file-path
 		    "fr" 'razzi-recentf
 		    "f SPC" 'razzi-copy-file-name-to-clipboard
@@ -579,9 +584,3 @@
 
 (define-key isearch-mode-map (kbd "C-t") 'razzi-isearch-transpose-char)
 (define-key isearch-mode-map (kbd "C-g") 'isearch-quit)
-
-;; todo all keys should go under M-m and spc
-;; ripgrep file names take up whole screen
-;; git push current with progress or async - editor hangs at the moment
-;; D moves ; comments to the right (try it below)
-; hihi x
