@@ -18,17 +18,19 @@
  auto-save-default nil
  create-lockfiles nil
  default-directory (expand-file-name "~")
+ enable-local-variables nil
  fill-column 100
  frame-title-format "%f"
+ help-window-select t
  inhibit-startup-screen t
  kill-buffer-query-functions nil
  make-backup-files nil
+ ns-pop-up-frames nil
  recentf-max-saved-items 100
  ring-bell-function 'ignore
  save-abbrevs 'silently
  shell-file-name "fish"
- vc-follow-symlinks t
- ns-pop-up-frames nil)
+ vc-follow-symlinks t)
 
 (global-eldoc-mode -1)
 (global-linum-mode)
@@ -209,9 +211,19 @@
 
 (straight-use-package 'js2-mode)
 (straight-use-package 'restart-emacs)
-(straight-use-package 'ripgrep)
 (straight-use-package 'rjsx-mode)
-(straight-use-package 'string-inflection)
+
+(use-package string-inflection
+  :general
+  (:states 'normal
+	   "c" (general-key-dispatch 'evil-change
+		 "ru" 'string-inflection-upcase
+		 "rs" 'string-inflection-underscore
+		 "rt" 'string-inflection-camelcase
+		 "rc" 'string-inflection-lower-camelcase
+		 "rd" 'string-inflection-kebab-case
+		 "c" 'magit-commit)))
+
 
 (use-package markdown-mode)
 
@@ -221,6 +233,13 @@
   :blackout)
 
 (use-package projectile
+  :general
+  (:states 'normal
+	   :prefix "SPC"
+	   "p f" 'projectile-find-file
+	   "p p" 'projectile-switch-project)
+
+  :custom (projectile-completion-system 'default)
   :config (projectile-mode 1))
 
 (use-package flycheck-flow
@@ -306,10 +325,10 @@
 ;;   :init (add-hook 'js2-mode-hook 'tern-mode))
 
 (use-package golden-ratio
+  :disabled
   :config
   (golden-ratio-mode)
   :blackout)
-
 
 (use-package eval-sexp-fu)
 (use-package iedit
@@ -411,7 +430,6 @@
 		    "hdv" 'describe-variable
 		    "ff" 'find-file
 		    "fi" 'razzi-find-init
-		    "pf" 'projectile-find-file
 		    "qq" 'save-buffers-kill-terminal
 		    "qr" 'razzi-restart-emacs
 		    "td" 'toggle-debug-on-error
@@ -443,13 +461,6 @@
 		    "C-c r" 'rjsx-rename-tag-at-point
 		    "[ SPC" 'razzi-insert-newline-before
 		    "] SPC" 'razzi-insert-newline-after
-		    "c" (general-key-dispatch 'evil-change
-			  "ru" 'string-inflection-upcase
-			  "rs" 'string-inflection-underscore
-			  "rt" 'string-inflection-camelcase
-			  "rc" 'string-inflection-lower-camelcase
-			  "rd" 'string-inflection-kebab-case
-			  "c" 'magit-commit)
 		    "C" 'razzi-change-line
 		    "D" 'razzi-kill-line-and-whitespace
 		    "K" 'evil-previous-line  ; Protect against typo
@@ -543,12 +554,6 @@
     (let ((dir (file-name-directory filename)))
       (unless (file-exists-p dir)
 	(make-directory dir)))))
-
-(defun cd-project-root ()
-  (let ((root (projectile-project-root)))
-    (when root (cd root))))
-
-(add-hook 'find-file-hook 'cd-project-root)
 
 (advice-add 'find-file :before 'razzi-make-parent-directories)
 
