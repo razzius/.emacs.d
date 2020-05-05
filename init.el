@@ -232,6 +232,8 @@
   (global-undo-tree-mode)
   :blackout)
 
+(use-package ripgrep)
+
 (use-package projectile
   :general
   (:states 'normal
@@ -387,7 +389,7 @@
 
 (use-package yasnippet
   :config
-  (yas-minor-mode))
+  (yas-global-mode))
 
 (add-hook 'js2-mode-hook 'flycheck-mode)
 (razzi-associate-extension-mode "js" 'rjsx-mode)
