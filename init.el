@@ -21,7 +21,6 @@
  enable-local-variables nil
  fill-column 100
  frame-title-format "%f"
- help-window-select t
  inhibit-startup-screen t
  kill-buffer-query-functions nil
  make-backup-files nil
@@ -34,13 +33,16 @@
 
 (global-eldoc-mode -1)
 (global-linum-mode)
-(set-face-attribute 'default nil :height 180)
-(recentf-mode)
 (tool-bar-mode -1)
 (column-number-mode)
 (global-auto-revert-mode 1)
-(global-hl-line-mode 1)
+(scroll-bar-mode -1)
+;; (global-hl-line-mode 1)
 (server-start)
+
+(use-package recentf
+  :config
+  (recentf-mode))
 
 (use-package blackout)
 
@@ -64,13 +66,24 @@
 
 (use-package zerodark-theme
   :straight (:host github :repo "NicolasPetton/zerodark-theme")
-  :config (load-theme 'zerodark 'noconfirm))
+  :config
+  (load-theme 'zerodark 'noconfirm)
+  (set-face-attribute 'default nil :height 180)
+  (set-face-attribute 'region nil :background "white" :foreground "black")
+  ;; (set-face-background 'hl-line "black")
+  (set-background-color "black")
+  (set-foreground-color "white"))
 
 (use-package general)
 
 (use-package flow-js2-mode)
 
-(general-define-key :keymaps 'help-mode-map "<tab>" 'forward-button)
+(use-package help
+  :straight nil
+  :custom
+  (help-window-select t)
+  :general (:keymaps 'help-mode-map
+		     "<tab>" 'forward-button))
 
 (use-package evil
   :config
@@ -114,6 +127,30 @@
   (evil-set-initial-state 'eshell-mode 'emacs))
 
 (use-package vterm
+  :general
+  (:keymaps 'vterm-mode-map
+	    "<tab>" #'vterm--self-insert
+	    "C-a" #'vterm--self-insert
+	    "C-c" #'vterm--self-insert
+	    "C-e" #'vterm--self-insert
+	    "C-h" #'vterm--self-insert
+	    "C-n" #'vterm--self-insert
+	    "C-p" #'vterm--self-insert
+	    "C-u" #'vterm--self-insert
+
+	    "M-v" #'vterm-yank
+	    "M-w" #'kill-this-buffer
+
+	    "<s-backspace>" #'razzi-vterm-send-c-w
+
+	    ;; todo bind other than arrow keys to stay on home row
+	    "<s-up>" #'razzi-vterm-send-s-up
+	    "<s-down>" #'razzi-vterm-send-s-down
+
+	    ;; These are remapped to c-q and c-v system-wide
+	    "<s-left>" #'razzi-vterm-send-m-b
+	    "<s-right>" #'razzi-vterm-send-m-f)
+
   :config
   (evil-set-initial-state 'vterm-mode 'emacs)
 
@@ -138,33 +175,68 @@
     (interactive)
     (vterm-send-key "<down>" t nil nil))
 
-  (general-define-key :keymaps 'vterm-mode-map
-		      "<tab>" #'vterm--self-insert
-		      "C-a" #'vterm--self-insert
-		      "C-c" #'vterm--self-insert
-		      "C-e" #'vterm--self-insert
-		      "C-h" #'vterm--self-insert
-		      "C-n" #'vterm--self-insert
-		      "C-p" #'vterm--self-insert
-		      "C-u" #'vterm--self-insert
+  (defun razzi-vterm-split-vertically ()
+    (interactive)
+    (split-window-vertically)
+    (windmove-down)
+    (vterm))
 
-		      "M-v" #'vterm-yank
-		      "M-w" #'kill-this-buffer
+  (defun razzi-vterm-split-horizontally ()
+    (interactive)
+    (split-window-horizontally)
+    (windmove-right)
+    (vterm))
 
-		      "<s-backspace>" #'razzi-vterm-send-c-w
+  (defun razzi-setup-vterm ()
+    (setq-local
+     global-hl-line-mode nil
+     mode-line-format nil)
+    (golden-ratio-mode 0)
+    (linum-mode 0))
 
-		      ;; todo bind other than arrow keys to stay on home row
-		      "<s-up>" #'razzi-vterm-send-s-up
-		      "<s-down>" #'razzi-vterm-send-s-down
+  (defun razzi-vterm-close-split-on-exit (buf event)
+    (when buf (kill-buffer buf))
+    (when (> (count-windows) 1)
+      (delete-window)))
 
-		      ;; These are remapped to c-q and c-v system-wide
-		      "<s-left>" #'razzi-vterm-send-m-b
-		      "<s-right>" #'razzi-vterm-send-m-f)
+  (add-hook 'vterm-mode-hook #'razzi-setup-vterm)
+  (add-hook 'vterm-exit-functions #'razzi-vterm-close-split-on-exit)
+  (setq vterm-exit-functions '(razzi-vterm-close-split-on-exit))
 
   (general-define-key :keymaps 'vterm-mode-map
 		      :prefix "C-SPC"
 		      "" nil
-		      "c" 'vterm))
+		      "c" #'vterm
+		      "h" #'windmove-left
+		      "j" #'windmove-down
+		      "k" #'windmove-up
+		      "l" #'windmove-right
+		      "%" 'razzi-vterm-split-horizontally))
+
+(defun razzi-switch-between-terminal-window-config ()
+  (interactive)
+  (let* ((window-configs (frame-parameter nil 'eyebrowse-window-configs)))
+    (if (> (length window-configs) 1)
+	(progn
+	  (message "hav it")
+	  (eyebrowse-next-window-config 1))
+      (progn
+	(vterm)
+	(eyebrowse-create-window-config)))))
+
+(use-package eyebrowse
+  :custom
+  (eyebrowse-wrap-around t)
+  :general
+  ("M-`" 'razzi-switch-between-terminal-window-config
+
+   "M-~" 'eyebrowse-next-window-config)
+  (:states 'normal
+	   :prefix "SPC"
+	   "'" 'eyebrowse-next-window-config)
+
+  :config
+  (eyebrowse-mode))
 
 (use-package crux
   :general (:states 'normal
@@ -176,8 +248,8 @@
 
 (use-package flow-minor-mode)
 
-(use-package vterm-toggle
-  :general ("M-`" 'vterm-toggle))
+;; (use-package vterm-toggle
+;;   :general ("M-`" 'vterm-toggle))
 
 (use-package eval-sexp-fu
   :config
@@ -253,36 +325,37 @@
   :general
   ("M-s" 'razzi-flycheck-and-save-buffer)
   (:states 'normal
-	    "C-c r" 'web-mode-element-rename
-	    "<backtab>" 'razzi-previous-useful-buffer
-	    "[ SPC" 'razzi-insert-newline-before
-	    "] SPC" 'razzi-insert-newline-after
-	    "-" 'razzi-transpose-next-line
-	    "_" 'razzi-transpose-previous-line
-	    "g s" 'razzi-save-and-magit-status
-	    "C" 'razzi-change-line
-	    "D" 'razzi-kill-line-and-whitespace
-	    "G" 'razzi-almost-end-of-buffer
-	    "Q" 'razzi-replay-q-macro)
+	   "C-c r" 'web-mode-element-rename
+	   "<backtab>" 'razzi-previous-useful-buffer
+	   "[ SPC" 'razzi-insert-newline-before
+	   "] SPC" 'razzi-insert-newline-after
+	   "-" 'razzi-transpose-next-line
+	   "_" 'razzi-transpose-previous-line
+	   "g s" 'razzi-save-and-magit-status
+	   "C" 'razzi-change-line
+	   "D" 'razzi-kill-line-and-whitespace
+	   "G" 'razzi-almost-end-of-buffer
+	   "Q" 'razzi-replay-q-macro)
   (:states 'normal
-	    :prefix "SPC"
-	    "," 'razzi-append-comma
-	    "o" 'razzi-put-after
-	    "i d" 'razzi-put-debugger
-	    "f r" 'razzi-recentf
-	    "q r" 'razzi-restart-emacs)
+	   :prefix "SPC"
+	   "," 'razzi-append-comma
+	   "o" 'razzi-put-after
+	   "i d" 'razzi-put-debugger
+	   "f r" 'razzi-recentf
+	   "q r" 'razzi-restart-emacs)
   (:states 'visual
-	    "$" 'razzi-almost-end-of-line
-	    "il" 'razzi-mark-line-text)
+	   "$" 'razzi-almost-end-of-line
+	   "il" 'razzi-mark-line-text)
   (:states 'insert
-	    "C-t" 'razzi-transpose-previous-chars
-	    "C-c a" 'razzi-abbrev-or-add-global-abbrev
-	    "M-v" 'razzi-paste))
+	   "C-t" 'razzi-transpose-previous-chars
+	   "C-c a" 'razzi-abbrev-or-add-global-abbrev
+	   "M-v" 'razzi-paste))
 
 (use-package selectrum
   :straight (:host github :repo "raxod502/selectrum")
   :config
   (selectrum-mode +1)
+  (set-face-attribute 'selectrum-current-candidate 'nil :foreground "#34ffff")
 
   (defun razzi-delete-backward-to-slash ()
     (interactive)
@@ -300,6 +373,11 @@
     (local-set-key (kbd "C-h") 'razzi-delete-backward-to-slash))
 
   (add-hook 'minibuffer-setup-hook 'razzi-minibuffer-bindings))
+
+(use-package apheleia
+  :straight (:host github :repo "raxod502/apheleia")
+  :config (apheleia-global-mode +1)
+  :blackout)
 
 (use-package selectrum-prescient
   :straight (:host github :repo "raxod502/prescient.el" :files ("selectrum-prescient.el"))
@@ -327,12 +405,13 @@
 ;;   :init (add-hook 'js2-mode-hook 'tern-mode))
 
 (use-package golden-ratio
-  :disabled
   :config
-  (golden-ratio-mode)
+  ;; (setq golden-ratio-auto-scale t)
+  (golden-ratio-mode 1)
   :blackout)
 
 (use-package eval-sexp-fu)
+
 (use-package iedit
   :config
   (defun razzi-iedit-quit-and-quit ()
@@ -347,6 +426,10 @@
 		      "ie" 'iedit-mode))
 
 (use-package smartparens
+  :custom
+  (sp-highlight-pair-overlay nil
+   sp-highlight-wrap-overlay nil
+   sp-highlight-wrap-tag-overlay nil)
   :config
   (smartparens-global-mode)
   (sp-with-modes sp--lisp-modes
@@ -389,7 +472,9 @@
 
 (use-package yasnippet
   :config
-  (yas-global-mode))
+  (yas-global-mode)
+  (setq yas-verbosity 2)
+  :blackout yas-minor-mode)
 
 (add-hook 'js2-mode-hook 'flycheck-mode)
 (razzi-associate-extension-mode "js" 'rjsx-mode)
@@ -486,7 +571,6 @@
 
 (general-define-key :states 'insert
 		    "<tab>" 'yas-expand
-		    "<C-i>" 'hippie-expand
 		    "C-h" 'delete-backward-char
 		    "C-l" 'sp-forward-slurp-sexp
 		    "C-t" 'razzi-transpose-previous-chars
@@ -530,6 +614,8 @@
 (add-hook 'focus-out-hook 'garbage-collect)
 
 (use-package hippie-exp
+  :general
+  ("<C-i>" 'hippie-expand)
   :config
   (setq hippie-expand-try-functions-list
 	'(try-expand-line try-expand-line-all-buffers))
@@ -543,12 +629,57 @@
   (advice-add 'hippie-expand :after 'hippie-expand-substitute-string))
 
 (use-package prettier-js :config
-  (add-hook 'js2-mode-hook 'prettier-js-mode))
+	     (add-hook 'js2-mode-hook 'prettier-js-mode))
 
 (add-hook 'focus-out-hook 'garbage-collect)
-(add-hook 'python-mode-hook (lambda ()
-			      (flycheck-mode)
-			      (setq evil-shift-width 4)))
+
+(use-package python
+  :general
+  (:states 'normal
+	   :prefix "SPC"
+	   "i i" 'razzi-import-it-import-this)
+
+  :config
+  (defun razzi-import-it-get-import-path ()
+    (when (get-buffer "*import_it-output*")
+      (with-current-buffer "*import_it-output*"
+	(erase-buffer)))
+
+    (let ((error-file (make-temp-file "import_it-error")))
+      (call-process
+       "import_it"
+       nil
+       (list "*import_it-output*" error-file)
+       nil
+       (thing-at-point 'symbol) (s-trim (shell-command-to-string "git root")) (buffer-file-name)))
+
+    (razzi-buffer-string "*import_it-output*"))
+
+  (defun razzi-python-autoflake ()
+    (interactive)
+    (razzi-run-script-on-file "autoflake --remove-all-unused-imports -i"))
+
+  (defun razzi-python-isort ()
+    (interactive)
+    (razzi-run-script-on-file "isort"))
+
+  (defun razzi-import-it-import-this ()
+    (interactive)
+    (save-buffer)
+    (let ((import-path (razzi-import-it-get-import-path)))
+      (save-excursion
+	(goto-char (point-min))
+	(insert import-path))
+      (razzi-python-isort)
+      (razzi-python-autoflake)
+      (flycheck-buffer)))
+
+  (defun razzi-configure-python-mode ()
+    (flycheck-mode)
+    (setq evil-shift-width 4))
+
+  (add-hook 'python-mode-hook 'razzi-configure-python-mode))
+
 
 (defun razzi-make-parent-directories (filename &optional wildcards)
   "Create parent directory if not exists while visiting file."
@@ -556,6 +687,38 @@
     (let ((dir (file-name-directory filename)))
       (unless (file-exists-p dir)
 	(make-directory dir)))))
+
+(use-package centaur-tabs
+  :general
+  ("C-<tab>" 'centaur-tabs-forward
+   "C-S-<tab>" 'centaur-tabs-backward
+   "M-1" 'centaur-tabs-select-beg-tab
+   "M-2" 'centaur-tabs-select-visible-tab
+   "M-3" 'centaur-tabs-select-visible-tab
+   "M-4" 'centaur-tabs-select-visible-tab
+   "M-5" 'centaur-tabs-select-visible-tab
+   "M-6" 'centaur-tabs-select-visible-tab
+   "M-7" 'centaur-tabs-select-visible-tab
+   "M-8" 'centaur-tabs-select-visible-tab
+   "M-9" 'centaur-tabs-select-end-tab
+   :states 'normal
+   "g t" 'centaur-tabs-forward
+   "g T" 'centaur-tabs-backward)
+
+   :config
+   (defun razzi-tabs-hide-special-tabs (buffer)
+     (let ((name (format "%s" buffer)))
+       (or
+	(string-prefix-p "*" name)
+	(centaur-tabs-hide-tab buffer)
+	(and (string-prefix-p "magit" name)
+	     (s-contains? ":" name)))))
+
+   (setq centaur-tabs-cycle-scope 'tabs
+	 centaur-tabs-set-close-button nil
+	 centaur-tabs-hide-tab-function 'razzi-tabs-hide-special-tabs)
+
+   (centaur-tabs-mode))
 
 (advice-add 'find-file :before 'razzi-make-parent-directories)
 
@@ -581,9 +744,9 @@
 (defun razzi-isearch-transpose-char ()
   (interactive)
   (let* ((string isearch-string)
-         (len (length isearch-string))
-         (second-to-last-char (aref string (- len 2)))
-         (last-char (aref string (- len 1))))
+	 (len (length isearch-string))
+	 (second-to-last-char (aref string (- len 2)))
+	 (last-char (aref string (- len 1))))
     (isearch-pop-state)
     (isearch-pop-state)
     (isearch-process-search-char last-char)
