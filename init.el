@@ -209,6 +209,7 @@
   (defun razzi-setup-vterm ()
     (setq-local mode-line-format nil)
     (golden-ratio-mode 0)
+    (yas-minor-mode -1)
     (linum-mode 0))
 
   (defun razzi-vterm-cleanup-on-exit (buf event)
