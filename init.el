@@ -1,3 +1,4 @@
+;;; Bootstrap straight and use-package.
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -37,12 +38,21 @@
 (column-number-mode)
 (global-auto-revert-mode 1)
 (scroll-bar-mode -1)
-;; (global-hl-line-mode 1)
 (server-start)
 
+(define-key input-decode-map "\C-i" [C-i])
+
+;;; Configure builtin packages.
 (use-package recentf
   :config
   (recentf-mode))
+
+(use-package help
+  :straight nil
+  :custom
+  (help-window-select t)
+  :general (:keymaps 'help-mode-map
+		     "<tab>" 'forward-button))
 
 (use-package blackout)
 
@@ -50,8 +60,6 @@
   :config
   (global-subword-mode)
   :blackout)
-
-(define-key input-decode-map "\C-i" [C-i])
 
 (when (equal system-type 'darwin)
   (setq mac-option-modifier 'super
@@ -78,20 +86,14 @@
 
 (use-package flow-js2-mode)
 
-(use-package help
-  :straight nil
-  :custom
-  (help-window-select t)
-  :general (:keymaps 'help-mode-map
-		     "<tab>" 'forward-button))
-
 (use-package evil
-  :config
-  (setq evil-cross-lines t
-	evil-ex-substitute-global t
-	evil-regexp-search nil
-	evil-shift-width 2)
+  :custom
+  (evil-cross-lines t
+   evil-ex-substitute-global t
+   evil-regexp-search nil
+   evil-shift-width 2)
 
+  :config
   (setq-default evil-symbol-word-search t)
 
   (evil-mode 1)
@@ -188,20 +190,29 @@
     (vterm))
 
   (defun razzi-setup-vterm ()
-    (setq-local
-     global-hl-line-mode nil
-     mode-line-format nil)
+    (setq-local mode-line-format nil)
     (golden-ratio-mode 0)
     (linum-mode 0))
 
-  (defun razzi-vterm-close-split-on-exit (buf event)
+  (defun razzi-vterm-cleanup-on-exit (buf event)
     (when buf (kill-buffer buf))
+
+    ;; Close the split of a closed vterm buffer.
     (when (> (count-windows) 1)
-      (delete-window)))
+      (delete-window))
+
+    ;; Close the vterm perspective if no more vterm buffers.
+    (when (not (razzi-vterm-buffers))
+      (persp-kill "vterm")))
+
+  (defun razzi-vterm-buffer-vterm-p (buffer)
+    (eq (razzi-buffer-major-mode buffer) 'vterm-mode))
+
+  (defun razzi-vterm-buffers ()
+    (seq-filter #'razzi-vterm-buffer-vterm-p (buffer-list)))
 
   (add-hook 'vterm-mode-hook #'razzi-setup-vterm)
-  (add-hook 'vterm-exit-functions #'razzi-vterm-close-split-on-exit)
-  (setq vterm-exit-functions '(razzi-vterm-close-split-on-exit))
+  (setq vterm-exit-functions '(razzi-vterm-cleanup-on-exit))
 
   (general-define-key :keymaps 'vterm-mode-map
 		      :prefix "C-SPC"
@@ -213,30 +224,22 @@
 		      "l" #'windmove-right
 		      "%" 'razzi-vterm-split-horizontally))
 
-(defun razzi-switch-between-terminal-window-config ()
-  (interactive)
-  (let* ((window-configs (frame-parameter nil 'eyebrowse-window-configs)))
-    (if (> (length window-configs) 1)
-	(progn
-	  (message "hav it")
-	  (eyebrowse-next-window-config 1))
-      (progn
-	(vterm)
-	(eyebrowse-create-window-config)))))
-
-(use-package eyebrowse
-  :custom
-  (eyebrowse-wrap-around t)
+(use-package perspective
   :general
-  ("M-`" 'razzi-switch-between-terminal-window-config
-
-   "M-~" 'eyebrowse-next-window-config)
-  (:states 'normal
-	   :prefix "SPC"
-	   "'" 'eyebrowse-next-window-config)
+  ("M-`" 'razzi-switch-between-terminal)
 
   :config
-  (eyebrowse-mode))
+  (defun razzi-switch-between-terminal ()
+    (interactive)
+    (if (> (length (persp-names)) 1)
+	(persp-next)
+      (progn
+	(make-persp :name "vterm")
+	(persp-switch "vterm")
+	(vterm))))
+
+  (persp-mode)
+  (persp-turn-off-modestring))
 
 (use-package crux
   :general (:states 'normal
@@ -248,22 +251,21 @@
 
 (use-package flow-minor-mode)
 
-;; (use-package vterm-toggle
-;;   :general ("M-`" 'vterm-toggle))
-
 (use-package eval-sexp-fu
+  :custom
+  (eval-sexp-fu-flash-duration 1)
+
   :config
   ;; The default duration disappears for some forms that take a while
   ;; to evaluate, like use-package
-  (setq eval-sexp-fu-flash-duration .3)
-
   (defun razzi-flash-eval-defun ()
     "Hack to make the thing flash even when on an opening parenthesis."
     (interactive)
-    (save-excursion
-      (when (string= (thing-at-point 'char) "(")
-	(forward-char))
-      (call-interactively 'eval-defun)))
+    (if (eq (razzi-char-at-point) ?\))
+	(save-excursion
+	  (forward-char)
+	  (call-interactively #'eval-last-sexp))
+      (call-interactively #'eval-defun)))
 
   (general-define-key "M-RET" 'razzi-flash-eval-defun))
 
@@ -471,9 +473,10 @@
   :blackout)
 
 (use-package yasnippet
+  :custom
+  (yas-verbosity 2)
   :config
   (yas-global-mode)
-  (setq yas-verbosity 2)
   :blackout yas-minor-mode)
 
 (add-hook 'js2-mode-hook 'flycheck-mode)
