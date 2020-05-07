@@ -41,6 +41,10 @@
 (server-start)
 
 (define-key input-decode-map "\C-i" [C-i])
+(add-hook 'focus-out-hook 'garbage-collect)
+
+;;; Configure packages that others depend on.
+(use-package general)
 
 ;;; Configure builtin packages.
 (use-package recentf
@@ -81,8 +85,6 @@
   ;; (set-face-background 'hl-line "black")
   (set-background-color "black")
   (set-foreground-color "white"))
-
-(use-package general)
 
 (use-package flow-js2-mode)
 
@@ -153,6 +155,12 @@
 	    "<s-left>" #'razzi-vterm-send-m-b
 	    "<s-right>" #'razzi-vterm-send-m-f)
 
+  (:keymaps 'vterm-mode-map
+	    :prefix "C-SPC"
+	    "" nil
+	    "\"" 'razzi-vterm-split-vertically
+	    "%" 'razzi-vterm-split-horizontally)
+
   :config
   (evil-set-initial-state 'vterm-mode 'emacs)
 
@@ -212,17 +220,7 @@
     (seq-filter #'razzi-vterm-buffer-vterm-p (buffer-list)))
 
   (add-hook 'vterm-mode-hook #'razzi-setup-vterm)
-  (setq vterm-exit-functions '(razzi-vterm-cleanup-on-exit))
-
-  (general-define-key :keymaps 'vterm-mode-map
-		      :prefix "C-SPC"
-		      "" nil
-		      "c" #'vterm
-		      "h" #'windmove-left
-		      "j" #'windmove-down
-		      "k" #'windmove-up
-		      "l" #'windmove-right
-		      "%" 'razzi-vterm-split-horizontally))
+  (setq vterm-exit-functions '(razzi-vterm-cleanup-on-exit)))
 
 (use-package perspective
   :general
@@ -261,11 +259,15 @@
   (defun razzi-flash-eval-defun ()
     "Hack to make the thing flash even when on an opening parenthesis."
     (interactive)
-    (if (eq (razzi-char-at-point) ?\))
-	(save-excursion
-	  (forward-char)
-	  (call-interactively #'eval-last-sexp))
-      (call-interactively #'eval-defun)))
+    (let ((char (razzi-char-at-point)))
+      (cond
+       ((eq char ?\)) (save-excursion
+			(forward-char)
+			(call-interactively #'eval-last-sexp)))
+	((eq char ?\() (save-excursion
+			 (forward-sexp)
+			 (call-interactively #'eval-last-sexp)))
+	(t (call-interactively #'eval-defun))))))
 
   (general-define-key "M-RET" 'razzi-flash-eval-defun))
 
@@ -298,7 +300,6 @@
 		 "rd" 'string-inflection-kebab-case
 		 "c" 'magit-commit)))
 
-
 (use-package markdown-mode)
 
 (use-package undo-tree
@@ -316,7 +317,8 @@
 	   "p p" 'projectile-switch-project)
 
   :custom (projectile-completion-system 'default)
-  :config (projectile-mode 1))
+  :config (projectile-mode 1)
+  :blackout)
 
 (use-package flycheck-flow
   :config
@@ -351,6 +353,7 @@
   (:states 'insert
 	   "C-t" 'razzi-transpose-previous-chars
 	   "C-c a" 'razzi-abbrev-or-add-global-abbrev
+	   "M-o" 'sp-end-of-next-sexp
 	   "M-v" 'razzi-paste))
 
 (use-package selectrum
@@ -493,6 +496,25 @@
 		    "ee" 'eval-last-sexp
 		    "ec" 'eval-defun)
 
+(defvar razzi-next-or-previous nil)
+
+(defun razzi-toggle-window ()
+  (interactive)
+  (if razzi-next-or-previous
+      (other-window)
+    (other-window -1))
+
+  (setq razzi-next-or-previOus (not razzi-next-or-previous)))
+
+(general-define-key :prefix "C-SPC"
+		    "" nil
+		    "c" #'vterm
+		    "h" #'windmove-left
+		    "j" #'windmove-down
+		    "k" #'windmove-up
+		    "l" #'windmove-right
+		    "SPC" #'razzi-toggle-window)
+
 (general-define-key :states 'emacs
 		    :prefix "M-m"
 		    "fi" 'razzi-find-init)
@@ -634,8 +656,6 @@
 (use-package prettier-js :config
 	     (add-hook 'js2-mode-hook 'prettier-js-mode))
 
-(add-hook 'focus-out-hook 'garbage-collect)
-
 (use-package python
   :general
   (:states 'normal
@@ -692,6 +712,11 @@
 	(make-directory dir)))))
 
 (use-package centaur-tabs
+  :custom
+  (centaur-tabs-cycle-scope 'tabs
+   centaur-tabs-set-close-button nil
+   centaur-tabs-hide-tab-function 'razzi-tabs-hide-special-tabs)
+
   :general
   ("C-<tab>" 'centaur-tabs-forward
    "C-S-<tab>" 'centaur-tabs-backward
@@ -703,8 +728,8 @@
    "M-6" 'centaur-tabs-select-visible-tab
    "M-7" 'centaur-tabs-select-visible-tab
    "M-8" 'centaur-tabs-select-visible-tab
-   "M-9" 'centaur-tabs-select-end-tab
-   :states 'normal
+   "M-9" 'centaur-tabs-select-end-tab)
+  (:states 'normal
    "g t" 'centaur-tabs-forward
    "g T" 'centaur-tabs-backward)
 
@@ -716,10 +741,6 @@
 	(centaur-tabs-hide-tab buffer)
 	(and (string-prefix-p "magit" name)
 	     (s-contains? ":" name)))))
-
-   (setq centaur-tabs-cycle-scope 'tabs
-	 centaur-tabs-set-close-button nil
-	 centaur-tabs-hide-tab-function 'razzi-tabs-hide-special-tabs)
 
    (centaur-tabs-mode))
 
@@ -744,16 +765,20 @@
   (which-key-mode)
   :blackout)
 
-(defun razzi-isearch-transpose-char ()
-  (interactive)
-  (let* ((string isearch-string)
-	 (len (length isearch-string))
-	 (second-to-last-char (aref string (- len 2)))
-	 (last-char (aref string (- len 1))))
-    (isearch-pop-state)
-    (isearch-pop-state)
-    (isearch-process-search-char last-char)
-    (isearch-process-search-char second-to-last-char)))
-
-(define-key isearch-mode-map (kbd "C-t") 'razzi-isearch-transpose-char)
-(define-key isearch-mode-map (kbd "C-g") 'isearch-quit)
+(use-package isearch
+  :straight nil
+  :general
+  (:keymaps 'isearch-mode-map
+	    "C-t" 'razzi-isearch-transpose-char
+	    "C-g" 'isearch-exit)
+  :config
+  (defun razzi-isearch-transpose-char ()
+    (interactive)
+    (let* ((string isearch-string)
+	   (len (length isearch-string))
+	   (second-to-last-char (aref string (- len 2)))
+	   (last-char (aref string (- len 1))))
+      (isearch-pop-state)
+      (isearch-pop-state)
+      (isearch-process-search-char last-char)
+      (isearch-process-search-char second-to-last-char))))
