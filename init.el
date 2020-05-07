@@ -267,7 +267,7 @@
 	((eq char ?\() (save-excursion
 			 (forward-sexp)
 			 (call-interactively #'eval-last-sexp)))
-	(t (call-interactively #'eval-defun))))))
+	(t (call-interactively #'eval-defun)))))
 
   (general-define-key "M-RET" 'razzi-flash-eval-defun))
 
@@ -496,15 +496,25 @@
 		    "ee" 'eval-last-sexp
 		    "ec" 'eval-defun)
 
-(defvar razzi-next-or-previous nil)
+(defvar razzi-last-window nil)
+
+(defun razzi-track-selected-window (a b)
+  (setq razzi-last-window (selected-window)))
+
+(advice-add 'windmove-do-window-select :before 'razzi-track-selected-window)
 
 (defun razzi-toggle-window ()
   (interactive)
-  (if razzi-next-or-previous
-      (other-window)
-    (other-window -1))
+  (setq razzi-previous-window (selected-window))
 
-  (setq razzi-next-or-previOus (not razzi-next-or-previous)))
+  (let ((window-length (length (window-list))))
+    (when (> window-length 2)
+      (select-window razzi-last-window))
+
+    (when (= window-length 2)
+      (other-window 1)))
+
+  (setq razzi-last-window razzi-previous-window))
 
 (general-define-key :prefix "C-SPC"
 		    "" nil
@@ -515,8 +525,7 @@
 		    "l" #'windmove-right
 		    "SPC" #'razzi-toggle-window)
 
-(general-define-key :states 'emacs
-		    :prefix "M-m"
+(general-define-key :prefix "M-m"
 		    "fi" 'razzi-find-init)
 
 (defun razzi-find-init ()
