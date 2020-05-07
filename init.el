@@ -498,23 +498,24 @@
 
 (defvar razzi-last-window nil)
 
-(defun razzi-track-selected-window (a b)
+(defun razzi-track-selected-window (&rest arguments)
   (setq razzi-last-window (selected-window)))
 
 (advice-add 'windmove-do-window-select :before 'razzi-track-selected-window)
 
 (defun razzi-toggle-window ()
   (interactive)
-  (setq razzi-previous-window (selected-window))
+  (setq previous-window (selected-window))
 
-  (let ((window-length (length (window-list))))
-    (when (> window-length 2)
+  (let ((window-length (length (window-list)))
+	(window-active (window-live-p razzi-last-window)))
+    (when (and window-active (> window-length 2))
       (select-window razzi-last-window))
 
-    (when (= window-length 2)
+    (when (and window-active (= window-length 2))
       (other-window 1)))
 
-  (setq razzi-last-window razzi-previous-window))
+  (setq razzi-last-window previous-window))
 
 (general-define-key :prefix "C-SPC"
 		    "" nil
