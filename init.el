@@ -130,6 +130,15 @@
   :config
   (evil-set-initial-state 'eshell-mode 'emacs))
 
+(use-package frame
+  :straight nil
+  :config
+  (blink-cursor-mode 0)
+  (window-divider-mode)
+  (setq window-divider-default-places 'bottom-only)
+  (set-face-attribute 'window-divider 'nil :foreground "#333")
+  (setq window-divider-default-bottom-width 2))
+
 (use-package vterm
   :general
   (:keymaps 'vterm-mode-map
@@ -523,6 +532,7 @@
 		    "h" #'windmove-left
 		    "j" #'windmove-down
 		    "k" #'windmove-up
+		    "C-k" #'windmove-up
 		    "l" #'windmove-right
 		    "SPC" #'razzi-toggle-window)
 
