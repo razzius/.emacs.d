@@ -633,6 +633,8 @@
 
 (general-define-key :states 'insert
 		    "<tab>" 'yas-expand
+		    "C-a" 'evil-first-non-blank
+		    "C-e" 'end-of-line
 		    "C-h" 'delete-backward-char
 		    "C-l" 'sp-forward-slurp-sexp
 		    "C-t" 'razzi-transpose-previous-chars
@@ -644,7 +646,9 @@
 		    "M-s" 'razzi-exit-insert-and-save
 		    "M-v" 'razzi-paste
 		    "M-t" 'transpose-words
-		    "M-RET" 'eval-defun)
+		    "M-RET" 'eval-defun
+		    "<s-left>" 'backward-word
+		    "<s-right>" 'forward-word)
 
 (general-define-key :states 'operator
 		    "E" 'forward-symbol
