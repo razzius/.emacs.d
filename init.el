@@ -92,6 +92,7 @@
   :custom
   (evil-cross-lines t
    evil-ex-substitute-global t
+   evil-insert-state-message nil
    evil-regexp-search nil
    evil-shift-width 2)
 
@@ -132,12 +133,13 @@
 
 (use-package frame
   :straight nil
+  :custom
+  (window-divider-default-places 'bottom-only
+   window-divider-default-bottom-width 2)
   :config
   (blink-cursor-mode 0)
   (window-divider-mode)
-  (setq window-divider-default-places 'bottom-only)
-  (set-face-attribute 'window-divider 'nil :foreground "#333")
-  (setq window-divider-default-bottom-width 2))
+  (set-face-attribute 'window-divider 'nil :foreground "#333"))
 
 (use-package vterm
   :general
@@ -151,8 +153,11 @@
 	    "C-p" #'vterm--self-insert
 	    "C-u" #'vterm--self-insert
 
+	    "M-[" #'vterm-copy-mode
+	    "M-c" #'kill-ring-save
 	    "M-v" #'vterm-yank
 	    "M-w" #'kill-this-buffer
+	    "M-RET" #'razzi-toggle-window
 
 	    "<s-backspace>" #'razzi-vterm-send-c-w
 
@@ -170,8 +175,14 @@
 	    "\"" 'razzi-vterm-split-vertically
 	    "%" 'razzi-vterm-split-horizontally)
 
+  (:keymaps 'vterm-copy-mode-map "<return>" 'razzi-vterm-end-copy-mode)
+
   :config
   (evil-set-initial-state 'vterm-mode 'emacs)
+
+  (defun razzi-vterm-end-copy-mode ()
+    (interactive)
+    (vterm-copy-mode -1))
 
   (defun razzi-vterm-send-c-w ()
     (interactive)
@@ -374,7 +385,11 @@
 
   (defun razzi-delete-backward-to-slash ()
     (interactive)
-    (zap-up-to-char -1 ?/))
+    (let* ((text (buffer-string))
+	   (has-slash (cl-find ?/ text)))
+      (if has-slash
+	  (zap-up-to-char -1 ?/)
+	(kill-whole-line))))
 
   (defun razzi-go-home ()
     (interactive)
@@ -496,6 +511,7 @@
 (razzi-associate-extension-mode "js" 'rjsx-mode)
 
 (general-define-key "C-`" 'describe-key
+		    "M-c" 'kill-ring-save
 		    "M-w" 'kill-current-buffer
 		    "M-q" 'save-buffers-kill-terminal)
 
@@ -622,6 +638,7 @@
 		    "C-t" 'razzi-transpose-previous-chars
 		    "C-c a" 'razzi-abbrev-or-add-global-abbrev
 		    "s-<backspace>" 'evil-delete-backward-word
+		    "M-c" 'kill-ring-save
 		    "M-/" 'evil-commentary-line
 		    "M-l" 'evil-visual-line
 		    "M-s" 'razzi-exit-insert-and-save
@@ -720,7 +737,7 @@
 
   (defun razzi-configure-python-mode ()
     (flycheck-mode)
-    (setq evil-shift-width 4))
+    (setq-local evil-shift-width 4))
 
   (add-hook 'python-mode-hook 'razzi-configure-python-mode))
 
@@ -768,12 +785,11 @@
 (advice-add 'find-file :before 'razzi-make-parent-directories)
 
 (use-package dired+
-  :config
-  (setq
-   dired-recursive-copies 'always
+  :custom
+  (dired-recursive-copies 'always
    dired-recursive-deletes 'always
-
    diredp-hide-details-initially-flag t)
+  :config
   (define-key dired-mode-map (kbd "c") 'find-file)
   (define-key dired-mode-map (kbd ".") 'dired-up-directory)
   (define-key dired-mode-map (kbd "C-h") 'dired-up-directory)
@@ -803,3 +819,6 @@
       (isearch-pop-state)
       (isearch-process-search-char last-char)
       (isearch-process-search-char second-to-last-char))))
+
+(use-package auth-source
+  :custom auth-source-save-behavior nil)
