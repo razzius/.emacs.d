@@ -21,7 +21,6 @@
  default-directory (expand-file-name "~")
  enable-local-variables nil
  fill-column 100
- frame-title-format "%f"
  inhibit-startup-screen t
  kill-buffer-query-functions nil
  make-backup-files nil
@@ -82,7 +81,6 @@
   (load-theme 'zerodark 'noconfirm)
   (set-face-attribute 'default nil :height 180)
   (set-face-attribute 'region nil :background "white" :foreground "black")
-  ;; (set-face-background 'hl-line "black")
   (set-background-color "black")
   (set-foreground-color "white"))
 
@@ -134,9 +132,11 @@
 (use-package frame
   :straight nil
   :custom
-  (window-divider-default-places 'bottom-only
-   window-divider-default-bottom-width 2)
+  (frame-title-format "%f"
+   window-divider-default-places 'bottom-only)
   :config
+  ;; For whatever reason, window-divider-default-bottom-width doesn't work in :custom above...
+  (setq window-divider-default-bottom-width 2)
   (blink-cursor-mode 0)
   (window-divider-mode)
   (set-face-attribute 'window-divider 'nil :foreground "#333"))
@@ -328,7 +328,11 @@
   (global-undo-tree-mode)
   :blackout)
 
-(use-package ripgrep)
+(use-package ripgrep
+  :config
+  (defun razzi-ripgrep-at-point ()
+    (interactive)
+    (projectile-ripgrep (thing-at-point 'symbol))))
 
 (use-package projectile
   :general
@@ -565,6 +569,10 @@
 (general-define-key :states 'normal
 		    :prefix "SPC"
 		    "," 'razzi-append-comma
+		    "/" 'projectile-ripgrep
+		    "ESC" 'kill-this-buffer
+		    "O" 'razzi-put-before
+		    "SPC" 'execute-extended-command
 		    "bb" 'switch-to-buffer
 		    "bd" 'kill-buffer
 		    "bn" 'next-buffer
@@ -575,13 +583,19 @@
 		    "ep" 'flycheck-previous-error
 		    "ev" 'flycheck-verify-setup
 		    "f RET" 'razzi-copy-project-file-path
-		    "hdf" 'describe-function
-		    "hdv" 'describe-variable
+		    "f SPC" 'razzi-copy-full-file-name
 		    "ff" 'find-file
 		    "fi" 'razzi-find-init
+		    "fp" 'razzi-copy-project-file-path
+		    "fr" 'razzi-recentf
+		    "hdf" 'describe-function
+		    "hdv" 'describe-variable
+		    "o" 'razzi-put-after
 		    "qq" 'save-buffers-kill-terminal
 		    "qr" 'razzi-restart-emacs
 		    "td" 'toggle-debug-on-error
+		    "tg" 'golden-ratio-mode
+		    "u" 'universal-argument
 		    "w-" 'evil-window-split
 		    "w2" 'evil-window-vsplit
 		    "wd" 'delete-window
@@ -590,16 +604,12 @@
 		    "wk" 'evil-window-up
 		    "wl" 'evil-window-right
 		    "wm" 'delete-other-windows
-		    "wo" 'other-window
-		    "fp" 'razzi-copy-project-file-path
-		    "fr" 'razzi-recentf
-		    "f SPC" 'razzi-copy-file-name-to-clipboard
-		    "o" 'razzi-put-after
-		    "tg" 'golden-ratio-mode
-		    "O" 'razzi-put-before
-		    "u" 'universal-argument
-		    "ESC" 'kill-this-buffer
-		    "SPC" 'execute-extended-command)
+		    "wo" 'other-window)
+
+(defun razzi-evil-commentary-line ()
+  (interactive)
+  (save-excursion
+    (call-interactively 'evil-commentary-line)))
 
 (general-define-key :states 'normal
 		    "<up>" 'evil-scroll-line-up
@@ -613,7 +623,7 @@
 		    "C" 'razzi-change-line
 		    "D" 'razzi-kill-line-and-whitespace
 		    "K" 'evil-previous-line  ; Protect against typo
-		    "M-/" 'evil-commentary-line
+		    "M-/" 'razzi-evil-commentary-line
 		    "M-[" 'evil-backward-paragraph
 		    "M-]" 'evil-forward-paragraph
 		    "M-l" 'evil-visual-line
@@ -624,7 +634,7 @@
 		    "M-u" 'razzi-update-current-package
 		    "M-w" 'kill-current-buffer
 		    "Q" 'razzi-replay-q-macro
-		    ;; "g/" 'razzi-ivy-search-at-point
+		    "g/" 'razzi-ripgrep-at-point
 		    "g]" 'dumb-jump-go
 		    "gb" 'magit-blame-addition
 		    "gs" 'magit-status
@@ -694,9 +704,6 @@
 	(delete-char 1)))
 
   (advice-add 'hippie-expand :after 'hippie-expand-substitute-string))
-
-(use-package prettier-js :config
-	     (add-hook 'js2-mode-hook 'prettier-js-mode))
 
 (use-package python
   :general
@@ -823,6 +830,26 @@
       (isearch-pop-state)
       (isearch-process-search-char last-char)
       (isearch-process-search-char second-to-last-char))))
+
+(use-package ffap
+  :demand t
+  :general
+  ("<mouse-1>" 'razzi-mouse-open-file-or-url-on-click)
+  :config
+  (defun razzi-mouse-open-file-or-url-on-click ()
+    (interactive)
+    (let* ((string-at-point (ffap-string-at-point))
+	   (parts (split-string string-at-point ":"))
+	   (filename (car parts))
+	   (line-number (cadr parts)))
+      (if (and (not (string-empty-p string-at-point))
+	       (file-exists-p filename))
+	  (progn
+	    (find-file filename)
+	    (when line-number
+	      (goto-line line-number)))
+	(when (string-prefix-p "http" string-at-point)
+	  (browse-url-at-point))))))
 
 (use-package auth-source
   :custom auth-source-save-behavior nil)
