@@ -586,6 +586,7 @@
 		    "f SPC" 'razzi-copy-full-file-name
 		    "ff" 'find-file
 		    "fi" 'razzi-find-init
+		    "fn" 'razzi-file-name
 		    "fp" 'razzi-copy-project-file-path
 		    "fr" 'razzi-recentf
 		    "hdf" 'describe-function
@@ -848,7 +849,7 @@
 	    (find-file filename)
 	    (when line-number
 	      (goto-line line-number)))
-	(when (string-prefix-p "http" string-at-point)
+	(when (thing-at-point 'url)
 	  (browse-url-at-point))))))
 
 (use-package auth-source
