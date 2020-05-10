@@ -329,10 +329,29 @@
   :blackout)
 
 (use-package ripgrep
+  :general
+  (:states 'normal
+	   "g/" 'razzi-ripgrep-at-point)
+  (:states 'normal
+	   :prefix "SPC"
+	   "s l" 'razzi-ripgrep-resume)
+  (:states 'visual
+	   "g/" 'razzi-ripgrep-region)
   :config
+  (defun razzi-ripgrep-resume ()
+    (interactive)
+    (ripgrep-regexp (car (minibuffer-history-value)) (projectile-project-root)))
+
   (defun razzi-ripgrep-at-point ()
     (interactive)
-    (projectile-ripgrep (thing-at-point 'symbol))))
+    (let ((term (thing-at-point 'symbol)))
+      (setq minibuffer-history (cons term minibuffer-history))
+      (projectile-ripgrep (thing-at-point 'symbol))))
+
+  (defun razzi-ripgrep-region (beg end)
+    (interactive "r")
+    (projectile-ripgrep (buffer-substring-no-properties beg end))
+    (evil-normal-state)))
 
 (use-package projectile
   :general
@@ -374,7 +393,11 @@
 	   "q r" 'razzi-restart-emacs)
   (:states 'visual
 	   "$" 'razzi-almost-end-of-line
-	   "il" 'razzi-mark-line-text)
+	   "il" 'razzi-mark-line-text
+	   "C-t" 'razzi-transpose-previous-chars
+	   "C-c a" 'razzi-abbrev-or-add-global-abbrev
+	   "M-s" 'razzi-exit-insert-and-save
+	   "M-v" 'razzi-paste)
   (:states 'insert
 	   "C-t" 'razzi-transpose-previous-chars
 	   "C-c a" 'razzi-abbrev-or-add-global-abbrev
@@ -605,7 +628,8 @@
 		    "wk" 'evil-window-up
 		    "wl" 'evil-window-right
 		    "wm" 'delete-other-windows
-		    "wo" 'other-window)
+		    "wo" 'other-window
+		    "ww" 'other-window)
 
 (defun razzi-evil-commentary-line ()
   (interactive)
@@ -635,7 +659,6 @@
 		    "M-u" 'razzi-update-current-package
 		    "M-w" 'kill-current-buffer
 		    "Q" 'razzi-replay-q-macro
-		    "g/" 'razzi-ripgrep-at-point
 		    "g]" 'dumb-jump-go
 		    "gb" 'magit-blame-addition
 		    "gs" 'magit-status
@@ -648,14 +671,10 @@
 		    "C-e" 'end-of-line
 		    "C-h" 'delete-backward-char
 		    "C-l" 'sp-forward-slurp-sexp
-		    "C-t" 'razzi-transpose-previous-chars
-		    "C-c a" 'razzi-abbrev-or-add-global-abbrev
 		    "s-<backspace>" 'evil-delete-backward-word
 		    "M-c" 'kill-ring-save
 		    "M-/" 'evil-commentary-line
 		    "M-l" 'evil-visual-line
-		    "M-s" 'razzi-exit-insert-and-save
-		    "M-v" 'razzi-paste
 		    "M-t" 'transpose-words
 		    "M-RET" 'eval-defun
 		    "<s-left>" 'backward-word
@@ -679,7 +698,6 @@
 		    "\"" 'razzi-surround-with-double-quotes
 		    "]" 'razzi-surround-with-brackets
 		    "c" 'evil-change
-		    "il" 'razzi-mark-line-text
 		    "s" 'evil-surround-region
 		    "v" 'evil-normal-state)
 
@@ -698,9 +716,15 @@
   (setq hippie-expand-try-functions-list
 	'(try-expand-line try-expand-line-all-buffers))
 
+  (defun razzi-parens-unbalanced ()
+    (condition-case nil
+		 (scan-sexps (point-min) (point-max))
+	       (error t)))
+
   (defun hippie-expand-substitute-string (arg)
     "Remove extra paren when expanding line in smartparens"
     (if (and smartparens-mode
+	     (razzi-parens-unbalanced)
 	     (memq (razzi-char-at-point) '(?} ?\))))
 	(delete-char 1)))
 
