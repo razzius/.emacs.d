@@ -31,16 +31,25 @@
  shell-file-name "fish"
  vc-follow-symlinks t)
 
-(global-eldoc-mode -1)
-(global-linum-mode)
-(tool-bar-mode -1)
 (column-number-mode)
 (global-auto-revert-mode 1)
+(global-eldoc-mode -1)
+(global-linum-mode)
 (scroll-bar-mode -1)
 (server-start)
+(tool-bar-mode -1)
+(visual-line-mode)
 
 (define-key input-decode-map "\C-i" [C-i])
 (add-hook 'focus-out-hook 'garbage-collect)
+
+(defun razzi-separate-vterm-perspectives ()
+  (let ((buffer (current-buffer)))
+    (persp-switch "main")
+    (persp-add-buffer buffer)
+    (switch-to-buffer buffer)))
+
+(add-hook 'find-file-hook 'razzi-separate-vterm-perspectives)
 
 ;;; Configure packages that others depend on.
 (use-package general)
