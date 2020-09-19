@@ -29,6 +29,7 @@
  ring-bell-function 'ignore
  save-abbrevs 'silently
  shell-file-name "fish"
+ split-width-threshold nil
  vc-follow-symlinks t)
 
 (column-number-mode)
@@ -41,15 +42,6 @@
 (visual-line-mode)
 
 (define-key input-decode-map "\C-i" [C-i])
-(add-hook 'focus-out-hook 'garbage-collect)
-
-(defun razzi-separate-vterm-perspectives ()
-  (let ((buffer (current-buffer)))
-    (persp-switch "main")
-    (persp-add-buffer buffer)
-    (switch-to-buffer buffer)))
-
-(add-hook 'find-file-hook 'razzi-separate-vterm-perspectives)
 
 ;;; Configure packages that others depend on.
 (use-package general)
@@ -98,6 +90,8 @@
 (use-package puppet-mode
   :config
   (add-hook 'puppet-mode-hook 'flycheck-mode))
+
+(use-package php-mode)
 
 (use-package evil
   :custom
@@ -265,6 +259,14 @@
   ("M-`" 'razzi-switch-between-terminal)
 
   :config
+  (defun razzi-separate-vterm-perspectives ()
+    (let ((buffer (current-buffer)))
+      (persp-switch "main")
+      (persp-add-buffer buffer)
+      (switch-to-buffer buffer)))
+
+  (add-hook 'find-file-hook 'razzi-separate-vterm-perspectives)
+
   (defun razzi-switch-between-terminal ()
     (interactive)
     (if (> (length (persp-names)) 1)
@@ -638,6 +640,7 @@
 		    "fr" 'razzi-recentf
 		    "hdf" 'describe-function
 		    "hdv" 'describe-variable
+		    "i TAB" 'razzi-insert-tab
 		    "o" 'razzi-put-after
 		    "qq" 'save-buffers-kill-terminal
 		    "qr" 'razzi-restart-emacs
@@ -692,6 +695,7 @@
 (general-define-key :states 'insert
 		    "<tab>" 'yas-expand
 		    "C-a" 'evil-first-non-blank
+		    "C-d" 'delete-forward-char
 		    "C-e" 'end-of-line
 		    "C-h" 'delete-backward-char
 		    "C-l" 'sp-forward-slurp-sexp
@@ -700,6 +704,7 @@
 		    "M-/" 'evil-commentary-line
 		    "M-l" 'evil-visual-line
 		    "M-t" 'transpose-words
+		    "M-z" 'undo
 		    "M-RET" 'eval-defun
 		    "<s-left>" 'backward-word
 		    "<s-right>" 'forward-word)
@@ -730,7 +735,6 @@
 (setq js2-strict-missing-semi-warning nil)
 (setq js-indent-level 2)
 
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
 (add-hook 'focus-out-hook 'garbage-collect)
 
 (use-package hippie-exp
