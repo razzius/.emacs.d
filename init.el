@@ -54,6 +54,8 @@
 ;;; Configure packages that others depend on.
 (use-package general)
 
+(use-package blackout)
+
 ;;; Configure builtin packages.
 (use-package recentf
   :config
@@ -65,8 +67,6 @@
   (help-window-select t)
   :general (:keymaps 'help-mode-map
 		     "<tab>" 'forward-button))
-
-(use-package blackout)
 
 (use-package subword
   :config
@@ -98,9 +98,13 @@
 (use-package evil
   :custom
   (evil-cross-lines t
-   evil-ex-substitute-global t
    evil-insert-state-message nil
-   evil-regexp-search nil
+   evil-regexp-search nil)
+
+  :config
+  (setq-default
+   evil-symbol-word-search t
+   evil-ex-substitute-global t
    evil-shift-width 2)
 
   :config
@@ -350,6 +354,13 @@
   (defun razzi-ripgrep-resume ()
     (interactive)
     (ripgrep-regexp (car (minibuffer-history-value)) (projectile-project-root)))
+
+  (defun razzi-focus-rg-results (dir &optional arg window)
+    (when (and (eq major-mode 'ripgrep-search-mode)
+	       (eq (point) 1))
+      (--dotimes 4 (next-line))))
+
+  (advice-add 'windmove-do-window-select :after 'razzi-focus-rg-results)
 
   (defun razzi-ripgrep-at-point ()
     (interactive)
