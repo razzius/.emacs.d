@@ -1,0 +1,5 @@
+#!/bin/sh
+target=$(mktemp)
+cp $1 $target
+puppet-lint --fix $target > /dev/null 2>&1
+cat $target

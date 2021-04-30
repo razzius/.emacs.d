@@ -95,6 +95,10 @@
 
 (use-package flow-js2-mode)
 
+(use-package puppet-mode
+  :config
+  (add-hook 'puppet-mode-hook 'flycheck-mode))
+
 (use-package evil
   :custom
   (evil-cross-lines t
