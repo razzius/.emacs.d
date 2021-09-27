@@ -5,9 +5,9 @@
       (bootstrap-version 5))
   (unless (file-exists-p bootstrap-file)
     (with-current-buffer
-	(url-retrieve-synchronously
-	 "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-	 'silent 'inhibit-cookies)
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
       (goto-char (point-max))
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
@@ -26,11 +26,15 @@
  make-backup-files nil
  ns-pop-up-frames nil
  recentf-max-saved-items 100
+ revert-without-query '(".*")
  ring-bell-function 'ignore
  save-abbrevs 'silently
  shell-file-name "fish"
+ split-height-threshold 50
  split-width-threshold nil
  vc-follow-symlinks t)
+
+(setq-default indent-tabs-mode nil)
 
 (column-number-mode)
 (global-auto-revert-mode 1)
@@ -39,7 +43,7 @@
 (scroll-bar-mode -1)
 (server-start)
 (tool-bar-mode -1)
-(visual-line-mode)
+(global-visual-line-mode)
 
 (define-key input-decode-map "\C-i" [C-i])
 
@@ -58,7 +62,7 @@
   :custom
   (help-window-select t)
   :general (:keymaps 'help-mode-map
-		     "<tab>" 'forward-button))
+                     "<tab>" 'forward-button))
 
 (use-package subword
   :config
@@ -67,7 +71,7 @@
 
 (when (equal system-type 'darwin)
   (setq mac-option-modifier 'super
-	mac-command-modifier 'meta))
+        mac-command-modifier 'meta))
 
 (defun razzi-add-directory-to-path (directory)
   (setq exec-path (append exec-path (list directory)))
@@ -93,11 +97,29 @@
 
 (use-package php-mode)
 
+(use-package scala-mode)
+
+(use-package go-mode)
+
+(use-package dockerfile-mode)
+
+(use-package cql-mode)
+
+(use-package puppet-mode
+  :custom
+  (puppet-indent-level 4))
+
+(use-package yaml-mode
+  :config
+  (add-hook 'yaml-mode-hook (lambda () (apheleia-mode -1))))
+
+(use-package vue-mode)
+
 (use-package evil
   :custom
   (evil-cross-lines t
-   evil-insert-state-message nil
-   evil-regexp-search nil)
+                    evil-insert-state-message nil
+                    evil-regexp-search nil)
 
   :config
   (setq-default
@@ -111,9 +133,9 @@
   (evil-mode 1)
 
   (mapc 'evil-declare-not-repeat
-	'(flycheck-next-error
-	  flycheck-previous-error
-	  razzi-flycheck-and-save-buffer))
+        '(flycheck-next-error
+          flycheck-previous-error
+          razzi-flycheck-and-save-buffer))
 
   (evil-define-text-object whole-buffer (count &optional beginning end type)
     (evil-range 0 (point-max)))
@@ -144,7 +166,7 @@
   :straight nil
   :custom
   (frame-title-format "%f"
-   window-divider-default-places 'bottom-only)
+                      window-divider-default-places 'bottom-only)
   :config
   ;; For whatever reason, window-divider-default-bottom-width doesn't work in :custom above...
   (setq window-divider-default-bottom-width 2)
@@ -155,36 +177,36 @@
 (use-package vterm
   :general
   (:keymaps 'vterm-mode-map
-	    "<tab>" #'vterm--self-insert
-	    "C-a" #'vterm--self-insert
-	    "C-c" #'vterm--self-insert
-	    "C-e" #'vterm--self-insert
-	    "C-h" #'vterm--self-insert
-	    "C-n" #'vterm--self-insert
-	    "C-p" #'vterm--self-insert
-	    "C-u" #'vterm--self-insert
+            "<tab>" #'vterm--self-insert
+            "C-a" #'vterm--self-insert
+            "C-c" #'vterm--self-insert
+            "C-e" #'vterm--self-insert
+            "C-h" #'vterm--self-insert
+            "C-n" #'vterm--self-insert
+            "C-p" #'vterm--self-insert
+            "C-u" #'vterm--self-insert
 
-	    "M-[" #'vterm-copy-mode
-	    "M-c" #'kill-ring-save
-	    "M-v" #'vterm-yank
-	    "M-w" #'kill-this-buffer
-	    "M-RET" #'razzi-toggle-window
+            "M-[" #'vterm-copy-mode
+            "M-c" #'kill-ring-save
+            "M-v" #'vterm-yank
+            "M-w" #'kill-this-buffer
+            "M-RET" #'razzi-toggle-window
 
-	    "<s-backspace>" #'razzi-vterm-send-c-w
+            "<s-backspace>" #'razzi-vterm-send-c-w
 
-	    ;; todo bind other than arrow keys to stay on home row
-	    "<s-up>" #'razzi-vterm-send-s-up
-	    "<s-down>" #'razzi-vterm-send-s-down
+            ;; todo bind other than arrow keys to stay on home row
+            "<s-up>" #'razzi-vterm-send-s-up
+            "<s-down>" #'razzi-vterm-send-s-down
 
-	    ;; These are remapped to c-q and c-v system-wide
-	    "<s-left>" #'razzi-vterm-send-m-b
-	    "<s-right>" #'razzi-vterm-send-m-f)
+            ;; These are remapped to c-q and c-v system-wide
+            "<s-left>" #'razzi-vterm-send-m-b
+            "<s-right>" #'razzi-vterm-send-m-f)
 
   (:keymaps 'vterm-mode-map
-	    :prefix "C-SPC"
-	    "" nil
-	    "\"" 'razzi-vterm-split-vertically
-	    "%" 'razzi-vterm-split-horizontally)
+            :prefix "C-SPC"
+            "" nil
+            "\"" 'razzi-vterm-split-vertically
+            "%" 'razzi-vterm-split-horizontally)
 
   (:keymaps 'vterm-copy-mode-map "<return>" 'razzi-vterm-end-copy-mode)
 
@@ -270,22 +292,25 @@
   (defun razzi-switch-between-terminal ()
     (interactive)
     (if (> (length (persp-names)) 1)
-	(persp-next)
+        (persp-next)
       (progn
-	(make-persp :name "vterm")
-	(persp-switch "vterm")
-	(vterm))))
+        (make-persp :name "vterm")
+        (persp-switch "vterm")
+        (vterm))))
 
   (persp-mode)
   (persp-turn-off-modestring))
 
 (use-package crux
   :general (:states 'normal
-		    :prefix "SPC"
-		    "TAB" 'crux-switch-to-previous-buffer))
+                    :prefix "SPC"
+                    "TAB" 'crux-switch-to-previous-buffer
+                    "fd" 'crux-delete-file-and-buffer
+                    "fR" 'crux-rename-file-and-buffer))
 
 (use-package dumb-jump
-  :config (dumb-jump-mode))
+  :config
+  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
 
 (use-package flow-minor-mode)
 
@@ -302,19 +327,19 @@
     (let ((char (razzi-char-at-point)))
       (cond
        ((eq char ?\)) (save-excursion
-			(forward-char)
-			(call-interactively #'eval-last-sexp)))
-	((eq char ?\() (save-excursion
-			 (forward-sexp)
-			 (call-interactively #'eval-last-sexp)))
-	(t (call-interactively #'eval-defun)))))
+                        (forward-char)
+                        (call-interactively #'eval-last-sexp)))
+       ((eq char ?\() (save-excursion
+                        (forward-sexp)
+                        (call-interactively #'eval-last-sexp)))
+       (t (call-interactively #'eval-defun)))))
 
   (general-define-key "M-RET" 'razzi-flash-eval-defun))
 
 (use-package flycheck
   :config
   (setq flycheck-flake8rc "~/.config/flake8"
-	flycheck-python-flake8-executable "flake8")
+        flycheck-python-flake8-executable "flake8")
   (setq-default flycheck-disabled-checkers '(python-pycompile python-pylint)))
 
 (use-package flycheck-mypy
@@ -332,13 +357,13 @@
 (use-package string-inflection
   :general
   (:states 'normal
-	   "c" (general-key-dispatch 'evil-change
-		 "ru" 'string-inflection-upcase
-		 "rs" 'string-inflection-underscore
-		 "rt" 'string-inflection-camelcase
-		 "rc" 'string-inflection-lower-camelcase
-		 "rd" 'string-inflection-kebab-case
-		 "c" 'magit-commit)))
+           "c" (general-key-dispatch 'evil-change
+                 "ru" 'string-inflection-upcase
+                 "rs" 'string-inflection-underscore
+                 "rt" 'string-inflection-camelcase
+                 "rc" 'string-inflection-lower-camelcase
+                 "rd" 'string-inflection-kebab-case
+                 "c" 'magit-commit)))
 
 (use-package markdown-mode)
 
@@ -350,12 +375,12 @@
 (use-package ripgrep
   :general
   (:states 'normal
-	   "g/" 'razzi-ripgrep-at-point)
+           "g/" 'razzi-ripgrep-at-point)
   (:states 'normal
-	   :prefix "SPC"
-	   "s l" 'razzi-ripgrep-resume)
+           :prefix "SPC"
+           "s l" 'razzi-ripgrep-resume)
   (:states 'visual
-	   "g/" 'razzi-ripgrep-region)
+           "g/" 'razzi-ripgrep-region)
   :config
   (defun razzi-ripgrep-resume ()
     (interactive)
@@ -363,7 +388,7 @@
 
   (defun razzi-focus-rg-results (dir &optional arg window)
     (when (and (eq major-mode 'ripgrep-search-mode)
-	       (eq (point) 1))
+               (eq (point) 1))
       (--dotimes 4 (next-line))))
 
   (advice-add 'windmove-do-window-select :after 'razzi-focus-rg-results)
@@ -382,9 +407,9 @@
 (use-package projectile
   :general
   (:states 'normal
-	   :prefix "SPC"
-	   "p f" 'projectile-find-file
-	   "p p" 'projectile-switch-project)
+           :prefix "SPC"
+           "p f" 'projectile-find-file
+           "p p" 'projectile-switch-project)
 
   :custom (projectile-completion-system 'default)
   :config (projectile-mode 1)
@@ -396,39 +421,41 @@
 
 (use-package razzi
   :straight (:host github :repo "razzius/razzi.el")
+  :config
+  (razzi-mode)
   :general
   ("M-s" 'razzi-flycheck-and-save-buffer)
   (:states 'normal
-	   "C-c r" 'web-mode-element-rename
-	   "<backtab>" 'razzi-previous-useful-buffer
-	   "[ SPC" 'razzi-insert-newline-before
-	   "] SPC" 'razzi-insert-newline-after
-	   "-" 'razzi-transpose-next-line
-	   "_" 'razzi-transpose-previous-line
-	   "g s" 'razzi-save-and-magit-status
-	   "C" 'razzi-change-line
-	   "D" 'razzi-kill-line-and-whitespace
-	   "G" 'razzi-almost-end-of-buffer
-	   "Q" 'razzi-replay-q-macro)
+           "C-c r" 'web-mode-element-rename
+           "<backtab>" 'razzi-previous-useful-buffer
+           "[ SPC" 'razzi-insert-newline-before
+           "] SPC" 'razzi-insert-newline-after
+           "-" 'razzi-transpose-next-line
+           "_" 'razzi-transpose-previous-line
+           "g s" 'razzi-save-and-magit-status
+           "C" 'razzi-change-line
+           "D" 'razzi-kill-line-and-whitespace
+           "G" 'razzi-almost-end-of-buffer
+           "Q" 'razzi-replay-q-macro)
   (:states 'normal
-	   :prefix "SPC"
-	   "," 'razzi-append-comma
-	   "o" 'razzi-put-after
-	   "i d" 'razzi-put-debugger
-	   "f r" 'razzi-recentf
-	   "q r" 'razzi-restart-emacs)
+           :prefix "SPC"
+           "," 'razzi-append-comma
+           "o" 'razzi-put-after
+           "i d" 'razzi-put-debugger
+           "f r" 'razzi-recentf
+           "q r" 'razzi-restart-emacs)
   (:states 'visual
-	   "$" 'razzi-almost-end-of-line
-	   "il" 'razzi-mark-line-text
-	   "C-t" 'razzi-transpose-previous-chars
-	   "C-c a" 'razzi-abbrev-or-add-global-abbrev
-	   "M-s" 'razzi-exit-insert-and-save
-	   "M-v" 'razzi-paste)
+           "$" 'razzi-almost-end-of-line
+           "il" 'razzi-mark-line-text
+           "C-t" 'razzi-transpose-previous-chars
+           "C-c a" 'razzi-abbrev-or-add-global-abbrev
+           "M-s" 'razzi-exit-insert-and-save
+           "M-v" 'razzi-paste)
   (:states 'insert
-	   "C-t" 'razzi-transpose-previous-chars
-	   "C-c a" 'razzi-abbrev-or-add-global-abbrev
-	   "M-o" 'sp-end-of-next-sexp
-	   "M-v" 'razzi-paste))
+           "C-t" 'razzi-transpose-previous-chars
+           "C-c a" 'razzi-abbrev-or-add-global-abbrev
+           "M-o" 'sp-end-of-next-sexp
+           "M-v" 'razzi-paste))
 
 (use-package selectrum
   :straight (:host github :repo "raxod502/selectrum")
@@ -439,10 +466,10 @@
   (defun razzi-delete-backward-to-slash ()
     (interactive)
     (let* ((text (buffer-string))
-	   (has-slash (cl-find ?/ text)))
+           (has-slash (cl-find ?/ text)))
       (if has-slash
-	  (zap-up-to-char -1 ?/)
-	(kill-whole-line))))
+          (zap-up-to-char -1 ?/)
+        (kill-whole-line))))
 
   (defun razzi-go-home ()
     (interactive)
@@ -459,7 +486,7 @@
 
 (use-package apheleia
   :straight (:host github :repo "raxod502/apheleia")
-  :config (apheleia-global-mode +1)
+  ;; :config (apheleia-global-mode +1)
   :blackout)
 
 (use-package selectrum-prescient
@@ -482,7 +509,8 @@
 
 (use-package ctrlf
   :straight (:host github :repo "raxod502/ctrlf")
-  :general (:states 'normal "M-f" 'ctrlf-forward-literal))
+  :custom
+  (ctrlf-mode-bindings '(("M-f" . ctrlf-forward-literal))))
 
 ;; (use-package tern
 ;;   :init (add-hook 'js2-mode-hook 'tern-mode))
@@ -491,6 +519,7 @@
   :config
   ;; (setq golden-ratio-auto-scale t)
   (golden-ratio-mode 1)
+  :disabled
   :blackout)
 
 (use-package eval-sexp-fu)
@@ -505,14 +534,14 @@
   (general-define-key :states 'normal "C-g" 'razzi-iedit-quit-and-quit)
 
   (general-define-key :states 'normal
-		      :prefix "SPC"
-		      "ie" 'iedit-mode))
+                      :prefix "SPC"
+                      "ie" 'iedit-mode))
 
 (use-package smartparens
   :custom
   (sp-highlight-pair-overlay nil
-   sp-highlight-wrap-overlay nil
-   sp-highlight-wrap-tag-overlay nil)
+                             sp-highlight-wrap-overlay nil
+                             sp-highlight-wrap-tag-overlay nil)
   :config
   (smartparens-global-mode)
   (sp-with-modes sp--lisp-modes
@@ -549,6 +578,7 @@
      magit-insert-unpushed-to-pushremote)))
 
 (use-package super-save
+  :disabled
   :config
   (super-save-mode)
   :blackout)
@@ -564,16 +594,17 @@
 (razzi-associate-extension-mode "js" 'rjsx-mode)
 
 (general-define-key "C-`" 'describe-key
-		    "M-c" 'kill-ring-save
-		    "M-w" 'kill-current-buffer
-		    "M-q" 'save-buffers-kill-terminal)
+                    "M-c" 'kill-ring-save
+                    "M-h" 'ns-do-hide-emacs
+                    "M-w" 'kill-current-buffer
+                    "M-q" 'save-buffers-kill-terminal)
 
 (general-auto-unbind-keys)
 
 (general-define-key :states 'normal
-		    :prefix ","
-		    "ee" 'eval-last-sexp
-		    "ec" 'eval-defun)
+                    :prefix ","
+                    "ee" 'eval-last-sexp
+                    "ec" 'eval-defun)
 
 (defvar razzi-last-window nil)
 
@@ -587,7 +618,7 @@
   (setq previous-window (selected-window))
 
   (let ((window-length (length (window-list)))
-	(window-active (window-live-p razzi-last-window)))
+        (window-active (window-live-p razzi-last-window)))
     (when (and window-active (> window-length 2))
       (select-window razzi-last-window))
 
@@ -597,138 +628,155 @@
   (setq razzi-last-window previous-window))
 
 (general-define-key :prefix "C-SPC"
-		    "" nil
-		    "c" #'vterm
-		    "h" #'windmove-left
-		    "j" #'windmove-down
-		    "k" #'windmove-up
-		    "C-k" #'windmove-up
-		    "l" #'windmove-right
-		    "SPC" #'razzi-toggle-window)
+                    "" nil
+                    "c" #'vterm
+                    "h" #'windmove-left
+                    "j" #'windmove-down
+                    "k" #'windmove-up
+                    "C-k" #'windmove-up
+                    "l" #'windmove-right
+                    "SPC" #'razzi-toggle-window)
 
 (general-define-key :prefix "M-m"
-		    "fi" 'razzi-find-init)
+                    "fi" 'razzi-find-init)
 
 (defun razzi-find-init ()
   (interactive)
   (find-file (expand-file-name
-	      (concat (cdadr (assoc chemacs-current-emacs-profile chemacs-emacs-profiles))
-		      "/init.el"))))
+                                        ;         (concat (cdadr (assoc chemacs-current-emacs-profile chemacs-emacs-profiles))
+              "~/.emacs.d/init.el")))
 
 (general-define-key :states 'normal
-		    :prefix "SPC"
-		    "," 'razzi-append-comma
-		    "/" 'projectile-ripgrep
-		    "ESC" 'kill-this-buffer
-		    "O" 'razzi-put-before
-		    "SPC" 'execute-extended-command
-		    "bb" 'switch-to-buffer
-		    "bd" 'kill-buffer
-		    "bn" 'next-buffer
-		    "bp" 'razzi-previous-useful-buffer
-		    "bs" 'razzi-switch-to-scratch-buffer
-		    "el" 'flycheck-list-errors
-		    "en" 'flycheck-next-error
-		    "ep" 'flycheck-previous-error
-		    "ev" 'flycheck-verify-setup
-		    "f RET" 'razzi-copy-project-file-path
-		    "f SPC" 'razzi-copy-full-file-name
-		    "ff" 'find-file
-		    "fi" 'razzi-find-init
-		    "fn" 'razzi-file-name
-		    "fp" 'razzi-copy-project-file-path
-		    "fr" 'razzi-recentf
-		    "hdf" 'describe-function
-		    "hdv" 'describe-variable
-		    "i TAB" 'razzi-insert-tab
-		    "o" 'razzi-put-after
-		    "qq" 'save-buffers-kill-terminal
-		    "qr" 'razzi-restart-emacs
-		    "td" 'toggle-debug-on-error
-		    "tg" 'golden-ratio-mode
-		    "u" 'universal-argument
-		    "w-" 'evil-window-split
-		    "w2" 'evil-window-vsplit
-		    "wd" 'delete-window
-		    "wh" 'evil-window-left
-		    "wj" 'evil-window-down
-		    "wk" 'evil-window-up
-		    "wl" 'evil-window-right
-		    "wm" 'delete-other-windows
-		    "wo" 'other-window
-		    "ww" 'other-window)
+                    :prefix "SPC"
+                    "," 'razzi-append-comma
+                    "/" 'projectile-ripgrep
+                    "ESC" 'kill-this-buffer
+                    "O" 'razzi-put-before
+                    "SPC" 'execute-extended-command
+                    "bb" 'switch-to-buffer
+                    "bd" 'kill-buffer
+                    "bn" 'next-buffer
+                    "bp" 'razzi-previous-useful-buffer
+                    "bs" 'razzi-switch-to-scratch-buffer
+                    "el" 'flycheck-list-errors
+                    "en" 'flycheck-next-error
+                    "ep" 'flycheck-previous-error
+                    "ev" 'flycheck-verify-setup
+                    "f RET" 'razzi-copy-project-file-path
+                    "f SPC" 'razzi-copy-full-file-name
+                    "ff" 'find-file
+                    "fi" 'razzi-find-init
+                    "fn" 'razzi-file-name
+                    "fp" 'razzi-copy-project-file-path
+                    "fr" 'razzi-recentf
+                    "hdf" 'describe-function
+                    "hdv" 'describe-variable
+                    "i TAB" 'razzi-insert-tab
+                    "o" 'razzi-put-after
+                    "qq" 'save-buffers-kill-terminal
+                    "qr" 'razzi-restart-emacs
+                    "td" 'toggle-debug-on-error
+                    "tg" 'golden-ratio-mode
+                    "u" 'universal-argument
+                    "w-" 'evil-window-split
+                    "w=" 'balance-windows
+                    "w2" 'evil-window-vsplit
+                    "wd" 'delete-window
+                    "wh" 'evil-window-left
+                    "wj" 'evil-window-down
+                    "wk" 'evil-window-up
+                    "wl" 'evil-window-right
+                    "wm" 'delete-other-windows
+                    "wo" 'other-window
+                    "ww" 'other-window)
 
 (defun razzi-evil-commentary-line ()
   (interactive)
   (save-excursion
     (call-interactively 'evil-commentary-line)))
 
+(defun today ()
+  (interactive)
+  (find-file (s-downcase (format-time-string "~/work/notes/%b-%d-%Y.org")))
+  (razzi-almost-end-of-buffer nil))
+
+(defun tomorrow ()
+  (interactive)
+  (find-file (s-concat "~/work/notes/" (org-read-date nil nil "+1") ".org" ))
+  (razzi-almost-end-of-buffer nil))
+
 (general-define-key :states 'normal
-		    "<up>" 'evil-scroll-line-up
-		    "<down>" 'evil-scroll-line-down
-		    "<C-i>" 'evil-jump-forward
-		    "/" 'evil-search-forward
-		    "0" 'evil-first-non-blank
-		    "C-c r" 'rjsx-rename-tag-at-point
-		    "[ SPC" 'razzi-insert-newline-before
-		    "] SPC" 'razzi-insert-newline-after
-		    "C" 'razzi-change-line
-		    "D" 'razzi-kill-line-and-whitespace
-		    "K" 'evil-previous-line  ; Protect against typo
-		    "M-/" 'razzi-evil-commentary-line
-		    "M-[" 'evil-backward-paragraph
-		    "M-]" 'evil-forward-paragraph
-		    "M-l" 'evil-visual-line
-		    "M-n" 'flycheck-next-error
-		    "M-p" 'flycheck-previous-error
-		    "M-r" 'raise-sexp
-		    "M-s" 'razzi-flycheck-and-save-buffer
-		    "M-u" 'razzi-update-current-package
-		    "M-w" 'kill-current-buffer
-		    "Q" 'razzi-replay-q-macro
-		    "g]" 'dumb-jump-go
-		    "gb" 'magit-blame-addition
-		    "gs" 'magit-status
-		    "o" 'razzi-open-with-comma
-		    "<backtab>" 'razzi-previous-useful-buffer)
+                    "<up>" 'evil-scroll-line-up
+                    "<down>" 'evil-scroll-line-down
+                    "/" 'evil-search-forward
+                    "0" 'evil-first-non-blank
+                    "<C-i>" 'evil-jump-forward
+                    "<backtab>" 'razzi-previous-useful-buffer
+                    "C" 'razzi-change-line
+                    "C-c r" 'rjsx-rename-tag-at-point
+                    "D" 'razzi-kill-line-and-whitespace
+                    "K" 'evil-previous-line  ; Protect against typo
+                    "M--" 'text-scale-decrease
+                    "M-/" 'razzi-evil-commentary-line
+                    "M-=" 'text-scale-increase
+                    "M-0" 'razzi-text-scale-reset
+                    "M-[" 'evil-backward-paragraph
+                    "M-]" 'evil-forward-paragraph
+                    "M-l" 'evil-visual-line
+                    "M-n" 'flycheck-next-error
+                    "M-p" 'flycheck-previous-error
+                    "M-r" 'raise-sexp
+                    "M-s" 'razzi-flycheck-and-save-buffer
+                    "M-T" 'razzi-reopen-killed-file
+                    "M-u" 'razzi-update-current-package
+                    "M-w" 'kill-current-buffer
+                    "Q" 'razzi-replay-q-macro
+                    "[ SPC" 'razzi-insert-newline-before
+                    "] SPC" 'razzi-insert-newline-after
+                    "g SPC" 'today
+                    "g]" 'xref-find-definitions
+                    "gb" 'magit-blame-addition
+                    "gs" 'magit-status
+                    "o" 'razzi-open-with-comma)
 
 (general-define-key :states 'insert
-		    "<tab>" 'yas-expand
-		    "C-a" 'evil-first-non-blank
-		    "C-d" 'delete-forward-char
-		    "C-e" 'end-of-line
-		    "C-h" 'delete-backward-char
-		    "C-l" 'sp-forward-slurp-sexp
-		    "s-<backspace>" 'evil-delete-backward-word
-		    "M-c" 'kill-ring-save
-		    "M-/" 'evil-commentary-line
-		    "M-l" 'evil-visual-line
-		    "M-t" 'transpose-words
-		    "M-z" 'undo
-		    "M-RET" 'eval-defun
-		    "<s-left>" 'backward-word
-		    "<s-right>" 'forward-word)
+                    "<tab>" 'yas-expand
+                    "C-a" 'evil-first-non-blank
+                    "C-d" 'delete-forward-char
+                    "C-e" 'end-of-line
+                    "C-h" 'delete-backward-char
+                    "C-l" 'sp-forward-slurp-sexp
+                    "s-<backspace>" 'evil-delete-backward-word
+                    "M-c" 'kill-ring-save
+                    "M-/" 'evil-commentary-line
+                    "M-l" 'evil-visual-line
+                    "M-t" 'transpose-words
+                    "M-T" 'razzi-reopen-killed-file
+                    "M-z" 'undo
+                    "M-RET" 'eval-defun
+                    "<s-left>" 'backward-word
+                    "<s-right>" 'forward-word)
 
 (general-define-key :states 'operator
-		    "E" 'forward-symbol
-		    "ae" 'whole-buffer
-		    "SPC" 'evil-inner-symbol)
+                    "E" 'forward-symbol
+                    "ae" 'whole-buffer
+                    "SPC" 'evil-inner-symbol)
 
 (general-define-key :states 'visual
-		    "$" 'evil-last-non-blank
-		    "'" 'razzi-surround-with-single-quotes
-		    ")" 'razzi-surround-with-parens
-		    "0" 'evil-first-non-blank
-		    "K" 'evil-previous-line  ; Protect against typo
-		    "M-RET" 'eval-region
-		    "M-l" 'evil-next-line
-		    "SPC RET" 'eval-region
-		    "SPC SPC" 'execute-extended-command
-		    "\"" 'razzi-surround-with-double-quotes
-		    "]" 'razzi-surround-with-brackets
-		    "c" 'evil-change
-		    "s" 'evil-surround-region
-		    "v" 'evil-normal-state)
+                    "$" 'evil-last-non-blank
+                    "'" 'razzi-surround-with-single-quotes
+                    ")" 'razzi-surround-with-parens
+                    "0" 'evil-first-non-blank
+                    "K" 'evil-previous-line  ; Protect against typo
+                    "M-RET" 'eval-region
+                    "M-l" 'evil-next-line
+                    "SPC RET" 'eval-region
+                    "SPC SPC" 'execute-extended-command
+                    "\"" 'razzi-surround-with-double-quotes
+                    "]" 'razzi-surround-with-brackets
+                    "c" 'evil-change
+                    "s" 'evil-surround-region
+                    "v" 'evil-normal-state)
 
 (setq js2-mode-show-parse-errors nil)
 (setq js2-mode-show-strict-warnings nil)
@@ -742,33 +790,33 @@
   ("<C-i>" 'hippie-expand)
   :config
   (setq hippie-expand-try-functions-list
-	'(try-expand-line try-expand-line-all-buffers))
+        '(try-expand-line try-expand-line-all-buffers))
 
   (defun razzi-parens-unbalanced ()
     (condition-case nil
-		 (scan-sexps (point-min) (point-max))
-	       (error t)))
+        (scan-sexps (point-min) (point-max))
+      (error t)))
 
   (defun hippie-expand-substitute-string (arg)
     "Remove extra paren when expanding line in smartparens"
     (if (and smartparens-mode
-	     (razzi-parens-unbalanced)
-	     (memq (razzi-char-at-point) '(?} ?\))))
-	(delete-char 1)))
+             (razzi-parens-unbalanced)
+             (memq (razzi-char-at-point) '(?} ?\))))
+        (delete-char 1)))
 
   (advice-add 'hippie-expand :after 'hippie-expand-substitute-string))
 
 (use-package python
   :general
   (:states 'normal
-	   :prefix "SPC"
-	   "i i" 'razzi-import-it-import-this)
+           :prefix "SPC"
+           "i i" 'razzi-import-it-import-this)
 
   :config
   (defun razzi-import-it-get-import-path ()
     (when (get-buffer "*import_it-output*")
       (with-current-buffer "*import_it-output*"
-	(erase-buffer)))
+        (erase-buffer)))
 
     (let ((error-file (make-temp-file "import_it-error")))
       (call-process
@@ -793,8 +841,8 @@
     (save-buffer)
     (let ((import-path (razzi-import-it-get-import-path)))
       (save-excursion
-	(goto-char (point-min))
-	(insert import-path))
+        (goto-char (point-min))
+        (insert import-path))
       (razzi-python-isort)
       (razzi-python-autoflake)
       (flycheck-buffer)))
@@ -811,13 +859,13 @@
   (unless (file-exists-p filename)
     (let ((dir (file-name-directory filename)))
       (unless (file-exists-p dir)
-	(make-directory dir)))))
+        (make-directory dir)))))
 
 (use-package centaur-tabs
   :custom
   (centaur-tabs-cycle-scope 'tabs
-   centaur-tabs-set-close-button nil
-   centaur-tabs-hide-tab-function 'razzi-tabs-hide-special-tabs)
+                            centaur-tabs-set-close-button nil
+                            centaur-tabs-hide-tab-function 'razzi-tabs-hide-special-tabs)
 
   :general
   ("C-<tab>" 'centaur-tabs-forward
@@ -832,27 +880,27 @@
    "M-8" 'centaur-tabs-select-visible-tab
    "M-9" 'centaur-tabs-select-end-tab)
   (:states 'normal
-   "g t" 'centaur-tabs-forward
-   "g T" 'centaur-tabs-backward)
+           "g t" 'centaur-tabs-forward
+           "g T" 'centaur-tabs-backward)
 
-   :config
-   (defun razzi-tabs-hide-special-tabs (buffer)
-     (let ((name (format "%s" buffer)))
-       (or
-	(string-prefix-p "*" name)
-	(centaur-tabs-hide-tab buffer)
-	(and (string-prefix-p "magit" name)
-	     (s-contains? ":" name)))))
+  :config
+  (defun razzi-tabs-hide-special-tabs (buffer)
+    (let ((name (format "%s" buffer)))
+      (or
+       (string-prefix-p "*" name)
+       (centaur-tabs-hide-tab buffer)
+       (and (string-prefix-p "magit" name)
+            (s-contains? ":" name)))))
 
-   (centaur-tabs-mode))
+  (centaur-tabs-mode))
 
 (advice-add 'find-file :before 'razzi-make-parent-directories)
 
 (use-package dired+
   :custom
   (dired-recursive-copies 'always
-   dired-recursive-deletes 'always
-   diredp-hide-details-initially-flag t)
+                          dired-recursive-deletes 'always
+                          diredp-hide-details-initially-flag t)
   :config
   (define-key dired-mode-map (kbd "c") 'find-file)
   (define-key dired-mode-map (kbd ".") 'dired-up-directory)
@@ -870,15 +918,15 @@
   :straight nil
   :general
   (:keymaps 'isearch-mode-map
-	    "C-t" 'razzi-isearch-transpose-char
-	    "C-g" 'isearch-exit)
+            "C-t" 'razzi-isearch-transpose-char
+            "C-g" 'isearch-exit)
   :config
   (defun razzi-isearch-transpose-char ()
     (interactive)
     (let* ((string isearch-string)
-	   (len (length isearch-string))
-	   (second-to-last-char (aref string (- len 2)))
-	   (last-char (aref string (- len 1))))
+           (len (length isearch-string))
+           (second-to-last-char (aref string (- len 2)))
+           (last-char (aref string (- len 1))))
       (isearch-pop-state)
       (isearch-pop-state)
       (isearch-process-search-char last-char)
@@ -892,17 +940,30 @@
   (defun razzi-mouse-open-file-or-url-on-click ()
     (interactive)
     (let* ((string-at-point (ffap-string-at-point))
-	   (parts (split-string string-at-point ":"))
-	   (filename (car parts))
-	   (line-number (cadr parts)))
+           (parts (split-string string-at-point ":"))
+           (filename (car parts))
+           (line-number (cadr parts)))
       (if (and (not (string-empty-p string-at-point))
-	       (file-exists-p filename))
-	  (progn
-	    (find-file filename)
-	    (when line-number
-	      (goto-line line-number)))
-	(when (thing-at-point 'url)
-	  (browse-url-at-point))))))
+               (file-exists-p filename))
+          (progn
+            (find-file filename)
+            (when line-number
+              (goto-line line-number)))
+        (when (thing-at-point 'url)
+          (browse-url-at-point))))))
 
 (use-package auth-source
   :custom auth-source-save-behavior nil)
+
+(use-package whitespace
+  :custom whitespace-style '(tab-mark)
+  :config (global-whitespace-mode))
+
+(use-package org)
+
+(use-package polymode)
+
+(use-package poly-markdown)
+
+(use-package zen-mode
+  :straight (:host github :repo "aki237/zen-mode"))
