@@ -43,7 +43,10 @@
 (scroll-bar-mode -1)
 (server-start)
 (tool-bar-mode -1)
+(menu-bar-mode -1)
 (global-visual-line-mode)
+
+(defun display-startup-echo-area-message ())
 
 (define-key input-decode-map "\C-i" [C-i])
 
@@ -54,6 +57,8 @@
 
 ;;; Configure builtin packages.
 (use-package recentf
+  :init
+  (setq recentf-auto-cleanup nil)
   :config
   (recentf-mode))
 
@@ -116,18 +121,18 @@
 (use-package vue-mode)
 
 (use-package evil
+  :init
+  (setq evil-want-keybinding nil)
   :custom
   (evil-cross-lines t
-                    evil-insert-state-message nil
-                    evil-regexp-search nil)
+   evil-insert-state-message nil
+   evil-regexp-search nil)
 
   :config
   (setq-default
    evil-symbol-word-search t
    evil-ex-substitute-global t
    evil-shift-width 2)
-
-  :config
   (setq-default evil-symbol-word-search t)
 
   (evil-mode 1)
@@ -148,15 +153,16 @@
     :config
     (global-evil-matchit-mode 1))
 
-  (use-package evil-magit
-    :config (evil-magit-init))
-
   (use-package evil-commentary
     :config (evil-commentary-mode)
     :blackout)
 
   (use-package evil-numbers
     :general (:states 'normal "C-a" 'evil-numbers/inc-at-pt)))
+
+(use-package evil-collection
+  :after evil
+  :config (evil-collection-init))
 
 (use-package eshell
   :config
@@ -439,6 +445,7 @@
            "Q" 'razzi-replay-q-macro)
   (:states 'normal
            :prefix "SPC"
+           "f s" 'save-buffer
            "," 'razzi-append-comma
            "o" 'razzi-put-after
            "i d" 'razzi-put-debugger
@@ -525,6 +532,8 @@
 (use-package eval-sexp-fu)
 
 (use-package iedit
+  :custom
+  (iedit-toggle-key-default nil)
   :config
   (defun razzi-iedit-quit-and-quit ()
     (interactive)
@@ -584,8 +593,8 @@
   :blackout)
 
 (use-package yasnippet
-  :custom
-  (yas-verbosity 2)
+  :init
+  (setq yas-verbosity 0)
   :config
   (yas-global-mode)
   :blackout yas-minor-mode)
