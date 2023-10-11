@@ -453,6 +453,7 @@
            "o" 'razzi-put-after
            "i d" 'razzi-put-debugger
            "f r" 'razzi-recentf
+           "f s" 'razzi-flycheck-and-save-buffer
            "q r" 'razzi-restart-emacs)
   (:states 'visual
            "$" 'razzi-almost-end-of-line
