@@ -130,10 +130,9 @@
 
   :config
   (setq-default
-   evil-symbol-word-search t
    evil-ex-substitute-global t
-   evil-shift-width 2)
-  (setq-default evil-symbol-word-search t)
+   evil-shift-width 2
+   evil-symbol-word-search t)
 
   (evil-mode 1)
 
