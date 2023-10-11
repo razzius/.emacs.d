@@ -44,8 +44,6 @@
 (global-linum-mode)
 (scroll-bar-mode -1)
 (server-start)
-(tool-bar-mode -1)
-(menu-bar-mode -1)
 (global-visual-line-mode)
 
 (defun display-startup-echo-area-message ())
