@@ -152,6 +152,10 @@
     :config
     (global-evil-matchit-mode 1))
 
+  (use-package evil-collection
+    :config
+    (evil-collection-init))
+
   (use-package evil-commentary
     :config (evil-commentary-mode)
     :blackout)
