@@ -34,6 +34,8 @@
  split-width-threshold nil
  vc-follow-symlinks t)
 
+(eval '(setq inhibit-startup-echo-area-message "razzi"))
+
 (setq-default indent-tabs-mode nil)
 
 (column-number-mode)
