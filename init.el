@@ -593,7 +593,7 @@
 
 (use-package yasnippet
   :init
-  (setq yas-verbosity 0)
+  (setq yas-verbosity 2)
   :config
   (yas-global-mode)
   :blackout yas-minor-mode)
