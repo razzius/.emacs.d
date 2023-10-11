@@ -531,8 +531,8 @@
 (use-package eval-sexp-fu)
 
 (use-package iedit
-  :custom
-  (iedit-toggle-key-default nil)
+  :init
+  (setq iedit-toggle-key-default nil)
   :config
   (defun razzi-iedit-quit-and-quit ()
     (interactive)
