@@ -18,7 +18,11 @@
 
 (use-package vterm
   :config
-  (evil-set-initial-state 'vterm-mode 'emacs))
+  (evil-set-initial-state 'vterm-mode 'emacs)
+  :general
+  (:states 'normal
+	   :prefix "SPC"
+	   "'" 'vterm))
 
 (use-package general)
 
