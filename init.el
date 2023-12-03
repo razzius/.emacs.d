@@ -1,12 +1,7 @@
-(defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name
 	"straight/repos/straight.el/bootstrap.el"
-	(or (bound-and-true-p straight-base-dir)
-	    user-emacs-directory)))
-      (bootstrap-version 7))
-  (unless (file-exists-p bootstrap-file)
-    (message "git clone https://github.com/radian-software/straight.el ~/.emacs.d/straight/repos/straight.el"))
+	user-emacs-directory)))
   (load bootstrap-file nil 'nomessage))
 
 (straight-use-package 'use-package)
