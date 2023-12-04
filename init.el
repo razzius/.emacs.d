@@ -9,6 +9,10 @@
   :custom
   (straight-use-package-by-default t))
 
+(use-package spacemacs-theme
+  :config
+  (load-theme 'spacemacs-dark 'noconfirm))
+
 (setq
  inhibit-startup-screen t
  visible-bell t)
