@@ -54,7 +54,12 @@
   :straight nil
   :general (:states 'normal
 		    :prefix "SPC"
+		    "bb" 'switch-to-buffer
 		    "wd" 'delete-window
+		    "wh" 'windmove-left
+		    "wj" 'windmove-down
+		    "wk" 'windmove-up
+		    "wl" 'windmove-right
 		    "wm" 'delete-other-windows
 		    "wo" 'other-window))
 
