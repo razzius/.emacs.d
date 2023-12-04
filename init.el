@@ -5,6 +5,7 @@
   (load bootstrap-file nil 'nomessage))
 
 (straight-use-package 'use-package)
+
 (use-package straight
   :custom
   (straight-use-package-by-default t))
@@ -77,7 +78,6 @@
 (use-package elisp-mode
   :straight nil
   :general ("M-RET" 'eval-defun))
-
 
 (use-package menu-bar
   :straight nil
@@ -155,6 +155,7 @@
 
 (use-package projectile)
 (general-define-key "C-`" 'describe-key)
+
 (defun razzi-edit-init ()
   (interactive)
   (find-file user-init-file))
