@@ -154,6 +154,9 @@
 		    "gs" 'magit-status))
 
 (use-package projectile)
+
+(use-package vimrc-mode)
+
 (general-define-key "C-`" 'describe-key)
 
 (defun razzi-edit-init ()
