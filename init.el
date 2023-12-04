@@ -124,8 +124,8 @@
   (eval-sexp-fu-flash-duration .3))
 
 (use-package ivy
-  :config
-  (ivy-mode))
+  :config (ivy-mode)
+  :blackout)
 
 (use-package magit
   :custom
