@@ -19,6 +19,12 @@
 
 (use-package general)
 
+(use-package simple
+  :straight nil
+  :general (:states 'normal
+		    :prefix "SPC"
+		    "bs" 'scratch-buffer))
+
 (use-package vc-hooks
   :straight nil
   :custom
