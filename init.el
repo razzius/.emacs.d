@@ -37,6 +37,12 @@
   :general (:keymaps 'help-mode-map
 		     "<tab>" 'forward-button))
 
+(use-package recentf
+  :straight nil
+  :general (:states 'normal
+		    :prefix "SPC"
+		    "fr" 'recentf))
+
 (use-package help-fns
   :straight nil
   :general (:states 'normal
