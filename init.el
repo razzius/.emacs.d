@@ -2,7 +2,7 @@
        (expand-file-name
 	"straight/repos/straight.el/bootstrap.el"
 	user-emacs-directory)))
-  (load bootstrap-file))
+  (load bootstrap-file nil 'nomessage))
 
 (straight-use-package 'use-package)
 (use-package straight
