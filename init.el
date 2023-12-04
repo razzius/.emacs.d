@@ -116,7 +116,6 @@
   :general (:states 'normal
 		    :prefix "SPC"
 		    "TAB" 'crux-switch-to-previous-buffer
-		    "fi" 'crux-find-user-init-file
 		    "fd" 'crux-delete-file-and-buffer
 		    "fR" 'crux-rename-file-and-buffer))
 
@@ -133,3 +132,12 @@
 		    "gs" 'magit-status))
 
 (use-package projectile)
+(defun razzi-edit-init ()
+  (interactive)
+  (find-file user-init-file))
+
+(general-define-key :states 'normal
+		    :prefix "SPC"
+		    "fi" 'razzi-edit-init
+		    "qq" 'kill-emacs)
+
