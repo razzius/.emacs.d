@@ -132,6 +132,7 @@
 		    "gs" 'magit-status))
 
 (use-package projectile)
+(general-define-key "C-`" 'describe-key)
 (defun razzi-edit-init ()
   (interactive)
   (find-file user-init-file))
