@@ -19,6 +19,8 @@
 
 (use-package general)
 
+(use-package blackout)
+
 (use-package simple
   :straight nil
   :general (:states 'normal
@@ -84,7 +86,18 @@
 		    "ESC" 'kill-this-buffer))
 
 (use-package evil
-  :config (evil-mode))
+  :init
+  (setq evil-want-keybinding nil)
+
+  :config
+  (evil-mode)
+
+  (use-package evil-commentary
+    :config (evil-commentary-mode)
+    :blackout)
+
+  (use-package evil-collection
+    :config (evil-collection-init)))
 
 (use-package restart-emacs
   :general (:states 'normal
