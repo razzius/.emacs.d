@@ -107,13 +107,43 @@
 		    :prefix "SPC"
 		    "qr" 'restart-emacs))
 
+(defun razzi-vterm-cleanup-on-exit (buf event)
+  (when buf (kill-buffer buf))
+
+  ;; Close the split of a closed vterm buffer.
+  (when (> (count-windows) 1)
+    (delete-window)))
+
+(defun razzi-vterm-split-vertically ()
+  (interactive)
+  (split-window-vertically)
+  (windmove-down)
+  (vterm 'new))
+
+(defun razzi-vterm-split-horizontally ()
+  (interactive)
+  (split-window-horizontally)
+  (windmove-right)
+  (vterm 'new))
+
 (use-package vterm
+  :custom
+  (vterm-exit-functions '(razzi-vterm-cleanup-on-exit))
+
   :config
   (evil-set-initial-state 'vterm-mode 'emacs)
+
   :general
   (:states 'normal
 	   :prefix "SPC"
-	   "'" 'vterm))
+	   "'" 'vterm)
+
+  (:keymaps 'vterm-mode-map
+	    :prefix "C-SPC"
+	    "" nil
+	    "'" 'razzi-vterm-split-vertically
+	    "\"" 'razzi-vterm-split-vertically
+	    "%" 'razzi-vterm-split-horizontally))
 
 (use-package crux
   :general (:states 'normal
@@ -170,4 +200,3 @@
 		    :prefix "SPC"
 		    "fi" 'razzi-edit-init
 		    "qq" 'kill-emacs)
-
