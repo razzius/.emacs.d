@@ -89,6 +89,9 @@
   :init
   (setq evil-want-keybinding nil)
 
+  :custom
+  (evil-symbol-word-search t)
+
   :config
   (evil-mode)
 
