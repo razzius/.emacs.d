@@ -17,6 +17,7 @@
 (setq
  inhibit-startup-screen t
  scroll-conservatively 1
+ scroll-margin 2
  visible-bell t)
 
 (use-package general)
