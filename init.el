@@ -28,6 +28,7 @@
   :straight nil
   :general (:states 'normal
 		    :prefix "SPC"
+		    "bd" 'kill-current-buffer
 		    "bs" 'scratch-buffer))
 
 (use-package vc-hooks
