@@ -61,6 +61,9 @@
   :general (:states 'normal
 		    :prefix "SPC"
 		    "bb" 'switch-to-buffer
+		    "w=" 'balance-windows
+		    "w2" 'split-window-horizontally
+		    "w-" 'split-window-vertically
 		    "wd" 'delete-window
 		    "wh" 'windmove-left
 		    "wj" 'windmove-down
