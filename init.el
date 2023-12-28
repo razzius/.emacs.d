@@ -207,3 +207,7 @@
 		    :prefix "SPC"
 		    "fi" 'razzi-edit-init
 		    "qq" 'kill-emacs)
+
+(use-package flycheck
+  :config
+  (global-flycheck-mode))
