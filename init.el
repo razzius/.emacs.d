@@ -78,6 +78,7 @@
   (make-backup-files nil)
   :general (:states 'normal
 		    :prefix "SPC"
+		    "SPC" 'save-buffer
 		    "ff" 'find-file
 		    "fs" 'save-buffer))
 
