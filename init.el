@@ -197,15 +197,22 @@
 
 (use-package vimrc-mode)
 
-(general-define-key "C-`" 'describe-key)
+(general-define-key
+  "C-`" 'describe-key
+  "M-s" 'save-buffer)
 
-(defun razzi-edit-init ()
-  (interactive)
-  (find-file user-init-file))
+(use-package razzi
+  :straight (:repo "https://git.sr.ht/~razzi/razzi.el")
+  :general (:states 'normal
+		    :prefix "M-m"
+		    "fi" 'razzi-edit-init
+
+		    :prefix "SPC"
+		    "fi" 'razzi-edit-init
+		    "f SPC" 'razzi-copy-full-file-name))
 
 (general-define-key :states 'normal
 		    :prefix "SPC"
-		    "fi" 'razzi-edit-init
 		    "qq" 'kill-emacs)
 
 (use-package flycheck
