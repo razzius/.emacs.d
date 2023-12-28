@@ -218,3 +218,8 @@
 (use-package flycheck
   :config
   (global-flycheck-mode))
+
+(use-package esxml)
+
+(use-package nov
+  :straight (:repo "https://depp.brause.cc/nov.el.git"))
