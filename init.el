@@ -15,22 +15,31 @@
   (load-theme 'spacemacs-dark 'noconfirm)
   (set-frame-font "Bitstream Vera Sans Mono 16"))
 
-(setq
- inhibit-startup-screen t
- scroll-conservatively 1
- scroll-margin 2
- visible-bell t)
+(setq inhibit-startup-screen t
+      scroll-conservatively 1
+      scroll-margin 2
+      visible-bell t)
 
 (use-package general)
+
+(general-define-key
+ "C-`" 'describe-key
+ "M-s" 'save-buffer)
+
+(general-define-key :states 'normal
+		    :prefix "SPC" "qq" 'kill-emacs)
 
 (use-package blackout)
 
 (use-package simple
   :straight nil
-  :general (:states 'normal
-		    :prefix "SPC"
-		    "bd" 'kill-current-buffer
-		    "bs" 'scratch-buffer))
+  :general
+  ("M-m" nil)
+
+  (:states 'normal
+   :prefix "SPC"
+   "bd" 'kill-current-buffer
+   "bs" 'scratch-buffer))
 
 (use-package vc-hooks
   :straight nil
@@ -41,47 +50,48 @@
   :straight nil
   :custom
   (help-window-select t)
+
   :general (:keymaps 'help-mode-map
-		     "<tab>" 'forward-button))
+	    "<tab>" 'forward-button))
 
 (use-package recentf
   :straight nil
   :general (:states 'normal
-		    :prefix "SPC"
-		    "fr" 'recentf))
+	    :prefix "SPC"
+	    "fr" 'recentf))
 
 (use-package help-fns
   :straight nil
   :general (:states 'normal
-		    :prefix "SPC"
-		    "hdf" 'describe-function
-		    "hdv" 'describe-variable))
+	    :prefix "SPC"
+	    "hdf" 'describe-function
+	    "hdv" 'describe-variable))
 
 (use-package window
   :straight nil
   :general (:states 'normal
-		    :prefix "SPC"
-		    "bb" 'switch-to-buffer
-		    "w=" 'balance-windows
-		    "w2" 'split-window-horizontally
-		    "w-" 'split-window-vertically
-		    "wd" 'delete-window
-		    "wh" 'windmove-left
-		    "wj" 'windmove-down
-		    "wk" 'windmove-up
-		    "wl" 'windmove-right
-		    "wm" 'delete-other-windows
-		    "wo" 'other-window))
+	    :prefix "SPC"
+	    "bb" 'switch-to-buffer
+	    "w=" 'balance-windows
+	    "w2" 'split-window-horizontally
+	    "w-" 'split-window-vertically
+	    "wd" 'delete-window
+	    "wh" 'windmove-left
+	    "wj" 'windmove-down
+	    "wk" 'windmove-up
+	    "wl" 'windmove-right
+	    "wm" 'delete-other-windows
+	    "wo" 'other-window))
 
 (use-package files
   :straight nil
   :custom
   (make-backup-files nil)
   :general (:states 'normal
-		    :prefix "SPC"
-		    "SPC" 'save-buffer
-		    "ff" 'find-file
-		    "fs" 'save-buffer))
+	    :prefix "SPC"
+	    "SPC" 'save-buffer
+	    "ff" 'find-file
+	    "fs" 'save-buffer))
 
 (use-package elisp-mode
   :straight nil
@@ -90,8 +100,8 @@
 (use-package menu-bar
   :straight nil
   :general (:states 'normal
-		    :prefix "SPC"
-		    "ESC" 'kill-this-buffer))
+	    :prefix "SPC"
+	    "ESC" 'kill-this-buffer))
 
 (use-package evil
   :init
@@ -112,8 +122,8 @@
 
 (use-package restart-emacs
   :general (:states 'normal
-		    :prefix "SPC"
-		    "qr" 'restart-emacs))
+	    :prefix "SPC"
+	    "qr" 'restart-emacs))
 
 (defun razzi-vterm-cleanup-on-exit (buf event)
   (when buf (kill-buffer buf))
@@ -143,22 +153,22 @@
 
   :general
   (:states 'normal
-	   :prefix "SPC"
-	   "'" 'vterm)
+   :prefix "SPC"
+   "'" 'vterm)
 
   (:keymaps 'vterm-mode-map
-	    :prefix "C-SPC"
-	    "" nil
-	    "'" 'razzi-vterm-split-vertically
-	    "\"" 'razzi-vterm-split-vertically
-	    "%" 'razzi-vterm-split-horizontally))
+   :prefix "C-SPC"
+   "" nil
+   "'" 'razzi-vterm-split-vertically
+   "\"" 'razzi-vterm-split-vertically
+   "%" 'razzi-vterm-split-horizontally))
 
 (use-package crux
   :general (:states 'normal
-		    :prefix "SPC"
-		    "TAB" 'crux-switch-to-previous-buffer
-		    "fd" 'crux-delete-file-and-buffer
-		    "fR" 'crux-rename-file-and-buffer))
+	    :prefix "SPC"
+	    "TAB" 'crux-switch-to-previous-buffer
+	    "fd" 'crux-delete-file-and-buffer
+	    "fR" 'crux-rename-file-and-buffer))
 
 (use-package eval-sexp-fu
   :custom
@@ -192,29 +202,21 @@
   (add-hook 'git-commit-mode-hook 'evil-insert-state)
 
   :general (:states 'normal
-		    "gs" 'magit-status))
+	    "gs" 'magit-status))
 
 (use-package projectile)
 
 (use-package vimrc-mode)
 
-(general-define-key
-  "C-`" 'describe-key
-  "M-s" 'save-buffer)
-
 (use-package razzi
   :straight (:repo "https://git.sr.ht/~razzi/razzi.el")
-  :general (:states 'normal
-		    :prefix "M-m"
-		    "fi" 'razzi-edit-init
-
-		    :prefix "SPC"
-		    "fi" 'razzi-edit-init
-		    "f SPC" 'razzi-copy-full-file-name))
-
-(general-define-key :states 'normal
-		    :prefix "SPC"
-		    "qq" 'kill-emacs)
+  :general
+  (:prefix "M-m"
+   "fi" 'razzi-edit-init)
+  (:states 'normal
+   :prefix "SPC"
+   "fi" 'razzi-edit-init
+   "f SPC" 'razzi-copy-full-file-name))
 
 (use-package flycheck
   :config
@@ -224,3 +226,6 @@
 
 (use-package nov
   :straight (:repo "https://depp.brause.cc/nov.el.git"))
+
+(use-package fuco1-redef-lisp-indent
+  :straight (:repo "https://git.sr.ht/~razzi/fuco1-redef-lisp-indent.el"))
