@@ -12,7 +12,8 @@
 
 (use-package spacemacs-theme
   :config
-  (load-theme 'spacemacs-dark 'noconfirm))
+  (load-theme 'spacemacs-dark 'noconfirm)
+  (set-frame-font "Bitstream Vera Sans Mono 16"))
 
 (setq
  inhibit-startup-screen t
