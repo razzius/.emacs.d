@@ -228,7 +228,9 @@
   (:states 'normal
    :prefix "SPC"
    "fi" 'razzi-edit-init
-   "f SPC" 'razzi-copy-full-file-name))
+   "f SPC" 'razzi-copy-full-file-name)
+  (:states 'visual
+   "il" 'razzi-mark-line-text))
 
 (use-package flycheck
   :config
