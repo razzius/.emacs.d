@@ -117,6 +117,11 @@
     :config (evil-commentary-mode)
     :blackout)
 
+  (use-package evil-surround
+    :config (global-evil-surround-mode)
+    :general (:states 'visual
+	      "s" 'evil-surround-region))
+
   (use-package evil-collection
     :config (evil-collection-init)))
 
