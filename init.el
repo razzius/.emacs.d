@@ -13,7 +13,14 @@
 (use-package spacemacs-theme
   :config
   (load-theme 'spacemacs-dark 'noconfirm)
-  (set-frame-font "Bitstream Vera Sans Mono 16"))
+  (set-face-attribute 'default nil :height 140)
+
+  (defvar razzi-font-list '("DejaVu Sans Mono",
+			    "Bitstream Vera Sans Mono"))
+
+  (dolist (font razzi-font-list)
+    (when (member font (font-family-list))
+	(set-frame-font font))))
 
 (setq inhibit-startup-screen t
       scroll-conservatively 1
