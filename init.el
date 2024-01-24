@@ -219,12 +219,18 @@
 (use-package razzi
   :straight (:repo "https://git.sr.ht/~razzi/razzi.el")
   :general
+  ("<backtab>" 'razzi-previous-useful-buffer)
   (:prefix "M-m"
    "fi" 'razzi-edit-init)
+  (:states 'insert
+   "C-t" 'razzi-transpose-previous-chars)
+  (:states 'normal
+   "C" 'razzi-change-line)
   (:states 'normal
    :prefix "SPC"
    "fi" 'razzi-edit-init
-   "f SPC" 'razzi-copy-full-file-name)
+   "f SPC" 'razzi-copy-full-file-name
+   "o" 'razzi-put-after)
   (:states 'visual
    "il" 'razzi-mark-line-text))
 
@@ -245,3 +251,5 @@
   (read-file-name-completion-ignore-case t
    read-buffer-completion-ignore-case t
    completion-ignore-case t))
+
+(use-package smartparens)
