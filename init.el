@@ -186,10 +186,6 @@
   :custom
   (eval-sexp-fu-flash-duration .3))
 
-(use-package ivy
-  :config (ivy-mode)
-  :blackout)
-
 (use-package magit
   :custom
   (magit-status-sections-hook
@@ -243,3 +239,9 @@
 
 (use-package fuco1-redef-lisp-indent
   :straight (:repo "https://git.sr.ht/~razzi/fuco1-redef-lisp-indent.el"))
+(use-package vertico
+  :init (vertico-mode)
+  :custom
+  (read-file-name-completion-ignore-case t
+   read-buffer-completion-ignore-case t
+   completion-ignore-case t))
