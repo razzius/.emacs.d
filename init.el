@@ -245,11 +245,22 @@
 
 (use-package fuco1-redef-lisp-indent
   :straight (:repo "https://git.sr.ht/~razzi/fuco1-redef-lisp-indent.el"))
+
+(use-package markdown-mode)
+
 (use-package vertico
   :init (vertico-mode)
   :custom
   (read-file-name-completion-ignore-case t
    read-buffer-completion-ignore-case t
    completion-ignore-case t))
+
+(use-package vue-mode
+  :custom
+  (sgml-quick-keys 'close)
+  :config
+  (add-hook 'mmm-mode-hook
+	    (lambda ()
+	      (set-face-background 'mmm-default-submode-face nil))))
 
 (use-package smartparens)
