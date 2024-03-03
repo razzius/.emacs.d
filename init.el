@@ -34,7 +34,7 @@
  "M-s" 'save-buffer)
 
 (general-define-key :states 'normal
-		    :prefix "SPC" "qq" 'kill-emacs)
+		    :prefix "SPC" "q" 'kill-emacs)
 
 (use-package blackout)
 
@@ -72,6 +72,7 @@
   :general (:states 'normal
 	    :prefix "SPC"
 	    "hdf" 'describe-function
+	    "hdk" 'describe-key
 	    "hdv" 'describe-variable))
 
 (use-package window
@@ -135,7 +136,7 @@
 (use-package restart-emacs
   :general (:states 'normal
 	    :prefix "SPC"
-	    "qr" 'restart-emacs))
+	    "r" 'restart-emacs))
 
 (defun razzi-vterm-cleanup-on-exit (buf event)
   (when buf (kill-buffer buf))
@@ -264,3 +265,14 @@
 	      (set-face-background 'mmm-default-submode-face nil))))
 
 (use-package smartparens)
+
+(defun yank-to-clipboard (&rest _)
+  "Use ANSI OSC 52 escape sequence to attempt clipboard copy."
+  (send-string-to-terminal
+   (format "\033]52;c;%s\a"
+	   (base64-encode-string
+            (encode-coding-string
+             (substring-no-properties
+              (nth 0 kill-ring)) 'utf-8) t))))
+
+(advice-add 'evil-yank :after #'yank-to-clipboard)
