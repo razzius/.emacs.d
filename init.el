@@ -15,7 +15,7 @@
 (use-package spacemacs-theme
   :config
   (load-theme 'spacemacs-dark 'noconfirm)
-  (set-face-attribute 'default nil :height 140)
+  (set-face-attribute 'default nil :height 180)
 
   (defvar razzi-font-list '("DejaVu Sans Mono",
 			    "Bitstream Vera Sans Mono"))
