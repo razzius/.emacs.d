@@ -278,7 +278,7 @@
 
 (use-package smartparens)
 
-(defun yank-to-clipboard (&rest _)
+(defun osc-52-yank-to-clipboard (&rest _)
   "Use ANSI OSC 52 escape sequence to attempt clipboard copy."
   (send-string-to-terminal
    (format "\033]52;c;%s\a"
@@ -287,4 +287,5 @@
              (substring-no-properties
               (nth 0 kill-ring)) 'utf-8) t))))
 
-(advice-add 'evil-yank :after #'yank-to-clipboard)
+(unless (display-graphic-p)
+  (advice-add 'evil-yank :after #'osc-52-yank-to-clipboard))
