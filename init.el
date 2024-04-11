@@ -10,6 +10,8 @@
   :custom
   (straight-use-package-by-default t))
 
+(tool-bar-mode -1)
+
 (use-package spacemacs-theme
   :config
   (load-theme 'spacemacs-dark 'noconfirm)
