@@ -29,6 +29,8 @@
       scroll-margin 2
       ring-bell-function 'ignore)
 
+(setq mac-command-modifier 'meta)
+
 (use-package general)
 
 (general-define-key
