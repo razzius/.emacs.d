@@ -35,7 +35,8 @@
 
 (general-define-key
  "C-`" 'describe-key
- "M-s" 'save-buffer)
+ "M-s" 'save-buffer
+ "M-<return>" 'razzi-eval-current-sexp)
 
 (general-define-key :states 'normal
 		    :prefix "SPC" "q" 'kill-emacs)
@@ -230,7 +231,8 @@
   (:states 'insert
    "C-t" 'razzi-transpose-previous-chars)
   (:states 'normal
-   "C" 'razzi-change-line)
+   "C" 'razzi-change-line
+   "D" 'razzi-kill-line-and-whitespace)
   (:states 'normal
    :prefix "SPC"
    "fi" 'razzi-edit-init
@@ -241,7 +243,11 @@
 
 (use-package flycheck
   :config
-  (global-flycheck-mode))
+  (global-flycheck-mode)
+  :general
+  (:states 'normal :prefix "SPC"
+   "en" 'flycheck-next-error
+   "ep" 'flycheck-previous-error))
 
 (use-package esxml)
 
