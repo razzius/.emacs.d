@@ -107,6 +107,8 @@
 	    "fs" 'save-buffer))
 
 (use-package elisp-mode
+  :custom
+  flycheck-disabled-checkers '(emacs-lisp-checkdoc)
   :straight nil
   :general ("M-RET" 'eval-defun))
 
