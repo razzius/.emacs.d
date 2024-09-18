@@ -131,6 +131,11 @@
   :custom
   (evil-symbol-word-search t)
 
+  :general
+  (:states 'normal
+   "0" 'evil-first-non-blank
+   "^" 'evil-beginning-of-line)
+
   :config
   (evil-mode)
 
@@ -184,6 +189,7 @@
 
   (:keymaps 'vterm-mode-map
    "C-c" 'vterm--self-insert
+   "C-u" 'vterm--self-insert
    "C-h" 'vterm--self-insert)
 
   (:keymaps 'vterm-mode-map
