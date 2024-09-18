@@ -36,6 +36,7 @@
 (general-define-key
  "C-`" 'describe-key
  "M-s" 'save-buffer
+ "M-q" 'save-buffers-kill-terminal
  "M-<return>" 'razzi-eval-current-sexp)
 
 (general-define-key :states 'normal
@@ -46,7 +47,8 @@
 (use-package simple
   :straight nil
   :general
-  ("M-m" nil)
+  ("M-m" nil
+   "C-SPC" nil)
 
   (:states 'normal
    :prefix "SPC"
@@ -82,19 +84,23 @@
 
 (use-package window
   :straight nil
-  :general (:states 'normal
-	    :prefix "SPC"
-	    "bb" 'switch-to-buffer
-	    "w=" 'balance-windows
-	    "w2" 'split-window-horizontally
-	    "w-" 'split-window-vertically
-	    "wd" 'delete-window
-	    "wh" 'windmove-left
-	    "wj" 'windmove-down
-	    "wk" 'windmove-up
-	    "wl" 'windmove-right
-	    "wm" 'delete-other-windows
-	    "wo" 'other-window))
+  :general
+  (:prefix "C-SPC"
+   "j" 'windmove-down
+   "k" 'windmove-up)
+  (:states 'normal
+   :prefix "SPC"
+   "bb" 'switch-to-buffer
+   "w=" 'balance-windows
+   "w2" 'split-window-horizontally
+   "w-" 'split-window-vertically
+   "wd" 'delete-window
+   "wh" 'windmove-left
+   "wj" 'windmove-down
+   "wk" 'windmove-up
+   "wl" 'windmove-right
+   "wm" 'delete-other-windows
+   "wo" 'other-window))
 
 (use-package files
   :straight nil
@@ -177,11 +183,17 @@
    "'" 'vterm)
 
   (:keymaps 'vterm-mode-map
+   "C-c" 'vterm--self-insert
+   "C-h" 'vterm--self-insert)
+
+  (:keymaps 'vterm-mode-map
    :prefix "C-SPC"
    "" nil
    "'" 'razzi-vterm-split-vertically
    "\"" 'razzi-vterm-split-vertically
-   "%" 'razzi-vterm-split-horizontally))
+   "%" 'razzi-vterm-split-horizontally
+   "j" 'windmove-down
+   "k" 'windmove-up))
 
 (use-package crux
   :general (:states 'normal
