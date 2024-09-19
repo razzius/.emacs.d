@@ -5,3 +5,5 @@
 
 (put 'inhibit-startup-echo-area-message 'saved-value t)
 (setq inhibit-startup-echo-area-message (user-login-name))
+
+(add-hook 'window-setup-hook 'toggle-frame-maximized t)
