@@ -1,7 +1,7 @@
 (let ((bootstrap-file
        (expand-file-name
-	"straight/repos/straight.el/bootstrap.el"
-	user-emacs-directory)))
+        "straight/repos/straight.el/bootstrap.el"
+        user-emacs-directory)))
   (load bootstrap-file nil 'nomessage))
 
 (straight-use-package 'use-package)
@@ -18,11 +18,11 @@
   (set-face-attribute 'default nil :height 180)
 
   (defvar razzi-font-list '("DejaVu Sans Mono",
-			    "Bitstream Vera Sans Mono"))
+                            "Bitstream Vera Sans Mono"))
 
   (dolist (font razzi-font-list)
     (when (member font (font-family-list))
-	(set-frame-font font))))
+      (set-frame-font font))))
 
 (setq inhibit-startup-screen t
       scroll-conservatively 1
@@ -39,13 +39,16 @@
  "M-q" 'save-buffers-kill-terminal
  "M-<return>" 'razzi-eval-current-sexp)
 
-(general-define-key :states 'normal
-		    :prefix "SPC" "q" 'kill-emacs)
+(general-define-key
+ :states 'normal
+ :prefix "SPC" "qq" 'kill-emacs)
 
 (use-package blackout)
 
 (use-package simple
   :straight nil
+  :custom
+  (indent-tabs-mode nil)
   :general
   ("M-m" nil
    "C-SPC" nil)
@@ -66,21 +69,21 @@
   (help-window-select t)
 
   :general (:keymaps 'help-mode-map
-	    "<tab>" 'forward-button))
+            "<tab>" 'forward-button))
 
 (use-package recentf
   :straight nil
   :general (:states 'normal
-	    :prefix "SPC"
-	    "fr" 'recentf))
+            :prefix "SPC"
+            "fr" 'recentf))
 
 (use-package help-fns
   :straight nil
-  :general (:states 'normal
-	    :prefix "SPC"
-	    "hdf" 'describe-function
-	    "hdk" 'describe-key
-	    "hdv" 'describe-variable))
+  :general
+  (:states 'normal :prefix "SPC"
+   "hdf" 'describe-function
+   "hdk" 'describe-key
+   "hdv" 'describe-variable))
 
 (use-package window
   :straight nil
@@ -88,8 +91,7 @@
   (:prefix "C-SPC"
    "j" 'windmove-down
    "k" 'windmove-up)
-  (:states 'normal
-   :prefix "SPC"
+  (:states 'normal :prefix "SPC"
    "bb" 'switch-to-buffer
    "w=" 'balance-windows
    "w2" 'split-window-horizontally
@@ -106,55 +108,65 @@
   :straight nil
   :custom
   (make-backup-files nil)
-  :general (:states 'normal
-	    :prefix "SPC"
-	    "SPC" 'save-buffer
-	    "ff" 'find-file
-	    "fs" 'save-buffer))
+  :general
+  (:states 'normal :prefix "SPC"
+   "SPC" 'save-buffer
+   "ff" 'find-file
+   "fs" 'save-buffer))
 
 (use-package elisp-mode
   :custom
-  flycheck-disabled-checkers '(emacs-lisp-checkdoc)
+  (flycheck-disabled-checkers '(emacs-lisp-checkdoc))
   :straight nil
   :general ("M-RET" 'eval-defun))
 
 (use-package menu-bar
   :straight nil
-  :general (:states 'normal
-	    :prefix "SPC"
-	    "ESC" 'kill-this-buffer))
+  :general
+  (:states 'normal :prefix "SPC"
+   "ESC" 'kill-this-buffer))
 
 (use-package evil
   :init
-  (setq evil-want-keybinding nil)
+  (setq
+   evil-want-keybinding nil
+   evil-undo-system 'undo-fu)
 
   :custom
   (evil-symbol-word-search t)
 
-  :general
-  (:states 'normal
-   "0" 'evil-first-non-blank
-   "^" 'evil-beginning-of-line)
-
   :config
-  (evil-mode)
+  (evil-mode 1))
 
-  (use-package evil-commentary
-    :config (evil-commentary-mode)
-    :blackout)
+(use-package undo-fu)
 
-  (use-package evil-surround
-    :config (global-evil-surround-mode)
-    :general (:states 'visual
-	      "s" 'evil-surround-region))
+(use-package undo-fu-session
+  :config
+  (undo-fu-session-global-mode))
 
-  (use-package evil-collection
-    :config (evil-collection-init)))
+(use-package evil-commentary
+  :config (evil-commentary-mode)
+  :blackout)
+
+(use-package evil-surround
+  :config (global-evil-surround-mode)
+  :general (:states 'visual
+            "s" 'evil-surround-region))
+
+(use-package evil-collection
+  :config (evil-collection-init))
+
+; For whatever reason, putting this as :general in (use-package evil)
+; makes evil not start, so I have to put it outside the use-package
+(general-evil-setup)
+(general-nmap
+  "0" 'evil-first-non-blank
+  "^" 'evil-beginning-of-line)
 
 (use-package restart-emacs
-  :general (:states 'normal
-	    :prefix "SPC"
-	    "r" 'restart-emacs))
+  :general
+  (:states 'normal :prefix "SPC"
+   "qr" 'restart-emacs))
 
 (defun razzi-vterm-cleanup-on-exit (buf event)
   (when buf (kill-buffer buf))
@@ -163,24 +175,24 @@
   (when (> (count-windows) 1)
     (delete-window)))
 
-(defun razzi-vterm-split-vertically ()
-  (interactive)
-  (split-window-vertically)
-  (windmove-down)
-  (vterm 'new))
-
-(defun razzi-vterm-split-horizontally ()
-  (interactive)
-  (split-window-horizontally)
-  (windmove-right)
-  (vterm 'new))
-
 (use-package vterm
   :custom
   (vterm-exit-functions '(razzi-vterm-cleanup-on-exit))
 
   :config
   (evil-set-initial-state 'vterm-mode 'emacs)
+
+  (defun razzi-vterm-split-vertically ()
+    (interactive)
+    (split-window-vertically)
+    (windmove-down)
+    (vterm 'new))
+
+  (defun razzi-vterm-split-horizontally ()
+    (interactive)
+    (split-window-horizontally)
+    (windmove-right)
+    (vterm 'new))
 
   :general
   (:states 'normal
@@ -202,11 +214,11 @@
    "k" 'windmove-up))
 
 (use-package crux
-  :general (:states 'normal
-	    :prefix "SPC"
-	    "TAB" 'crux-switch-to-previous-buffer
-	    "fd" 'crux-delete-file-and-buffer
-	    "fR" 'crux-rename-file-and-buffer))
+  :general
+  (:states 'normal :prefix "SPC"
+   "TAB" 'crux-switch-to-previous-buffer
+   "fd" 'crux-delete-file-and-buffer
+   "fR" 'crux-rename-file-and-buffer))
 
 (use-package eval-sexp-fu
   :custom
@@ -214,31 +226,34 @@
 
 (use-package magit
   :custom
-  (magit-status-sections-hook
-   '(magit-insert-untracked-files
-     magit-insert-unstaged-changes
-     magit-insert-staged-changes
-     magit-insert-status-headers
-     magit-insert-merge-log
-     magit-insert-rebase-sequence
-     magit-insert-am-sequence
-     magit-insert-sequencer-sequence
-     magit-insert-bisect-output
-     magit-insert-bisect-rest
-     magit-insert-bisect-log
-     magit-insert-stashes
-     magit-insert-unpushed-to-pushremote
-     magit-insert-unpushed-to-upstream-or-recent
-     magit-insert-unpulled-from-pushremote
-     magit-insert-unpulled-from-upstream))
+  (magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1
+   magit-status-sections-hook '(magit-insert-untracked-files
+                                magit-insert-unstaged-changes
+                                magit-insert-staged-changes
+                                magit-insert-status-headers
+                                magit-insert-merge-log
+                                magit-insert-rebase-sequence
+                                magit-insert-am-sequence
+                                magit-insert-sequencer-sequence
+                                magit-insert-bisect-output
+                                magit-insert-bisect-rest
+                                magit-insert-bisect-log
+                                magit-insert-stashes
+                                magit-insert-unpushed-to-pushremote
+                                magit-insert-unpushed-to-upstream-or-recent
+                                magit-insert-unpulled-from-pushremote
+                                magit-insert-unpulled-from-upstream))
 
   :config
   (add-hook 'git-commit-mode-hook 'evil-insert-state)
 
-  :general (:states 'normal
-	    "gs" 'magit-status))
+  :general
+  (:states 'normal
+   "gs" 'magit-status))
 
 (use-package projectile)
+
+(use-package ripgrep)
 
 (use-package vimrc-mode)
 
@@ -259,7 +274,8 @@
    "f SPC" 'razzi-copy-full-file-name
    "o" 'razzi-put-after)
   (:states 'visual
-   "il" 'razzi-mark-line-text))
+   "il" 'razzi-mark-line-text
+   "$" 'razzi-almost-end-of-line))
 
 (use-package flycheck
   :config
@@ -280,7 +296,7 @@
 (use-package markdown-mode)
 
 (use-package vertico
-  :init (vertico-mode)
+  :config (vertico-mode)
   :custom
   (read-file-name-completion-ignore-case t
    read-buffer-completion-ignore-case t
@@ -291,16 +307,27 @@
   (sgml-quick-keys 'close)
   :config
   (add-hook 'mmm-mode-hook
-	    (lambda ()
-	      (set-face-background 'mmm-default-submode-face nil))))
+            (lambda ()
+              (set-face-background 'mmm-default-submode-face nil))))
 
-(use-package smartparens)
+(use-package smartparens
+  :config
+  (smartparens-global-mode)
+  (require 'smartparens-config))
+
+(use-package whitespace
+  :config
+  (global-whitespace-mode)
+  :custom
+  (whitespace-style '(tab-mark)))
+
+;; (setq whitespace-style '(trailing tabs newline tab-mark))
 
 (defun osc-52-yank-to-clipboard (&rest _)
   "Use ANSI OSC 52 escape sequence to attempt clipboard copy."
   (send-string-to-terminal
    (format "\033]52;c;%s\a"
-	   (base64-encode-string
+           (base64-encode-string
             (encode-coding-string
              (substring-no-properties
               (nth 0 kill-ring)) 'utf-8) t))))
