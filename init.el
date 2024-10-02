@@ -234,8 +234,9 @@
 
   (:keymaps 'vterm-mode-map
    "C-c" 'vterm--self-insert
-   "C-u" 'vterm--self-insert
-   "C-h" 'vterm--self-insert)
+   "C-g" 'vterm--self-insert
+   "C-h" 'vterm--self-insert
+   "C-u" 'vterm--self-insert)
 
   (:keymaps 'vterm-mode-map
    :prefix "C-SPC"
