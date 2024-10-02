@@ -89,8 +89,10 @@
   :straight nil
   :general
   (:prefix "C-SPC"
+   "h" 'windmove-left
    "j" 'windmove-down
-   "k" 'windmove-up)
+   "k" 'windmove-up
+   "l" 'windmove-right)
   (:states 'normal :prefix "SPC"
    "bb" 'switch-to-buffer
    "w=" 'balance-windows
@@ -199,6 +201,11 @@
    :prefix "SPC"
    "'" 'vterm)
 
+  (:states 'normal
+   :prefix "C-SPC"
+   "%" 'razzi-vterm-split-horizontally
+   "\"" 'razzi-vterm-split-vertically)
+
   (:keymaps 'vterm-mode-map
    "C-c" 'vterm--self-insert
    "C-u" 'vterm--self-insert
@@ -210,8 +217,10 @@
    "'" 'razzi-vterm-split-vertically
    "\"" 'razzi-vterm-split-vertically
    "%" 'razzi-vterm-split-horizontally
+   "h" 'windmove-left
    "j" 'windmove-down
-   "k" 'windmove-up))
+   "k" 'windmove-up
+   "l" 'windmove-right))
 
 (use-package crux
   :general
