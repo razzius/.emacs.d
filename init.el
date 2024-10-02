@@ -89,13 +89,35 @@
    "hdv" 'describe-variable))
 
 (use-package window
+  :config
+  (defun razzi-do-window-resize (origin horizontal)
+    "Resize the current window either towards the ORIGIN or away.
+
+     Goes either HORIZONTAL or vertical."
+    (let* ((left-edge (nth 0 (window-edges)))
+           (leftmost (eq left-edge 0))
+           (sign (if origin 1 -1))
+           (offset (if leftmost -5 5))
+           (delta (* sign offset)))
+      (enlarge-window delta horizontal)))
+
+  (defun razzi-resize-window-left ()
+    (interactive)
+    (razzi-do-window-resize t t))
+
+  (defun razzi-resize-window-right ()
+    (interactive)
+    (razzi-do-window-resize nil t))
+
   :straight nil
   :general
   (:prefix "C-SPC"
    "h" 'windmove-left
    "j" 'windmove-down
    "k" 'windmove-up
-   "l" 'windmove-right)
+   "l" 'windmove-right
+   "H" 'razzi-resize-window-left
+   "L" 'razzi-resize-window-right)
   (:states 'normal :prefix "SPC"
    "bb" 'switch-to-buffer
    "w=" 'balance-windows
