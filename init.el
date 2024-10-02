@@ -56,7 +56,10 @@
   (:states 'normal
    :prefix "SPC"
    "bd" 'kill-current-buffer
-   "bs" 'scratch-buffer))
+   "bs" 'scratch-buffer)
+
+  (:states 'insert
+   "C-h" 'backward-delete-char-untabify))
 
 (use-package vc-hooks
   :straight nil
