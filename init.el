@@ -136,6 +136,7 @@
 
   :custom
   (evil-symbol-word-search t)
+  (evil-cross-lines t)
 
   :config
   (evil-mode 1))
