@@ -348,6 +348,9 @@
 (use-package smartparens
   :config
   (smartparens-global-mode)
+  :general
+  (:states 'insert
+   "C-l" 'sp-slurp-hybrid-sexp)
   (require 'smartparens-config))
 
 (use-package whitespace
