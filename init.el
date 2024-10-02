@@ -210,6 +210,10 @@
   :config
   (evil-set-initial-state 'vterm-mode 'emacs)
 
+  (defun razzi-vterm-new ()
+    (interactive)
+    (vterm 'new))
+
   (defun razzi-vterm-split-vertically ()
     (interactive)
     (split-window-vertically)
@@ -244,6 +248,7 @@
    "'" 'razzi-vterm-split-vertically
    "\"" 'razzi-vterm-split-vertically
    "%" 'razzi-vterm-split-horizontally
+   "c" 'razzi-vterm-new
    "h" 'windmove-left
    "j" 'windmove-down
    "k" 'windmove-up
