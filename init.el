@@ -84,7 +84,8 @@
    "hdk" 'describe-key
    "hdv" 'describe-variable))
 
-(use-package window
+(use-package windmove
+  :straight nil
   :config
   (defun razzi-do-window-resize (origin horizontal)
     "Resize the current window either towards the ORIGIN or away.
