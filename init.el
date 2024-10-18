@@ -246,16 +246,12 @@
    "'" 'razzi-vterm-split-vertically
    "\"" 'razzi-vterm-split-vertically
    "%" 'razzi-vterm-split-horizontally
-   "c" 'razzi-vterm-new
-   "h" 'windmove-left
-   "j" 'windmove-down
-   "k" 'windmove-up
-   "l" 'windmove-right))
+   "c" 'razzi-vterm-new))
 
 (use-package crux
   :general
   (:states 'normal :prefix "SPC"
-   "TAB" 'crux-switch-to-previous-buffer
+   "<tab>" 'crux-switch-to-previous-buffer
    "fd" 'crux-delete-file-and-buffer
    "fR" 'crux-rename-file-and-buffer))
 
@@ -347,8 +343,6 @@
   (global-whitespace-mode)
   :custom
   (whitespace-style '(tab-mark)))
-
-;; (setq whitespace-style '(trailing tabs newline tab-mark))
 
 (defun osc-52-yank-to-clipboard (&rest _)
   "Use ANSI OSC 52 escape sequence to attempt clipboard copy."
