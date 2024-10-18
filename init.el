@@ -137,7 +137,9 @@
   (:states 'normal :prefix "SPC"
    "SPC" 'save-buffer
    "ff" 'find-file
-   "fs" 'save-buffer))
+   "fs" 'save-buffer)
+  :config
+  (add-hook 'before-save-hook 'delete-trailing-whitespace))
 
 (use-package elisp-mode
   :custom
