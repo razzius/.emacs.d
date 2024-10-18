@@ -161,7 +161,12 @@
   (evil-cross-lines t)
 
   :config
-  (evil-mode 1))
+  (evil-mode 1)
+
+  :general
+  (:states 'normal
+   "0" 'evil-first-non-blank
+   "^" 'evil-beginning-of-line))
 
 (use-package undo-fu)
 
@@ -180,13 +185,6 @@
 
 (use-package evil-collection
   :config (evil-collection-init))
-
-; For whatever reason, putting this as :general in (use-package evil)
-; makes evil not start, so I have to put it outside the use-package
-(general-evil-setup)
-(general-nmap
-  "0" 'evil-first-non-blank
-  "^" 'evil-beginning-of-line)
 
 (use-package restart-emacs
   :general
