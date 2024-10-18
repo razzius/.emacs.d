@@ -34,12 +34,6 @@
 (use-package general)
 
 (general-define-key
- "C-`" 'describe-key
- "M-s" 'save-buffer
- "M-q" 'save-buffers-kill-terminal
- "M-<return>" 'razzi-eval-current-sexp)
-
-(general-define-key
  :states 'normal
  :prefix "SPC" "qq" 'kill-emacs)
 
@@ -71,7 +65,9 @@
   :custom
   (help-window-select t)
 
-  :general (:keymaps 'help-mode-map
+  :general
+  ("C-`" 'describe-key)
+  (:keymaps 'help-mode-map
             "<tab>" 'forward-button))
 
 (use-package recentf
@@ -136,6 +132,7 @@
   :custom
   (make-backup-files nil)
   :general
+  ("M-q" 'save-buffers-kill-terminal)
   (:states 'normal :prefix "SPC"
    "SPC" 'save-buffer
    "ff" 'find-file
@@ -286,7 +283,9 @@
 (use-package razzi
   :straight (:repo "https://git.sr.ht/~razzi/razzi.el")
   :general
-  ("<backtab>" 'razzi-previous-useful-buffer)
+  ("M-s" 'razzi-exit-insert-and-save
+   "M-<return>" 'razzi-eval-current-sexp
+   "<backtab>" 'razzi-previous-useful-buffer)
   (:prefix "M-m"
    "fi" 'razzi-edit-init)
   (:states 'insert
