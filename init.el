@@ -273,7 +273,7 @@
 
   :general
   (:states 'normal
-   "gs" 'magit-status))
+   "gs" 'magit-status-here))
 
 (use-package projectile)
 
