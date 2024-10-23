@@ -355,3 +355,7 @@
 
 (unless (display-graphic-p)
   (advice-add 'evil-yank :after #'osc-52-yank-to-clipboard))
+
+(use-package server
+  :straight nil
+  :config (server-start))
