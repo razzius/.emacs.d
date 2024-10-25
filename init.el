@@ -109,6 +109,7 @@
   :straight nil
   :general
   (:prefix "C-SPC"
+   :states 'normal
    "h" 'windmove-left
    "j" 'windmove-down
    "k" 'windmove-up
@@ -232,7 +233,9 @@
   (:states 'normal
    :prefix "C-SPC"
    "%" 'razzi-vterm-split-horizontally
-   "\"" 'razzi-vterm-split-vertically)
+   "'" 'razzi-vterm-split-vertically
+   "\"" 'razzi-vterm-split-vertically
+   "c" 'razzi-vterm-new)
 
   (:keymaps 'vterm-mode-map
    "C-c" 'vterm--self-insert
@@ -243,6 +246,10 @@
   (:keymaps 'vterm-mode-map
    :prefix "C-SPC"
    "" nil
+   "h" 'windmove-left
+   "j" 'windmove-down
+   "k" 'windmove-up
+   "l" 'windmove-right
    "'" 'razzi-vterm-split-vertically
    "\"" 'razzi-vterm-split-vertically
    "%" 'razzi-vterm-split-horizontally
