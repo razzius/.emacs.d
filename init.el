@@ -366,3 +366,26 @@
 (use-package server
   :straight nil
   :config (server-start))
+
+(defun razzi-string-startswith (prefix string)
+  (let* ((len (length prefix)))))
+
+
+(let* ((a 3)) a)
+
+(razzi-string-startswith "a" "abc")
+
+(use-package centaur-tabs
+  :custom
+  (centaur-tabs-cycle-scope 'tabs)
+  :config
+  (centaur-tabs-mode t)
+  (defun centaur-tabs-buffer-groups ()
+    (list
+     (cond
+      (string-equal))))
+  :general
+  ("C-<tab>" 'centaur-tabs-forward
+   "C-S-<tab>" 'centaur-tabs-backward))
+
+(use-package yasnippet)
