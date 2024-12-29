@@ -190,6 +190,10 @@
 (use-package evil-collection
   :config (evil-collection-init))
 
+(use-package evil-numbers
+  :general
+  (:states 'normal "C-a" 'evil-numbers/inc-at-pt))
+
 (use-package restart-emacs
   :general
   (:states 'normal :prefix "SPC"
