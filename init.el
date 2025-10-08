@@ -154,7 +154,7 @@
   :straight nil
   :general
   (:states 'normal :prefix "SPC"
-   "ESC" 'kill-this-buffer))
+   "<escape>" 'kill-current-buffer))
 
 (use-package evil
   :init
