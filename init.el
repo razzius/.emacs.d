@@ -371,14 +371,6 @@
   :straight nil
   :config (server-start))
 
-(defun razzi-string-startswith (prefix string)
-  (let* ((len (length prefix)))))
-
-
-(let* ((a 3)) a)
-
-(razzi-string-startswith "a" "abc")
-
 (use-package centaur-tabs
   :custom
   (centaur-tabs-cycle-scope 'tabs)
