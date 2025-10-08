@@ -386,4 +386,9 @@
   ("C-<tab>" 'centaur-tabs-forward
    "C-S-<tab>" 'centaur-tabs-backward))
 
-(use-package yasnippet)
+(use-package yasnippet
+  :config
+  (yas-global-mode)
+  :general
+  (:states 'insert
+   "TAB" 'yas-expand))
