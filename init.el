@@ -67,8 +67,10 @@
 
   :general
   ("C-`" 'describe-key)
+  (:states '(normal insert)
+   "C-@" 'describe-key)
   (:keymaps 'help-mode-map
-            "<tab>" 'forward-button))
+   "<tab>" 'forward-button))
 
 (use-package recentf
   :straight nil
