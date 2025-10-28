@@ -1,6 +1,6 @@
 auto-save-list/
 eln-cache/
-straight/
+straight/*
 transient/
 recentf
 projectile-bookmarks.eld
