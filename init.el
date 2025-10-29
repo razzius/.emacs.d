@@ -264,7 +264,7 @@
 (use-package crux
   :general
   (:states 'normal :prefix "SPC"
-   "<tab>" 'crux-switch-to-previous-buffer
+   "TAB" 'crux-switch-to-previous-buffer
    "fd" 'crux-delete-file-and-buffer
    "fR" 'crux-rename-file-and-buffer))
 
