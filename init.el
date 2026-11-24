@@ -390,3 +390,5 @@
   :general
   (:states 'insert
    "TAB" 'yas-expand))
+(use-package saveplace
+  :config (save-place-mode))
